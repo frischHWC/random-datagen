@@ -1,0 +1,213 @@
+= Random - Data Generation
+
+Goal of this project is to generate Random data in order to insert them into different services of CDP platform.
+
+== Glossary
+
+Sink = Output system were data will be written, such as HDFS, HIVE, HBASE etc... +
+model = Representation of data model use to generate random data
+
+== Possible sinks
+
+List of possible sinks working:
+
+- HDFS-AVRO : generates an AVRO file sent to HDFS
+- HDFS-CSV : generates a CSV file sent to HDFS
+- HDFS-ORC : generates an ORC file sent to HDFS
+- HDFS-PARQUET : generates a PARQUET file sent to HDFS
+- HBase
+- Kafka: Generates an avro and send it to Kafka
+- Kudu
+- Ozone
+- SolR
+- Hive
+- Parquet: Generates a parquet file locally
+- ORC: Generates an ORC file locally
+- CSV: Generate a CSV file locally
+- Avro: Generates an Avro file locally
+
+
+== How to run it ?
+
+First, go to link:pom.xml[pom.xml] and change cdp version to yours, change also if required, individual versions of each component. +
+Then Package the program:
+
+        mvn clean package
+
+Use the script link:src/main/resources/launchToPlatform.sh[src/main/resources/launchToPlatform.sh].
+(Adapt it to your needs by changing user & machine of the platform) +
+
+Launch the script with 4 arguments: +
+- Location of model file (by default one is pushed alongside the jar: model.json)
+- Packet of rows (linked) generated before inserting them to external systems +
+- Number of times to generate this bunch of rows +
+- List of sinks separated by a space that must either be: HDFS-AVRO, HDFS-ORC, HDFS-PARQUET, HDFS-CSV, HBASE, HIVE, IMPALA, KAFKA, OZONE, SOLR, AVRO, ORC, PARQUET, CSV
+
+Launching scrip example:
+
+[source,bash]
+java -jar random-datagen.jar model.json 1000 1000 HBASE
+
+It will create a directory on the platform and send all needed files there. +
+Then script link:src/main/resources/launch.sh[src/main/resources/launch.sh] will be launched on platform.
+
+This script add required jars to classpath and launch jar with provided arguments in the script.
+
+
+Note that once every needed files are copied to the platform, program could be directly launched there
+using launch.sh script under random-datagen directory, by providing arguments at the command line.
+
+
+== Random data
+
+=== Data
+
+Launch with at least 4 parameters:  +
+- Location of model file (by default one is defined under resources/model.json) +
+- Packet of rows (linked) generated before inserting them to external systems +
+- Number of times to generate this bunch of rows +
+- List of sinks separated by a space that must either be: HDFS, HBASE, HIVE, KAFKA, OZONE, SOLR, CSV
+
+
+=== Data generated
+
+Data is generated according to a model passed in first argument of the launch.
+
+This model is divided into 4 sections:
+
+==== Fields:
+
+This is an array describing all fields by at least a name and a type, length could be precised but is optional. +
+All available types are:
+- STRING which represents an alphaNumeric string (length represents length of string, by default 20 if not set) +
+- STRINGAZ which represents an alpha non-numeric string (length represents length of string, by default 20 if not set) +
+- INTEGER (with length representing maximum value, by default Integer.MAX_VALUE) +
+- BOOLEAN +
+- FLOAT +
+- LONG +
+- TIMESTAMP (represents timestamp of data generation) +
+- BYTES (length represents length of byte array, by default 20) +
+- HASHMD5 which represent the hash of a random string (length represents size of byte array, by default 32) +
+- BIRTHDATE which represents a date between 1910 & 2020 +
+- NAME which represents a first name taken from a dictionary of over 10,000+ names +
+- COUNTRY which represents a country name taken from a dictionary +
+- BLOB which is a byte array of default 1MB (length represents length of byte array) (Use it carefully) +
+- EMAIL which is a string as in form of (<name>.<name>|<AZ09><name>)@(google|outlook|yahoo|mail).com +
+
+Note that each field could have defined a set of "possible_values" that will limit values to be exactly these ones.
+
+==== Table Names:
+
+An array of following properties self-describing: +
+- HDFS_FILE_PATH +
+- HDFS_FILE_NAME +
+- HBASE_TABLE_NAME +
+- HBASE_NAMESPACE +
+- KAFKA_TOPIC +
+- OZONE_VOLUME +
+- SOLR_COLLECTION +
+- HIVE_DATABASE +
+- HIVE_TABLE_NAME +
+- KUDU_TABLE_NAME +
+- LOCAL_FILE_PATH +
+- LOCAL_FILE_NAME +
+
+==== Primary Keys:
+
+An array of following properties, each of it associated with a value that is
+corresponding to the name of field (multiple fields could be provided separated by a comma): +
+- KAFKA_MSG_KEY +
+- HBASE_PRIMARY_KEY +
+- OZONE_BUCKET +
+- OZONE_KEY +
+
+==== Options:
+
+An array of other options that could be required depending with which sinks it is launched: +
+- HBASE_COLUMN_FAMILIES_MAPPING +
+This mapping must be in the form : "CF:col1,col2;CF2:col5" +
+- SOLR_SHARDS +
+- SOLR_REPLICAS +
+
+
+Note that all not required settings could be safely removed with no errors.
+
+== Benchmarks
+
+Inserting 100 batches of 1000 rows on CDP-DC 7.1.1 with 3 workers and 2 masters gave following results: +
+- HDFS : 4s +
+- HBase : 30s +
+- SolR : 28s +
+- Ozone : 100s +
+- Kafka: 5s +
+- Kudu : 11s +
+- Hive : 23s +
+
+Note that to make it more efficient and faster, all previous benchmarks (except HDFS one) could be launched in parallel way using the project link:yarn-submit[https://github.infra.cloudera.com/frisch/yarnsubmit]. +
+This project has intent to launch java programs on YARN containers, with as many instances as dsired by the user, which is perfectly suited for this project. +
+Hence, a benchmark was run with 10 containers, each of it inserting 100 batches of 100 rows, resulting 1 million rows at the end (on the same cluster than before). +
+
+It gave following results (this includes setting up Application Master, submitting applications and setting up containers): +
+- HBase : 60s +
+- SolR : 120s +
+- Ozone : 1200s (20min) +
+- Kafka : 15s +
+- Kudu : 30s +
+- Hive :
+
+The command used to launched the application with yarn-submit project was the following:
+
+[source,bash]
+./yarn-submit.sh
+    --app-name=random
+    --container-number=10
+    --kerberos-user=frisch/admin@FRISCH.COM
+    --keytab=/home/frisch/frisch.keytab
+    --app-files=/home/frisch/random-datagen/model.json,/home/frisch/random-datagen/config.properties,/home/frisch/random-datagen/log4j.properties
+    /home/frisch/random-datagen/random-datagen.jar model.json 1000 100 hbase
+
+
+== Code Architecture
+
+=== How does it work ?
+
+There is a main that orchestrates the whole program: Main.java. +
+
+This main reads the command-line arguments to know which model to use, how much data it should generate per iteration
+, how much iteration to do, and to which output system it should write (HDFS, HBase, Hive etc..).
+
+It parses the model file and create a model object based on it, this model contains a list of fields with their definition,
+also table names definitions, primary keys and other options passed through model.
+
+It then uses the config file link:src/main/resources/config.properties[src/main/resources/config.properties] to get
+configuration of output systems (that are called sink). It initiates sinks by creating needed files or tables for all required sinks.
+
+Finally, it launches batches of generation of data, that are then send to all sinks in parallel.
+
+=== How to add a sink ?
+
+- Create a Sink under sink package that extends SinkInterface 
+- Implements required functions (to send one and multiple rows to the output system) and all other
+needed function in this class
+- Add the sink in the function "stringToSink" of ArgumentsParser under config package
+- Add the sink initialization under the function "sinksInit" of SinkSender under sink package
+- Add a function to create required object for insertion under Field abstract class
+- If needed, add a specific function for some or all Fields extended class
+- Add a function to create required object combining all Fields functions under Row class
+- If needed, under Model class, create a function to create initial queries required
+- Add required properties under config.properties file
+
+=== How to add a type of field ?
+
+- Create an extended class of field under package model.type
+- Create a builder in previous class, implement generateRandomValue() function
+- If needed, override Fields function specific to some or all sinks available
+- In Field, instantiateField() function, add in the switch case statement, the new type of field
+- In Model, modify functions on table creation to be able to integrate the new type of field
+
+== TODOs
+
+TODO: Add some tests +
+TODO: Add YAML Parser +
+TODO: Add review of model before launching (implements some checks in it)
+

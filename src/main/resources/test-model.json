@@ -1,0 +1,32 @@
+{
+  "Fields": [
+    {
+      "name": "country_of_provenance",
+      "type": "COUNTRY",
+      "possible_values": ["France", "Germany"]
+    },
+    {
+      "name": "name",
+      "type": "NAME"
+    },
+    {
+      "name": "balance_used",
+      "type": "FLOAT"
+    },
+    {
+      "name": "credits_used",
+      "type": "INTEGER",
+      "possible_values": [0, 1, -1]
+    }
+  ],
+  "Table_Names": [
+    {"HDFS_FILE_PATH": "/user/dev/random_datagen/"},
+    {"HDFS_FILE_NAME": "random_data"},
+    {"HIVE_HDFS_FILE_PATH": "/user/dev/random_datagen_hive/"},
+    {"HIVE_DATABASE": "random_data"},
+    {"HIVE_TABLE_NAME":  "person_balance"},
+    {"LOCAL_FILE_PATH":  "/root/"},
+    {"LOCAL_FILE_NAME":  "random-datagen"},
+    {"AVRO_NAME":  "randomdata"}
+  ]
+}

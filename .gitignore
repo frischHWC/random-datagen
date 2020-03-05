@@ -1,0 +1,9 @@
+*.iml
+.DS_Store
+.idea/*
+.idea/
+target/*
+target/
+*.log
+src/main/resources/overall_launch.sh
+src/main/resources/config.properties
