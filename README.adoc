@@ -158,13 +158,13 @@ It gave following results (this includes setting up Application Master, submitti
 The command used to launched the application with yarn-submit project was the following:
 
 [source,bash]
-./yarn-submit.sh
-    --app-name=random
-    --container-number=10
-    --kerberos-user=frisch/admin@FRISCH.COM
-    --keytab=/home/frisch/frisch.keytab
-    --app-files=/home/frisch/random-datagen/model.json,/home/frisch/random-datagen/config.properties,/home/frisch/random-datagen/log4j.properties
-    /home/frisch/random-datagen/random-datagen.jar model.json 1000 100 hbase
+        ./yarn-submit.sh
+                --app-name=random
+                --container-number=10
+                --kerberos-user=frisch/admin@FRISCH.COM
+                --keytab=/home/frisch/frisch.keytab
+                --app-files=/home/frisch/random-datagen/model.json,/home/frisch/random-datagen/config.properties,/home/frisch/random-datagen/log4j.properties
+                /home/frisch/random-datagen/random-datagen.jar model.json 1000 100 hbase
 
 
 == Code Architecture
