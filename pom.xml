@@ -12,7 +12,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <!-- Check your EXACT version of CDP as all platform jars depends on it -->
-        <cdp.version>7.1.2.0-96</cdp.version>
+        <cdp.version>7.1.3.0-100</cdp.version>
     </properties>
 
     <!-- Cloudera repository needed to get good CDP versions of jars -->
@@ -45,7 +45,7 @@
             <version>2.10.3</version>
         </dependency>
 
-        <!-- HDFSCSV -->
+        <!-- HDFS -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-client</artifactId>
@@ -60,6 +60,11 @@
                     <artifactId>jsr311-api</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+            <version>3.1.1.${cdp.version}</version>
         </dependency>
 
 

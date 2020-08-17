@@ -6,6 +6,7 @@ import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -31,7 +32,7 @@ public class HdfsCsvSink implements SinkInterface {
      * @return filesystem connection to HDFSCSV
      */
     public void init(Model model) {
-        org.apache.hadoop.conf.Configuration config = new org.apache.hadoop.conf.Configuration();
+        Configuration config = new Configuration();
         Utils.setupHadoopEnv(config);
 
         // Set all kerberos if needed (Note that connection will require a user and its appropriate keytab with right privileges to access folders and files on HDFSCSV)

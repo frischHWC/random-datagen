@@ -7,9 +7,9 @@ import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
 import com.cloudera.frisch.randomdatagen.sink.objects.OzoneObject;
-import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hdds.client.ReplicationFactor;
 import org.apache.hadoop.hdds.client.ReplicationType;
+import org.apache.hadoop.hdds.conf.OzoneConfiguration;
 import org.apache.hadoop.ozone.client.*;
 import org.apache.hadoop.ozone.client.io.OzoneOutputStream;
 import org.apache.hadoop.ozone.om.exceptions.OMException;
@@ -32,13 +32,14 @@ public class OzoneSink implements SinkInterface {
 
     public void init(Model model) {
         try {
-            Configuration config = new Configuration();
+            OzoneConfiguration config = new OzoneConfiguration();
             Utils.setupHadoopEnv(config);
 
             if (Boolean.valueOf(PropertiesLoader.getProperty("ozone.auth.kerberos"))) {
                 Utils.loginUserWithKerberos(PropertiesLoader.getProperty("ozone.auth.kerberos.user"),
                         PropertiesLoader.getProperty("ozone.auth.kerberos.keytab"), config);
             }
+
 
             ozClient = OzoneClientFactory.getRpcClient(PropertiesLoader.getProperty("ozone.service.id"), config);
 
