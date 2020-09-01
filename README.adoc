@@ -38,12 +38,16 @@ Use the script link:src/main/resources/launchToPlatform.sh[src/main/resources/la
 (Adapt it to your needs by changing user & machine of the platform) +
 
 Launch the script with 4 arguments: +
-- Location of model file (by default one is pushed alongside the jar: model.json)
+- Location of model file (by default one is pushed alongside the jar: model.json) +
 - Packet of rows (linked) generated before inserting them to external systems +
 - Number of times to generate this bunch of rows +
 - List of sinks separated by a space that must either be: HDFS-AVRO, HDFS-ORC, HDFS-PARQUET, HDFS-CSV, HBASE, HIVE, IMPALA, KAFKA, OZONE, SOLR, AVRO, ORC, PARQUET, CSV
 
-Launching scrip example:
+[source,bash]
+java -jar random-datagen.jar <PATH_TO_MODEL> <NUMBER_OF_ROW_PER_ITERATION> <NUMBER_OF_ITERATION> <SINK>
+
+
+Launching script example:
 
 [source,bash]
 java -jar random-datagen.jar model.json 1000 1000 HBASE
