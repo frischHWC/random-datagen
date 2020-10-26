@@ -1,7 +1,7 @@
 package com.cloudera.frisch.randomdatagen.model;
 
 import com.cloudera.frisch.randomdatagen.model.type.Field;
-import com.cloudera.frisch.randomdatagen.sink.objects.OzoneObject;
+import com.cloudera.frisch.randomdatagen.sink.storedobjects.OzoneObject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

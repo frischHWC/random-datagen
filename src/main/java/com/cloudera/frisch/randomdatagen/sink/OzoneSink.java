@@ -6,7 +6,7 @@ import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
-import com.cloudera.frisch.randomdatagen.sink.objects.OzoneObject;
+import com.cloudera.frisch.randomdatagen.sink.storedobjects.OzoneObject;
 import org.apache.hadoop.hdds.client.ReplicationFactor;
 import org.apache.hadoop.hdds.client.ReplicationType;
 import org.apache.hadoop.hdds.conf.OzoneConfiguration;
