@@ -1,0 +1,61 @@
+{
+  "Fields": [
+    {
+      "name": "name",
+      "type": "NAME"
+    },
+    {
+      "name": "email",
+      "type": "EMAIL"
+    },
+    {
+      "name": "last_connection",
+      "type": "TIMESTAMP"
+    },
+    {
+      "name": "birthdate",
+      "type": "BIRTHDATE"
+    },
+    {
+      "name": "country",
+      "type": "COUNTRY"
+    },
+    {
+      "name": "membership",
+      "type": "STRING",
+      "possible_values": ["bronze", "silver", "gold", "platinum"]
+    },
+    {
+      "name": "id",
+      "type": "LONG"
+    }
+  ],
+  "Table_Names": [
+    {"HDFS_FILE_PATH": "/user/dev/customers/"},
+    {"HDFS_FILE_NAME": "customer"},
+    {"HIVE_HDFS_FILE_PATH": "/user/dev/customer_hive/"},
+    {"HBASE_TABLE_NAME": "customer"},
+    {"HBASE_NAMESPACE": "fd"},
+    {"KAFKA_TOPIC": "customer"},
+    {"OZONE_VOLUME": "customer"},
+    {"SOLR_COLLECTION": "customer"},
+    {"HIVE_DATABASE": "fake_data"},
+    {"HIVE_TABLE_NAME":  "customer"},
+    {"KUDU_TABLE_NAME":  "customer"},
+    {"LOCAL_FILE_PATH":  "/root/fake_data/"},
+    {"LOCAL_FILE_NAME":  "customer"},
+    {"AVRO_NAME":  "customer"}
+  ],
+  "Primary_Keys": [
+    {"KAFKA_MSG_KEY": "membership"},
+    {"HBASE_PRIMARY_KEY":  "id"},
+    {"OZONE_BUCKET":  "country"},
+    {"OZONE_KEY":  "id"},
+    {"KUDU_HASH_KEYS":  "id"}
+  ],
+  "Options": [
+    {"HBASE_COLUMN_FAMILIES_MAPPING": "details:name,email,country,birthdate;technicals:last_connection,membership,id"},
+    {"SOLR_SHARDS":  1},
+    {"SOLR_REPLICAS":  1}
+  ]
+}

@@ -77,6 +77,8 @@ Launch with at least 4 parameters:  +
 
 Data is generated according to a model passed in first argument of the launch.
 
+Exmaples of models could be found under link:src/main/resources/models/[src/main/resources/models/]
+
 This model is divided into 4 sections:
 
 ==== Fields:
