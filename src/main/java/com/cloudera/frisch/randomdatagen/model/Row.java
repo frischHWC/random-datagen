@@ -91,6 +91,12 @@ public class Row<T extends Field> {
         return new AbstractMap.SimpleEntry<>(pksValues.get(OptionsConverter.PrimaryKeys.KAFKA_MSG_KEY).toString(), genericRecordRow);
     }
 
+    public Map.Entry<String, String> toKafkaMessageString() {
+        StringBuilder sb = new StringBuilder();
+        values.forEach((f,o) -> sb.append(f.toCSVString(o)));
+        return new AbstractMap.SimpleEntry<>(pksValues.get(OptionsConverter.PrimaryKeys.KAFKA_MSG_KEY).toString(), sb.toString());
+    }
+
     public Put toHbasePut() {
         Put put = new Put(Bytes.toBytes(pksValues.get(OptionsConverter.PrimaryKeys.HBASE_PRIMARY_KEY).toString()));
         values.forEach((f, o) -> f.toHbasePut(o, put));
