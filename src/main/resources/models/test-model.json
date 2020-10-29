@@ -22,7 +22,7 @@
   "Table_Names": [
     {"HDFS_FILE_PATH": "/user/dev/random_datagen/"},
     {"HDFS_FILE_NAME": "random_data"},
-    {"HIVE_HDFS_FILE_PATH": "/user/dev/random_datagen_hive/"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen_hive/"},
     {"HIVE_DATABASE": "random_data"},
     {"HIVE_TABLE_NAME":  "person_balance"},
     {"LOCAL_FILE_PATH":  "/root/"},

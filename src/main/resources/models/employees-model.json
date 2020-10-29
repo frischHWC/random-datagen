@@ -1,0 +1,62 @@
+{
+  "Fields": [
+    {
+      "name": "id",
+      "type": "LONG"
+    },
+    {
+      "name": "name",
+      "type": "NAME"
+    },
+    {
+      "name": "last_connection",
+      "type": "TIMESTAMP"
+    },
+    {
+      "name": "birthdate",
+      "type": "BIRTHDATE"
+    },
+    {
+      "name": "country",
+      "type": "COUNTRY"
+    },
+    {
+      "name": "department",
+      "type": "STRING",
+      "possible_values": ["hr", "consulting", "marketing", "finance"]
+    },
+    {
+      "name": "seniority",
+      "type": "INTEGER",
+      "length":  40
+    }
+  ],
+  "Table_Names": [
+    {"HDFS_FILE_PATH": "/user/dev/employees/"},
+    {"HDFS_FILE_NAME": "employee"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/employee_hive/"},
+    {"HBASE_TABLE_NAME": "employee"},
+    {"HBASE_NAMESPACE": "fd"},
+    {"KAFKA_TOPIC": "employee"},
+    {"OZONE_VOLUME": "employee"},
+    {"SOLR_COLLECTION": "employee"},
+    {"HIVE_DATABASE": "fake_data"},
+    {"HIVE_TABLE_NAME":  "employee"},
+    {"KUDU_TABLE_NAME":  "employee"},
+    {"LOCAL_FILE_PATH":  "/root/fake_data/"},
+    {"LOCAL_FILE_NAME":  "employee"},
+    {"AVRO_NAME":  "employee"}
+  ],
+  "Primary_Keys": [
+    {"KAFKA_MSG_KEY": "department"},
+    {"HBASE_PRIMARY_KEY":  "id"},
+    {"OZONE_BUCKET":  "department"},
+    {"OZONE_KEY":  "id"},
+    {"KUDU_HASH_KEYS":  "id"}
+  ],
+  "Options": [
+    {"HBASE_COLUMN_FAMILIES_MAPPING": "details:name,country,birthdate,department;technicals:last_connection,seniority,id"},
+    {"SOLR_SHARDS":  1},
+    {"SOLR_REPLICAS":  1}
+  ]
+}

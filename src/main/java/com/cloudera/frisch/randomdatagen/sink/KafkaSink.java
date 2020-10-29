@@ -26,6 +26,7 @@ import java.util.concurrent.Future;
 public class KafkaSink implements SinkInterface {
 
     private Producer<String, GenericRecord> producer;
+    private Producer<String, String> producerString;
     private String topic;
     private Schema schema;
 
@@ -37,9 +38,18 @@ public class KafkaSink implements SinkInterface {
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, PropertiesLoader.getProperty("kafka.brokers"));
         props.put(ProducerConfig.ACKS_CONFIG, "all");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "com.hortonworks.registries.schemaregistry.serdes.avro.kafka.KafkaAvroSerializer");
-        props.put(SchemaRegistryClient.Configuration.SCHEMA_REGISTRY_URL.name(), "http://" + PropertiesLoader.getProperty("schema.registry.url") + "/api/v1");
 
+        if(PropertiesLoader.getProperty("kafka.messages").equalsIgnoreCase("avro")) {
+          props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+              "com.hortonworks.registries.schemaregistry.serdes.avro.kafka.KafkaAvroSerializer");
+          props.put(
+              SchemaRegistryClient.Configuration.SCHEMA_REGISTRY_URL.name(),
+              "http://" + PropertiesLoader.getProperty("schema.registry.url") +
+                  "/api/v1");
+        } else {
+          props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+              "org.apache.kafka.common.serialization.StringSerializer");
+        }
 
         String securityProtocol = PropertiesLoader.getProperty("kafka.security.protocol");
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
@@ -71,27 +81,51 @@ public class KafkaSink implements SinkInterface {
         }
 
         topic = (String) model.getTableNames().get(OptionsConverter.TableNames.KAFKA_TOPIC);
-        producer = new KafkaProducer<>(props);
+
+        if(PropertiesLoader.getProperty("kafka.messages").equalsIgnoreCase("avro")) {
+            producer = new KafkaProducer<>(props);
+        } else {
+            producerString = new KafkaProducer<>(props);
+        }
     }
 
     public void terminate() {
-        producer.close();
+        if(PropertiesLoader.getProperty("kafka.messages").equalsIgnoreCase("avro")) {
+            producer.close();
+        } else {
+            producerString.close();
+        }
     }
 
     public void sendOneBatchOfRows(List<Row> rows) {
         ConcurrentLinkedQueue<Future<RecordMetadata>> queue = new ConcurrentLinkedQueue<>();
-        rows.parallelStream()
+        if(PropertiesLoader.getProperty("kafka.messages").equalsIgnoreCase("avro")) {
+            rows.parallelStream()
                 .map(row -> row.toKafkaMessage(schema))
                 .forEach(keyValue ->
-                        queue.add(
-                                producer.send(
-                                        new ProducerRecord<>(
-                                                topic,
-                                                (String) keyValue.getKey(),
-                                                (GenericRecord) keyValue.getValue()
-                                        )
-                                ))
+                    queue.add(
+                        producer.send(
+                            new ProducerRecord<>(
+                                topic,
+                                (String) keyValue.getKey(),
+                                (GenericRecord) keyValue.getValue()
+                            )
+                        ))
                 );
+        } else {
+            rows.parallelStream()
+                .map(row -> row.toKafkaMessageString())
+                .forEach(keyValue ->
+                    queue.add(
+                        producerString.send(
+                            new ProducerRecord<>(
+                                topic,
+                                (String) keyValue.getKey(),
+                                (String) keyValue.getValue()
+                            )
+                        ))
+                );
+        }
         checkMessagesHaveBeenSent(queue);
     }
 

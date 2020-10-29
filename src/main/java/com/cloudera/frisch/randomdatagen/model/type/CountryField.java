@@ -36,7 +36,8 @@ public class CountryField extends Field<String> {
 
     private List<String> loadCountryDico() {
         try {
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream("country-dico.txt");
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream(
+                "dictionnaries/country-dico.txt");
             return new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
                     .lines()
                     .collect(Collectors.toList());

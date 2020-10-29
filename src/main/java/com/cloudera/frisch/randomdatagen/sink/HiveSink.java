@@ -46,12 +46,16 @@ public class HiveSink implements SinkInterface {
             System.setProperty("javax.net.ssl.trustStore", PropertiesLoader.getProperty("hive.truststore.location"));
             System.setProperty("javax.net.ssl.trustStorePassword", PropertiesLoader.getProperty("hive.truststore.password"));
 
+            java.util.Properties properties = new Properties();
+            properties.put("tez.queue.name", "root.default");
+
             hiveConnection = DriverManager.getConnection("jdbc:hive2://" +
                             PropertiesLoader.getProperty("hive.zookeeper.server") + ":" +
                             PropertiesLoader.getProperty("hive.zookeeper.port") + "/" +
                             ";serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" +
-                            PropertiesLoader.getProperty("hive.zookeeper.namespace")
-                    , new Properties());
+                            PropertiesLoader.getProperty("hive.zookeeper.namespace") +
+                            "?tez.queue.name=" + PropertiesLoader.getProperty("tez.queue.name")
+                    , properties);
 
             database = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE);
             tableName = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TABLE_NAME);

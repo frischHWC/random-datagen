@@ -10,7 +10,7 @@ public class ModelTest {
 
     @Test
     public void checkMapHbasecolMapping() {
-        /*JsonParser jsonParser = new JsonParser("/Users/frisch/Documents/CodeProjects/Professional/random-datagen/src/main/resources/model.json");
+        /*JsonParser jsonParser = new JsonParser("/Users/frisch/Documents/CodeProjects/Professional/random-datagen/src/main/resources/full-model.json");
         Model model = jsonParser.renderModelFromFile();
         model.convertHbaseColFamilyOption("c:col1,col2,col3;d:col4,col5,col6")
                 .forEach((k,v) -> logger.warn("key : " + k + " - value: " + v)); */

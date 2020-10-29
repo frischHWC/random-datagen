@@ -1,0 +1,55 @@
+{
+  "Fields": [
+    {
+      "name": "sender_id",
+      "type": "INTEGER",
+      "length": 10000
+    },
+    {
+      "name": "receiver_id",
+      "type": "INTEGER",
+      "length": 10000
+    },
+    {
+      "name": "amount",
+      "type": "FLOAT"
+    },
+    {
+      "name": "execution_date",
+      "type": "TIMESTAMP"
+    },
+    {
+      "name": "currency",
+      "type": "STRING",
+      "possible_values": ["EUR", "DOL", "YEN"]
+    }
+  ],
+  "Table_Names": [
+    {"HDFS_FILE_PATH": "/user/dev/transactions/"},
+    {"HDFS_FILE_NAME": "transaction"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/transaction_hive/"},
+    {"HBASE_TABLE_NAME": "transaction"},
+    {"HBASE_NAMESPACE": "fd"},
+    {"KAFKA_TOPIC": "transaction"},
+    {"OZONE_VOLUME": "transaction"},
+    {"SOLR_COLLECTION": "transaction"},
+    {"HIVE_DATABASE": "fake_data"},
+    {"HIVE_TABLE_NAME":  "transaction"},
+    {"KUDU_TABLE_NAME":  "transaction"},
+    {"LOCAL_FILE_PATH":  "/root/fake_data/"},
+    {"LOCAL_FILE_NAME":  "transaction"},
+    {"AVRO_NAME":  "transaction"}
+  ],
+  "Primary_Keys": [
+    {"KAFKA_MSG_KEY": "currency"},
+    {"HBASE_PRIMARY_KEY":  "sender_id,receiver_id,execution_date"},
+    {"OZONE_BUCKET":  "currency"},
+    {"OZONE_KEY":  "sender_id,receiver_id,execution_date"},
+    {"KUDU_HASH_KEYS":  "sender_id"}
+  ],
+  "Options": [
+    {"HBASE_COLUMN_FAMILIES_MAPPING": "parties:sender_id,receiver_id;details:amount,execution_date,currency"},
+    {"SOLR_SHARDS":  1},
+    {"SOLR_REPLICAS":  1}
+  ]
+}

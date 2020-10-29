@@ -45,7 +45,8 @@ public class EmailField extends Field<String> {
 
     private List<String> loadNameDico() {
         try {
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream("names-dico.txt");
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream(
+                "dictionnaries/names-dico.txt");
             return new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
                     .lines()
                     .collect(Collectors.toList());
