@@ -1,6 +1,10 @@
 {
   "Fields": [
     {
+      "name": "id",
+      "type": "LONG"
+    },,
+    {
       "name": "name",
       "type": "NAME"
     },
@@ -24,16 +28,12 @@
       "name": "membership",
       "type": "STRING",
       "possible_values": ["bronze", "silver", "gold", "platinum"]
-    },
-    {
-      "name": "id",
-      "type": "LONG"
     }
   ],
   "Table_Names": [
     {"HDFS_FILE_PATH": "/user/dev/customers/"},
     {"HDFS_FILE_NAME": "customer"},
-    {"HIVE_HDFS_FILE_PATH": "/user/dev/customer_hive/"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/customer_hive/"},
     {"HBASE_TABLE_NAME": "customer"},
     {"HBASE_NAMESPACE": "fd"},
     {"KAFKA_TOPIC": "customer"},

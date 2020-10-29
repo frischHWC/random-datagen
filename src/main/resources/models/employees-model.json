@@ -1,12 +1,12 @@
 {
   "Fields": [
     {
-      "name": "name",
-      "type": "NAME"
-    },
-    {
       "name": "id",
       "type": "LONG"
+    },
+    {
+      "name": "name",
+      "type": "NAME"
     },
     {
       "name": "last_connection",
@@ -34,7 +34,7 @@
   "Table_Names": [
     {"HDFS_FILE_PATH": "/user/dev/employees/"},
     {"HDFS_FILE_NAME": "employee"},
-    {"HIVE_HDFS_FILE_PATH": "/user/dev/employee_hive/"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/employee_hive/"},
     {"HBASE_TABLE_NAME": "employee"},
     {"HBASE_NAMESPACE": "fd"},
     {"KAFKA_TOPIC": "employee"},
