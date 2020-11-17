@@ -3,7 +3,7 @@
     {
       "name": "id",
       "type": "LONG"
-    },,
+    },  
     {
       "name": "name",
       "type": "NAME"
