@@ -141,14 +141,24 @@ public class OzoneSink implements SinkInterface {
 
             volume.listBuckets("bucket").forEachRemaining(bucket -> {
                 logger.debug("Deleting everything in bucket: " + bucket.getName() + " in volume: " + volumeName);
-                bucket.listKeys(null).forEachRemaining(key -> {
-                    try {
-                        logger.debug("Deleting key: " + key.getName() + " in bucket: " + bucket.getName() + " in volume: " + volumeName);
-                        bucket.deleteKey(key.getName());
-                    } catch (IOException e) {
-                        logger.error("cannot delete key : " + key.getName() + " in bucket: " + bucket.getName() + " in volume: " + volumeName + " due to error: ", e);
-                    }
-                });
+                try {
+                    bucket.listKeys(null).forEachRemaining(key -> {
+                        try {
+                            logger.debug("Deleting key: " + key.getName() +
+                                " in bucket: " + bucket.getName() +
+                                " in volume: " + volumeName);
+                            bucket.deleteKey(key.getName());
+                        } catch (IOException e) {
+                            logger.error(
+                                "cannot delete key : " + key.getName() +
+                                    " in bucket: " + bucket.getName() +
+                                    " in volume: " + volumeName +
+                                    " due to error: ", e);
+                        }
+                    });
+                } catch (IOException e) {
+                    logger.error("Could not list keys in bucket " + bucket.getName() + " in volume: " + volumeName);
+                }
                 try {
                     volume.deleteBucket(bucket.getName());
                 } catch (IOException e) {
