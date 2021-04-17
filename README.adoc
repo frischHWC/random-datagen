@@ -13,16 +13,10 @@ List of possible sinks working:
 
 - HDFS-AVRO : generates an AVRO file sent to HDFS
 - HDFS-CSV : generates a CSV file sent to HDFS
-- HDFS-ORC : generates an ORC file sent to HDFS
-- HDFS-PARQUET : generates a PARQUET file sent to HDFS
 - HBase
-- Kafka: Generates an avro and send it to Kafka
 - Kudu
-- Ozone
 - SolR
 - Hive
-- Parquet: Generates a parquet file locally
-- ORC: Generates an ORC file locally
 - CSV: Generate a CSV file locally
 - Avro: Generates an Avro file locally
 

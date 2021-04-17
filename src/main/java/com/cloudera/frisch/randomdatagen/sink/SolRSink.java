@@ -5,11 +5,12 @@ import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
-import org.apache.solr.client.solrj.impl.BaseHttpSolrClient;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.impl.HttpClientUtil;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.impl.Krb5HttpClientBuilder;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
+import org.apache.solr.client.solrj.impl.Krb5HttpClientConfigurer;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
+import org.apache.solr.client.solrj.request.CoreAdminRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
  */
 public class SolRSink implements SinkInterface {
 
-    private HttpSolrClient httpSolrClient;
+    private SolrServer httpSolrClient;
     private String collection;
 
 
@@ -36,11 +37,6 @@ public class SolRSink implements SinkInterface {
             protocol = "https";
         }
 
-        HttpSolrClient.Builder solrClientBuilder = new HttpSolrClient.Builder(protocol + "://" +
-                PropertiesLoader.getProperty("solr.server.url") + ":" +
-                PropertiesLoader.getProperty("solr.server.port") + "/solr")
-                .withConnectionTimeout(10000)
-                .withSocketTimeout(60000);
 
         if (Boolean.parseBoolean(PropertiesLoader.getProperty("solr.auth.kerberos"))) {
             Utils.createJaasConfigFile("solr-jaas-randomdatagen.config", "SolrJClient",
@@ -50,27 +46,26 @@ public class SolRSink implements SinkInterface {
             System.setProperty("java.security.auth.login.config", "solr-jaas-randomdatagen.config");
             System.setProperty("solr.kerberos.jaas.appname", "SolrJClient");
 
-            try(Krb5HttpClientBuilder krb5HttpClientBuilder = new Krb5HttpClientBuilder()) {
-                HttpClientUtil.setHttpClientBuilder(krb5HttpClientBuilder.getHttpClientBuilder(java.util.Optional.empty()));
-            } catch (Exception e) {
-                logger.warn("Could set Kerberos for HTTP client due to error:", e);
-            }
+            HttpClientUtil.setConfigurer(new Krb5HttpClientConfigurer());
 
         }
 
-        httpSolrClient = solrClientBuilder.build();
+        httpSolrClient =  new HttpSolrServer(protocol + "://" +
+            PropertiesLoader.getProperty("solr.server.url") + ":" +
+            PropertiesLoader.getProperty("solr.server.port") + "/solr");
 
         collection = (String) model.getTableNames().get(OptionsConverter.TableNames.SOLR_COLLECTION);
         createSolRCollectionIfNotExists(collection, model);
 
-        // Set base URL directly to the collection, note that this is required
-        httpSolrClient.setBaseURL(protocol + "://" + PropertiesLoader.getProperty("solr.server.url") + ":" +
-                PropertiesLoader.getProperty("solr.server.port") + "/solr/" + collection);
+        httpSolrClient =  new HttpSolrServer(protocol + "://" +
+            PropertiesLoader.getProperty("solr.server.url") + ":" +
+            PropertiesLoader.getProperty("solr.server.port") + "/solr/" + collection);
+
     }
 
     public void terminate() {
         try {
-            httpSolrClient.close();
+            httpSolrClient.shutdown();
         } catch (Exception e) {
             logger.error("Could not close connection to SolR due to error: ", e);
         }
@@ -91,13 +86,12 @@ public class SolRSink implements SinkInterface {
     private void createSolRCollectionIfNotExists(String collection, Model model) {
         try {
             logger.debug("Creating collection : " + collection + " in SolR");
-            httpSolrClient.request(
-                    CollectionAdminRequest.createCollection(collection,
-                            (Integer) model.getOptions().get(OptionsConverter.Options.SOLR_SHARDS),
-                            (Integer) model.getOptions().get(OptionsConverter.Options.SOLR_REPLICAS))
-            );
+            CollectionAdminRequest.createCollection(collection,
+                (Integer) model.getOptions().get(OptionsConverter.Options.SOLR_SHARDS), "managedTemplate", httpSolrClient);
+            CoreAdminRequest.createCore(collection, collection, httpSolrClient);
+
             logger.debug("Finished to create collection : " + collection + " in SolR");
-        } catch (BaseHttpSolrClient.RemoteSolrException e) {
+        } catch (HttpSolrServer.RemoteSolrException e) {
             if (e.getMessage().contains("collection already exists")) {
                 logger.warn("Collection already exists so it has not been created");
             } else {

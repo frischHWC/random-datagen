@@ -7,7 +7,6 @@ import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hive.jdbc.HivePreparedStatement;
 import org.apache.kudu.Type;
 import org.apache.kudu.client.PartialRow;
-import org.apache.orc.TypeDescription;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -89,11 +88,6 @@ public class CountryField extends Field<String> {
     @Override
     public ColumnVector getOrcColumnVector(VectorizedRowBatch batch, int cols) {
         return batch.cols[cols];
-    }
-
-    @Override
-    public TypeDescription getTypeDescriptionOrc() {
-        return TypeDescription.createString();
     }
 
 

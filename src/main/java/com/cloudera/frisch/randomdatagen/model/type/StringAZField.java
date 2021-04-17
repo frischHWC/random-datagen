@@ -8,7 +8,6 @@ import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hive.jdbc.HivePreparedStatement;
 import org.apache.kudu.Type;
 import org.apache.kudu.client.PartialRow;
-import org.apache.orc.TypeDescription;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -74,8 +73,4 @@ public class StringAZField extends Field<String> {
         return batch.cols[cols];
     }
 
-    @Override
-    public TypeDescription getTypeDescriptionOrc() {
-        return TypeDescription.createString();
-    }
 }

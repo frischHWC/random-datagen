@@ -5,12 +5,9 @@ import com.cloudera.frisch.randomdatagen.model.type.Field;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.avro.SchemaBuilder;
-import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.kudu.ColumnSchema;
 import org.apache.kudu.Schema;
 import org.apache.log4j.Logger;
-import org.apache.orc.TypeDescription;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -295,21 +292,7 @@ public class Model<T extends Field> {
         return schemaBuilder.endRecord();
     }
 
-    public TypeDescription getOrcSchema() {
-        TypeDescription typeDescription = TypeDescription.createStruct();
-        fields.forEach(field -> typeDescription.addField(field.name, field.getTypeDescriptionOrc()));
-        return typeDescription;
-    }
 
-    public Map<T, ColumnVector> createOrcVectors(VectorizedRowBatch batch) {
-        LinkedHashMap<T, ColumnVector> hashMap = new LinkedHashMap<>();
-        int cols = 0;
-        for(T field: fields) {
-            hashMap.put(field, field.getOrcColumnVector(batch, cols));
-            cols++;
-        }
-        return hashMap;
-    }
 
     // TODO: Implement verifications on the model before starting (not two same names of field, primary keys defined)
     // Ozone bucket and volume should be string between 3-63 characters (No upper case)

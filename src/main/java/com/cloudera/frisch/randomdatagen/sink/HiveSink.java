@@ -29,7 +29,7 @@ public class HiveSink implements SinkInterface {
 
     private static final int NUMBER_OF_THREADS = Integer.parseInt(PropertiesLoader.getProperty("hive.threads.number"));
     private Connection hiveConnection;
-    private HdfsParquetSink hdfsSink;
+    private HdfsCsvSink hdfsSink;
     private String database;
     private String tableName;
     private String tableNameTemporary;
@@ -47,14 +47,13 @@ public class HiveSink implements SinkInterface {
             System.setProperty("javax.net.ssl.trustStorePassword", PropertiesLoader.getProperty("hive.truststore.password"));
 
             java.util.Properties properties = new Properties();
-            properties.put("tez.queue.name", "root.default");
+
 
             hiveConnection = DriverManager.getConnection("jdbc:hive2://" +
                             PropertiesLoader.getProperty("hive.zookeeper.server") + ":" +
                             PropertiesLoader.getProperty("hive.zookeeper.port") + "/" +
                             ";serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" +
-                            PropertiesLoader.getProperty("hive.zookeeper.namespace") +
-                            "?tez.queue.name=" + PropertiesLoader.getProperty("tez.queue.name")
+                            PropertiesLoader.getProperty("hive.zookeeper.namespace")
                     , properties);
 
             database = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE);
@@ -71,7 +70,7 @@ public class HiveSink implements SinkInterface {
 
             if (hiveOnHDFS) {
                 // If using an HDFS sink, we want it to use the Hive HDFS File path and not the Hdfs file path
-                hdfsSink = new HdfsParquetSink();
+                hdfsSink = new HdfsCsvSink();
                 model.getTableNames().put(OptionsConverter.TableNames.HDFS_FILE_PATH,
                         model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH));
                 hdfsSink.init(model);
@@ -79,7 +78,6 @@ public class HiveSink implements SinkInterface {
                 logger.info("Creating temporary table");
                 prepareAndExecuteStatement(
                         "CREATE EXTERNAL TABLE IF NOT EXISTS " + tableNameTemporary + model.getSQLSchema() +
-                                " STORED AS PARQUET " +
                                 " LOCATION '" + locationTemporaryTable + "'" //+
                 );
             }

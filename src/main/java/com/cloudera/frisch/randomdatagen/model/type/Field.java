@@ -11,7 +11,6 @@ import org.apache.hive.jdbc.HivePreparedStatement;
 import org.apache.kudu.Type;
 import org.apache.kudu.client.PartialRow;
 import org.apache.log4j.Logger;
-import org.apache.orc.TypeDescription;
 import org.apache.solr.common.SolrInputDocument;
 
 import java.sql.SQLException;
@@ -182,7 +181,7 @@ public abstract class Field<T> {
     }
 
     public PartialRow toKudu(T value, PartialRow partialRow) {
-        partialRow.addObject(name, value);
+        partialRow.addString(name, value.toString());
         return partialRow;
     }
 
@@ -215,8 +214,5 @@ public abstract class Field<T> {
         return batch.cols[cols];
     }
 
-    public TypeDescription getTypeDescriptionOrc() {
-        return TypeDescription.createBinary();
-    }
 
 }

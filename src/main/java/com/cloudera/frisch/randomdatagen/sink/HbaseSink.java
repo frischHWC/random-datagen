@@ -6,10 +6,7 @@ import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.NamespaceDescriptor;
-import org.apache.hadoop.hbase.NamespaceNotFoundException;
-import org.apache.hadoop.hbase.TableName;
+import org.apache.hadoop.hbase.*;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 
@@ -54,15 +51,16 @@ public class HbaseSink implements SinkInterface {
 
             if (!connection.getAdmin().tableExists(TableName.valueOf(fullTableName))) {
 
-                TableDescriptorBuilder tbdesc = TableDescriptorBuilder.newBuilder(TableName.valueOf(fullTableName));
+
+                HTableDescriptor tbdesc = new HTableDescriptor(TableName.valueOf(fullTableName));
 
                 model.getHBaseColumnFamilyList().forEach(cf ->
-                        tbdesc.setColumnFamily(ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes((String) cf)).build())
+                        tbdesc.addFamily(new HColumnDescriptor(Bytes.toBytes((String) cf)))
                 );
                 // In case of missing columns and to avoid troubles, a default 'cq' is created
-                tbdesc.setColumnFamily(ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes("cq")).build());
+                tbdesc.addFamily(new HColumnDescriptor(Bytes.toBytes("cq")));
 
-                connection.getAdmin().createTable(tbdesc.build());
+                connection.getAdmin().createTable(tbdesc);
             }
 
             table = connection.getTable(TableName.valueOf(fullTableName));

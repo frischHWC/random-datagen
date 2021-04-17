@@ -12,7 +12,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <!-- Check your EXACT version of CDP as all platform jars depends on it -->
-        <cdp.version>7.1.6.0-297</cdp.version>
+        <cdp.version>cdh5.16.2</cdp.version>
     </properties>
 
     <!-- Cloudera repository needed to get good CDP versions of jars -->
@@ -46,19 +46,19 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.10.3</version>
+            <version>2.1.0</version>
         </dependency>
 
         <!-- HDFS -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-client</artifactId>
-            <version>3.1.1.${cdp.version}</version>
+            <artifactId>hadoop-common</artifactId>
+            <version>2.6.0-${cdp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>3.1.1.${cdp.version}</version>
+            <artifactId>hadoop-hdfs</artifactId>
+            <version>2.6.0-${cdp.version}</version>
         </dependency>
 
 
@@ -66,51 +66,27 @@
         <dependency>
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-client</artifactId>
-            <version>2.2.3.${cdp.version}</version>
+            <version>1.2.0-${cdp.version}</version>
         </dependency>
 
         <!-- HIVE -->
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-jdbc</artifactId>
-            <version>3.1.3000.${cdp.version}</version>
+            <version>1.1.0-${cdp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hive</groupId>
+            <artifactId>hive-exec</artifactId>
+            <version>1.1.0-${cdp.version}</version>
         </dependency>
 
-        <!-- OZONE -->
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-ozone-client</artifactId>
-            <version>1.0.0.${cdp.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>28.2-jre</version>
-        </dependency>
 
         <!-- SOLR -->
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
-            <version>8.4.1.${cdp.version}</version>
-        </dependency>
-
-        <!-- KAFKA -->
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
-            <version>2.5.0.${cdp.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.hortonworks.registries</groupId>
-            <artifactId>schema-registry-serdes</artifactId>
-            <version>0.10.0.${cdp.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>log4j-over-slf4j</artifactId>
-                </exclusion>
-            </exclusions>
+            <version>4.10.3-${cdp.version}</version>
         </dependency>
 
 
@@ -118,20 +94,9 @@
         <dependency>
             <groupId>org.apache.kudu</groupId>
             <artifactId>kudu-client</artifactId>
-            <version>1.13.0.${cdp.version}</version>
+            <version>1.7.0-${cdp.version}</version>
         </dependency>
 
-        <!-- Parquet -->
-        <dependency>
-            <groupId>org.apache.parquet</groupId>
-            <artifactId>parquet-avro</artifactId>
-            <version>1.10.99.${cdp.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.parquet</groupId>
-            <artifactId>parquet-hadoop</artifactId>
-            <version>1.10.99.${cdp.version}</version>
-        </dependency>
 
     </dependencies>
 
