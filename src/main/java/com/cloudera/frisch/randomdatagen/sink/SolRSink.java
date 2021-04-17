@@ -87,7 +87,7 @@ public class SolRSink implements SinkInterface {
         try {
             logger.debug("Creating collection : " + collection + " in SolR");
             CollectionAdminRequest.createCollection(collection,
-                (Integer) model.getOptions().get(OptionsConverter.Options.SOLR_SHARDS), "managedTemplate", httpSolrClient);
+                (Integer) model.getOptions().get(OptionsConverter.Options.SOLR_SHARDS), "schemalessTemplate", httpSolrClient);
             CoreAdminRequest.createCore(collection, collection, httpSolrClient);
 
             logger.debug("Finished to create collection : " + collection + " in SolR");
