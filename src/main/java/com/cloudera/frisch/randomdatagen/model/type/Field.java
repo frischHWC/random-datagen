@@ -5,14 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hive.jdbc.HivePreparedStatement;
-import org.apache.kudu.Type;
-import org.apache.kudu.client.PartialRow;
 import org.apache.log4j.Logger;
-import org.apache.orc.TypeDescription;
-import org.apache.solr.common.SolrInputDocument;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -172,23 +166,6 @@ public abstract class Field<T> {
         return hbasePut;
     }
 
-    public SolrInputDocument toSolrDoc(T value, SolrInputDocument doc) {
-        doc.addField(name, value);
-        return doc;
-    }
-
-    public String toOzone(T value) {
-        return toString(value);
-    }
-
-    public PartialRow toKudu(T value, PartialRow partialRow) {
-        partialRow.addObject(name, value);
-        return partialRow;
-    }
-
-    public Type getKuduType() {
-        return Type.BINARY;
-    }
 
     public HivePreparedStatement toHive(T value, int index, HivePreparedStatement hivePreparedStatement) {
         try {
@@ -209,14 +186,6 @@ public abstract class Field<T> {
 
     public Object toAvroValue(T value) {
         return value;
-    }
-
-    public ColumnVector getOrcColumnVector(VectorizedRowBatch batch, int cols) {
-        return batch.cols[cols];
-    }
-
-    public TypeDescription getTypeDescriptionOrc() {
-        return TypeDescription.createBinary();
     }
 
 }

@@ -1,7 +1,6 @@
 package com.cloudera.frisch.randomdatagen.model;
 
 import com.cloudera.frisch.randomdatagen.model.type.Field;
-import com.cloudera.frisch.randomdatagen.sink.storedobjects.OzoneObject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,19 +9,9 @@ import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hive.ql.exec.vector.BytesColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.DoubleColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.LongColumnVector;
 import org.apache.hive.jdbc.HivePreparedStatement;
-import org.apache.kudu.client.Insert;
-import org.apache.kudu.client.KuduTable;
-import org.apache.kudu.client.PartialRow;
 import org.apache.log4j.Logger;
-import org.apache.solr.common.SolrInputDocument;
 
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.*;
 
 /**
@@ -103,29 +92,6 @@ public class Row<T extends Field> {
         return put;
     }
 
-    public SolrInputDocument toSolRDoc() {
-        SolrInputDocument doc = new SolrInputDocument();
-        values.forEach((f, o) -> f.toSolrDoc(o, doc));
-        return doc;
-    }
-
-    public OzoneObject toOzoneObject() {
-        StringBuilder sb = new StringBuilder();
-        values.forEach((f, o) -> sb.append(f.toOzone(o)));
-        // Bucket does not support upper case letter, so conversion to lower case is made
-        return new OzoneObject(
-                pksValues.get(OptionsConverter.PrimaryKeys.OZONE_BUCKET).toString().toLowerCase(),
-                pksValues.get(OptionsConverter.PrimaryKeys.OZONE_KEY).toString(),
-                sb.toString()
-        );
-    }
-
-    public Insert toKuduInsert(KuduTable table) {
-        Insert insert = table.newInsert();
-        PartialRow partialRow = insert.getRow();
-        values.forEach((field,value) -> field.toKudu(value, partialRow));
-        return insert;
-    }
 
     public HivePreparedStatement toHiveStatement(HivePreparedStatement hivePreparedStatement){
         int i = 1;
@@ -136,58 +102,5 @@ public class Row<T extends Field> {
         return hivePreparedStatement;
     }
 
-    public GenericRecord toGenericRecord(Schema schema) {
-        GenericRecord genericRecordRow = new GenericData.Record(schema);
-        values.forEach((f,o) -> genericRecordRow.put(f.name, f.toAvroValue(o)));
-        return genericRecordRow;
-    }
-
-
-    public void fillinOrcVector(int rowNumber, Map<T, ? extends ColumnVector> vectors) {
-        vectors.forEach((field, cv) -> {
-            switch (field.getClass().getSimpleName()) {
-                case "LongField":
-                case "TimestampField":
-                    LongColumnVector longColumnVector = (LongColumnVector) cv;
-                    longColumnVector.vector[rowNumber] = (long) values.get(field);
-                    break;
-                case "IntegerField":
-                    LongColumnVector longColumnVectorInt = (LongColumnVector) cv;
-                    longColumnVectorInt.vector[rowNumber] = Integer.toUnsignedLong((int) values.get(field));
-                    break;
-                case "FloatField":
-                    DoubleColumnVector doubleColumnVector = (DoubleColumnVector) cv;
-                    doubleColumnVector.vector[rowNumber] = (float) values.get(field);
-                    break;
-                case "StringField":
-                case "CountryField":
-                case "StringAZField":
-                case "NameField":
-                case "EmailField":
-                    BytesColumnVector bytesColumnVector = (BytesColumnVector) cv;
-                    String stringValue = (String) values.get(field);
-                    bytesColumnVector.setVal(rowNumber, stringValue.getBytes(StandardCharsets.UTF_8));
-                    break;
-                case "BirthdateField":
-                    BytesColumnVector bytesColumnVectorDate = (BytesColumnVector) cv;
-                    LocalDate valueDate = (LocalDate) values.get(field);
-                    bytesColumnVectorDate.setVal(rowNumber , valueDate.toString().getBytes(StandardCharsets.UTF_8));
-                    break;
-                case "BooleanField":
-                    LongColumnVector longColumnVectorBoolean = (LongColumnVector) cv;
-                    longColumnVectorBoolean.vector[rowNumber] = (boolean) values.get(field) ? 1L:0L;
-                    break;
-                case "BlobField":
-                case "BytesField":
-                case "HashMd5Field":
-                    BytesColumnVector bytesColumnVectorBytes = (BytesColumnVector) cv;
-                    bytesColumnVectorBytes.setVal(rowNumber, (byte[]) values.get(field));
-                    break;
-                default:
-                    logger.warn("Cannot get types of Orc column: " + field.getName() + " as field is " + field.getClass().getSimpleName() );
-            }
-        });
-
-    }
 
 }

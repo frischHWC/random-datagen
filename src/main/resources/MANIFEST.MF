@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Built-By: frisch
+Class-Path: /usr/hdp/2.6.5.0-292/hbase/lib/hbase-client-1.1.2.2.6.5.0-292.jar /usr/hdp/2.6.5.0-292/hbase/lib/hbase-common-1.1.2.2.6.5.0-292.jar
+    /usr/hdp/2.6.5.0-292/hbase/lib/hbase-protocol-1.1.2.2.6.5.0-292.jar /usr/hdp/2.6.5.0-292/hbase/lib/hbase-annotations-1.1.2.2.6.5.0-292.jar
+    /usr/hdp/2.6.5.0-292/hive/lib/hive-common-1.2.1000.2.6.5.0-292.jar /usr/hdp/2.6.5.0-292/hive/lib/hive-exec-1.2.1000.2.6.5.0-292.jar
+    /usr/hdp/2.6.5.0-292/hive/lib/hive-jdbc-1.2.1000.2.6.5.0-292.jar /usr/hdp/2.6.5.0-292/hive/lib/hive-serde-1.2.1000.2.6.5.0-292.jar
+    /usr/hdp/2.6.5.0-292/hive/lib/hive-cli-1.2.1000.2.6.5.0-292.jar /usr/hdp/2.6.5.0-292/hive/lib/hive-service-1.2.1000.2.6.5.0-292.jar
+    /usr/hdp/2.6.5.0-292/hive/lib/hive-metastore-1.2.1000.2.6.5.0-292.jar /usr/hdp/2.6.5.0-292/hive/lib/hive-contrib-1.2.1000.2.6.5.0-292.jar
+Created-By: Apache Maven 3.3.9
+Build-Jdk: 1.8.0_231
+Main-Class: com.cloudera.frisch.randomdatagen.Main

@@ -17,8 +17,6 @@ List of possible sinks working:
 - HDFS-PARQUET : generates a PARQUET file sent to HDFS
 - HBase
 - Kafka: Generates an avro and send it to Kafka
-- Kudu
-- Ozone
 - SolR
 - Hive
 - Parquet: Generates a parquet file locally

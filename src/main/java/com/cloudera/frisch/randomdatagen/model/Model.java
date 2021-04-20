@@ -4,13 +4,7 @@ package com.cloudera.frisch.randomdatagen.model;
 import com.cloudera.frisch.randomdatagen.model.type.Field;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.avro.SchemaBuilder;
-import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
-import org.apache.kudu.ColumnSchema;
-import org.apache.kudu.Schema;
 import org.apache.log4j.Logger;
-import org.apache.orc.TypeDescription;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -216,30 +210,6 @@ public class Model<T extends Field> {
         }
     }
 
-    public Schema getKuduSchema() {
-        List<ColumnSchema> columns = new ArrayList<>(fields.size());
-        fields.forEach(f -> {
-            for (T k : primaryKeys.get(OptionsConverter.PrimaryKeys.KUDU_HASH_KEYS)) {
-                if (k.name.equalsIgnoreCase(f.name)) {
-                    columns.add(new ColumnSchema.ColumnSchemaBuilder(f.name, f.getKuduType())
-                            .key(true)
-                            .build());
-                } else {
-                    columns.add(new ColumnSchema.ColumnSchemaBuilder(f.name, f.getKuduType())
-                            .build());
-                }
-            }
-        });
-
-        return new Schema(columns);
-    }
-
-    public List<String> getKuduHashKeys() {
-        List<T> kuduPrimaryKeys = primaryKeys.get(OptionsConverter.PrimaryKeys.KUDU_HASH_KEYS);
-        List<String> hashKeys = new ArrayList<>(kuduPrimaryKeys.size());
-        kuduPrimaryKeys.forEach(f -> hashKeys.add(f.name));
-        return hashKeys;
-    }
 
     public String getSQLSchema() {
         StringBuilder sb = new StringBuilder();
@@ -282,34 +252,8 @@ public class Model<T extends Field> {
         return sb.toString();
     }
 
-    public org.apache.avro.Schema getAvroSchema() {
-        SchemaBuilder.FieldAssembler<org.apache.avro.Schema> schemaBuilder = SchemaBuilder
-                .record(tableNames.get(OptionsConverter.TableNames.AVRO_NAME))
-                .namespace("org.apache.avro.ipc")
-                .fields();
 
-        for(T field: fields) {
-            schemaBuilder = schemaBuilder.name(field.name).type(field.getGenericRecordType()).noDefault();
-        }
 
-        return schemaBuilder.endRecord();
-    }
-
-    public TypeDescription getOrcSchema() {
-        TypeDescription typeDescription = TypeDescription.createStruct();
-        fields.forEach(field -> typeDescription.addField(field.name, field.getTypeDescriptionOrc()));
-        return typeDescription;
-    }
-
-    public Map<T, ColumnVector> createOrcVectors(VectorizedRowBatch batch) {
-        LinkedHashMap<T, ColumnVector> hashMap = new LinkedHashMap<>();
-        int cols = 0;
-        for(T field: fields) {
-            hashMap.put(field, field.getOrcColumnVector(batch, cols));
-            cols++;
-        }
-        return hashMap;
-    }
 
     // TODO: Implement verifications on the model before starting (not two same names of field, primary keys defined)
     // Ozone bucket and volume should be string between 3-63 characters (No upper case)

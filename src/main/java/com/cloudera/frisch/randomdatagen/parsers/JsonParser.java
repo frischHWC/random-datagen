@@ -23,7 +23,7 @@ public class JsonParser<T extends Field> implements Parser {
         try {
             logger.info("Model used is from Json file : " + jsonFilePath);
             root = mapper.readTree(new File(jsonFilePath));
-            logger.debug("JSON file content is :" + root.toPrettyString());
+            logger.debug("JSON file content is :" + root.toString());
         } catch (IOException e) {
             logger.error("Could not read JSON file: " + jsonFilePath + ", please verify its structure, error is : ", e);
         } catch (NullPointerException e) {

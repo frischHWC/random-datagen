@@ -8,7 +8,7 @@ echo "*** Starting to launch program ***"
 
 echo "Launching jar via java command"
 
-    java -jar random-datagen.jar $@
+    hadoop jar random-datagen.jar $@
 
     sleep 1
 

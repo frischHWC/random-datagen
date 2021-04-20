@@ -2,12 +2,7 @@ package com.cloudera.frisch.randomdatagen.model.type;
 
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hive.jdbc.HivePreparedStatement;
-import org.apache.kudu.Type;
-import org.apache.kudu.client.PartialRow;
-import org.apache.orc.TypeDescription;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -39,17 +34,6 @@ public class IntegerField extends Field<Integer> {
     }
 
     @Override
-    public PartialRow toKudu(Integer value, PartialRow partialRow) {
-        partialRow.addInt(name, value);
-        return partialRow;
-    }
-
-    @Override
-    public Type getKuduType() {
-        return Type.INT32;
-    }
-
-    @Override
     public HivePreparedStatement toHive(Integer value, int index, HivePreparedStatement hivePreparedStatement) {
         try {
             hivePreparedStatement.setInt(index, value);
@@ -66,15 +50,5 @@ public class IntegerField extends Field<Integer> {
 
     @Override
     public String getGenericRecordType() { return "int"; }
-
-    @Override
-    public ColumnVector getOrcColumnVector(VectorizedRowBatch batch, int cols) {
-        return batch.cols[cols];
-    }
-
-    @Override
-    public TypeDescription getTypeDescriptionOrc() {
-        return TypeDescription.createInt();
-    }
 
 }

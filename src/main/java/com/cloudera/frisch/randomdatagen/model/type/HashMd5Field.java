@@ -3,12 +3,7 @@ package com.cloudera.frisch.randomdatagen.model.type;
 import com.cloudera.frisch.randomdatagen.Utils;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
-import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hive.jdbc.HivePreparedStatement;
-import org.apache.kudu.Type;
-import org.apache.kudu.client.PartialRow;
-import org.apache.orc.TypeDescription;
 
 import javax.xml.bind.DatatypeConverter;
 import java.nio.ByteBuffer;
@@ -80,17 +75,6 @@ public class HashMd5Field extends Field<byte[]> {
     }
 
     @Override
-    public PartialRow toKudu(byte[] value, PartialRow partialRow) {
-        partialRow.addBinary(name, value);
-        return partialRow;
-    }
-
-    @Override
-    public Type getKuduType() {
-        return Type.BINARY;
-    }
-
-    @Override
     public HivePreparedStatement toHive(byte[] value, int index, HivePreparedStatement hivePreparedStatement) {
         try {
             hivePreparedStatement.setString(index, DatatypeConverter.printHexBinary(value).toUpperCase());
@@ -115,14 +99,5 @@ public class HashMd5Field extends Field<byte[]> {
         return ByteBuffer.wrap(value);
     }
 
-    @Override
-    public ColumnVector getOrcColumnVector(VectorizedRowBatch batch, int cols) {
-        return batch.cols[cols];
-    }
-
-    @Override
-    public TypeDescription getTypeDescriptionOrc() {
-        return TypeDescription.createBinary();
-    }
 
 }

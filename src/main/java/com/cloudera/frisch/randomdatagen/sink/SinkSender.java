@@ -37,44 +37,14 @@ public class SinkSender {
                 case HDFSCSV:
                     sinkToInitAndStart = new HdfsCsvSink();
                     break;
-                case HDFSAVRO:
-                    sinkToInitAndStart = new HdfsAvroSink();
-                    break;
-                case HDFSORC:
-                    sinkToInitAndStart = new HdfsOrcSink();
-                    break;
-                case HDFSPARQUET:
-                    sinkToInitAndStart = new HdfsParquetSink();
-                    break;
                 case HBASE:
                     sinkToInitAndStart = new HbaseSink();
                     break;
                 case HIVE:
                     sinkToInitAndStart = new HiveSink();
                     break;
-                case OZONE:
-                    sinkToInitAndStart = new OzoneSink();
-                    break;
-                case SOLR:
-                    sinkToInitAndStart = new SolRSink();
-                    break;
-                case KAFKA:
-                    sinkToInitAndStart = new KafkaSink();
-                    break;
-                case KUDU:
-                    sinkToInitAndStart = new KuduSink();
-                    break;
                 case CSV:
                     sinkToInitAndStart = new CSVSink();
-                    break;
-                case AVRO:
-                    sinkToInitAndStart = new AvroSink();
-                    break;
-                case PARQUET:
-                    sinkToInitAndStart = new ParquetSink();
-                    break;
-                case ORC:
-                    sinkToInitAndStart = new ORCSink();
                     break;
                  default:
                      logger.info("The sink " + sink.toString() + " provided has not been recognized as an expected sink");
