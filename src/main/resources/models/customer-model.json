@@ -31,18 +31,18 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/user/dev/customers/"},
+    {"HDFS_FILE_PATH": "/tmp/random_datagen/customer/"},
     {"HDFS_FILE_NAME": "customer"},
-    {"HIVE_HDFS_FILE_PATH": "/tmp/customer_hive/"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/hive/customer"},
     {"HBASE_TABLE_NAME": "customer"},
-    {"HBASE_NAMESPACE": "fd"},
+    {"HBASE_NAMESPACE": "rd"},
     {"KAFKA_TOPIC": "customer"},
     {"OZONE_VOLUME": "customer"},
     {"SOLR_COLLECTION": "customer"},
     {"HIVE_DATABASE": "fake_data"},
     {"HIVE_TABLE_NAME":  "customer"},
-    {"KUDU_TABLE_NAME":  "customer"},
-    {"LOCAL_FILE_PATH":  "/root/fake_data/"},
+    {"KUDU_TABLE_NAME":  "random_datagen.customer_kudu"},
+    {"LOCAL_FILE_PATH":  "/root/random_datagen/"},
     {"LOCAL_FILE_NAME":  "customer"},
     {"AVRO_NAME":  "customer"}
   ],

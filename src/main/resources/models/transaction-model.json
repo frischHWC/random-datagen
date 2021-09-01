@@ -25,18 +25,18 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/user/dev/transactions/"},
+    {"HDFS_FILE_PATH": "/tmp/random_datagen/transaction/"},
     {"HDFS_FILE_NAME": "transaction"},
-    {"HIVE_HDFS_FILE_PATH": "/tmp/transaction_hive/"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/hive/transaction/"},
     {"HBASE_TABLE_NAME": "transaction"},
-    {"HBASE_NAMESPACE": "fd"},
+    {"HBASE_NAMESPACE": "rd"},
     {"KAFKA_TOPIC": "transaction"},
     {"OZONE_VOLUME": "transaction"},
     {"SOLR_COLLECTION": "transaction"},
     {"HIVE_DATABASE": "fake_data"},
     {"HIVE_TABLE_NAME":  "transaction"},
-    {"KUDU_TABLE_NAME":  "transaction"},
-    {"LOCAL_FILE_PATH":  "/root/fake_data/"},
+    {"KUDU_TABLE_NAME":  "random_datagen.transaction_kudu"},
+    {"LOCAL_FILE_PATH":  "/root/random_datagen/"},
     {"LOCAL_FILE_NAME":  "transaction"},
     {"AVRO_NAME":  "transaction"}
   ],

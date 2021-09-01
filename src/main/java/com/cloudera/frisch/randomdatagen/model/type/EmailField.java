@@ -57,7 +57,7 @@ public class EmailField extends Field<String> {
     }
 
     private String emailSupplier() {
-        List<String> emailSupplier = Arrays.asList("google.com", "yahoo.com", "outlook.com", "mail.com");
+        List<String> emailSupplier = Arrays.asList("gaagle.com", "yahaa.com", "uutlook.com", "email.fr");
         return emailSupplier.get(random.nextInt(emailSupplier.size()));
     }
 

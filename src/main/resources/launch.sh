@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export DIR="/home/root/random-datagen"
+export DIR="/root/random-datagen"
 
 echo "*** Starting to launch program ***"
 
@@ -8,7 +8,7 @@ echo "*** Starting to launch program ***"
 
 echo "Launching jar via java command"
 
-    java -jar random-datagen.jar $@
+    java --add-opens java.base/jdk.internal.ref=ALL-UNNAMED -jar random-datagen.jar $@
 
     sleep 1
 

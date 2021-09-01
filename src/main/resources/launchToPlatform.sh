@@ -5,7 +5,7 @@
 # export SSH_KEY="-i <SSH_KEY>"
 
 export USER=root
-export DEST_DIR="/home/root/random-datagen"
+export DEST_DIR="/root/random-datagen"
 
 echo "Create needed directory on platform and send required files there"
 

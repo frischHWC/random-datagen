@@ -9,10 +9,10 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
         <!-- Check your EXACT version of CDP as all platform jars depends on it -->
-        <cdp.version>7.1.6.0-297</cdp.version>
+        <cdp.version>7.1.7.0-551</cdp.version>
     </properties>
 
     <!-- Cloudera repository needed to get good CDP versions of jars -->
@@ -38,9 +38,9 @@
         </dependency>
 
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+            <version>2.14.1</version>
         </dependency>
 
         <dependency>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-ozone-client</artifactId>
-            <version>1.0.0.${cdp.version}</version>
+            <version>1.1.0.${cdp.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -118,7 +118,7 @@
         <dependency>
             <groupId>org.apache.kudu</groupId>
             <artifactId>kudu-client</artifactId>
-            <version>1.13.0.${cdp.version}</version>
+            <version>1.15.0.${cdp.version}</version>
         </dependency>
 
         <!-- Parquet -->
