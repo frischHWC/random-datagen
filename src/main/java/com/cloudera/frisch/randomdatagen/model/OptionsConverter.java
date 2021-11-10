@@ -43,6 +43,7 @@ public class OptionsConverter {
         SOLR_COLLECTION,
         HIVE_DATABASE,
         HIVE_TABLE_NAME,
+        HIVE_TEMPORARY_TABLE_NAME,
         KUDU_TABLE_NAME,
         LOCAL_FILE_PATH,
         LOCAL_FILE_NAME,
@@ -71,6 +72,8 @@ public class OptionsConverter {
                 return TableNames.HIVE_DATABASE;
             case "HIVE_TABLE_NAME":
                 return TableNames.HIVE_TABLE_NAME;
+            case "HIVE_TEMPORARY_TABLE_NAME":
+                return TableNames.HIVE_TEMPORARY_TABLE_NAME;
             case "KUDU_TABLE_NAME":
                 return TableNames.KUDU_TABLE_NAME;
             case "LOCAL_FILE_PATH":

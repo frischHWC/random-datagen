@@ -42,6 +42,7 @@
     {"SOLR_COLLECTION": "employee"},
     {"HIVE_DATABASE": "random_datagen"},
     {"HIVE_TABLE_NAME":  "employee"},
+    {"HIVE_TEMPORARY_TABLE_NAME":  "employee_tmp"},
     {"KUDU_TABLE_NAME":  "random_datagen.employee_kudu"},
     {"LOCAL_FILE_PATH":  "/root/random_datagen/employee/"},
     {"LOCAL_FILE_NAME":  "employee"},
