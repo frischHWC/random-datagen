@@ -59,8 +59,9 @@ public class HiveSink implements SinkInterface {
 
             database = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE);
             tableName = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TABLE_NAME);
-            tableNameTemporary = ((String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TABLE_NAME)).isEmpty() ? tableName + "_tmp" :
-                (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TABLE_NAME);
+            tableNameTemporary = ((String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TEMPORARY_TABLE_NAME)).isEmpty() ?
+                tableName + "_tmp" :
+                (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TEMPORARY_TABLE_NAME);
             String locationTemporaryTable = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH);
 
             prepareAndExecuteStatement("CREATE DATABASE IF NOT EXISTS " + database);
@@ -77,7 +78,7 @@ public class HiveSink implements SinkInterface {
                         model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH));
                 hdfsSink.init(model);
 
-                logger.info("Creating temporary table");
+                logger.info("Creating temporary table: " + tableNameTemporary);
                 prepareAndExecuteStatement(
                         "CREATE EXTERNAL TABLE IF NOT EXISTS " + tableNameTemporary + model.getSQLSchema() +
                                 " STORED AS PARQUET " +
