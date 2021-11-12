@@ -163,7 +163,7 @@ public abstract class Field<T> {
     }
 
     public String toCSVString(T value) {
-        return value.toString() + ",";
+        return "\"" + value.toString() + "\",";
     }
 
     // This function needs to be overrided in each field
