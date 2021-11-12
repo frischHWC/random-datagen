@@ -32,7 +32,7 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/tmp/random_datagen/employee/"},
+    {"HDFS_FILE_PATH": "/tmp/random_datagen/hdfs/employee/"},
     {"HDFS_FILE_NAME": "employee"},
     {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/hive/employee/"},
     {"HBASE_TABLE_NAME": "employee"},
@@ -43,7 +43,7 @@
     {"HIVE_DATABASE": "random_datagen"},
     {"HIVE_TABLE_NAME":  "employee"},
     {"HIVE_TEMPORARY_TABLE_NAME":  "employee_tmp_test"},
-    {"KUDU_TABLE_NAME":  "random_datagen.employee_kudu"},
+    {"KUDU_TABLE_NAME":  "random_datagen.employee"},
     {"LOCAL_FILE_PATH":  "/root/random_datagen/employee/"},
     {"LOCAL_FILE_NAME":  "employee"},
     {"AVRO_NAME":  "employee"}

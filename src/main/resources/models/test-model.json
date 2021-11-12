@@ -20,12 +20,12 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/tmp/random_datagen/test_model/"},
-    {"HDFS_FILE_NAME": "random_data"},
-    {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/test_model/hive/"},
-    {"HIVE_DATABASE": "random_data"},
+    {"HDFS_FILE_PATH": "/tmp/random_datagen/hdfs/test_model/"},
+    {"HDFS_FILE_NAME": "test_model"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/hive/test_model/"},
+    {"HIVE_DATABASE": "random_datagen"},
     {"HIVE_TABLE_NAME":  "person_balance"},
-    {"LOCAL_FILE_PATH":  "/root/random_datagen/"},
+    {"LOCAL_FILE_PATH":  "/root/random_datagen/test_model/"},
     {"LOCAL_FILE_NAME":  "random-datagen"},
     {"AVRO_NAME":  "randomdata"}
   ]
