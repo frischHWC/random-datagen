@@ -10,6 +10,14 @@
       "type": "NAME"
     },
     {
+      "name": "increment_int",
+      "type": "INCREMENT_INTEGER"
+    },
+    {
+      "name": "increment_LONG",
+      "type": "INCREMENT_LONG"
+    },
+    {
       "name": "balance_used",
       "type": "FLOAT"
     },
