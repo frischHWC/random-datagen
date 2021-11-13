@@ -52,9 +52,13 @@ public class Main {
             logger.info("Finished to process batch " + (i+1) + "/" + numberOfBatches + " of " + rowsPerBatch + " rows");
         }
 
-        logger.info("All sinks will be closed");
+        // Recap of what has been generated
+        Utils.recap(numberOfBatches, rowsPerBatch, (List<ArgumentsParser.sinks>) ArgumentsParser.getArgsMap().get(ArgumentsParser.args.SINK_TO_FILL), model);
+        
         logger.info("Application Finished");
         logger.info("Application took : " + (System.currentTimeMillis()-start) + " ms to run");
+
+
     }
 
 }
