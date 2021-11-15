@@ -11,11 +11,13 @@ import org.apache.kudu.client.PartialRow;
 import org.apache.orc.TypeDescription;
 
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class StringField extends Field<String> {
 
-    StringField(String name, Integer length, List<String> possibleValues) {
+    StringField(String name, Integer length, List<String> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted) {
         this.name = name;
         if(length==null || length<1) {
             this.length = 20;
@@ -23,11 +25,17 @@ public class StringField extends Field<String> {
             this.length = length;
         }
         this.possibleValues = possibleValues;
+        this.possible_values_weighted = possible_values_weighted;
     }
 
     public String generateRandomValue() {
-        return possibleValues.isEmpty() ? Utils.getAlphaNumericString(this.length, random) :
-                possibleValues.get(random.nextInt(possibleValues.size()));
+        if(!possibleValues.isEmpty()) {
+            return possibleValues.get(random.nextInt(possibleValues.size()));
+        } else if (!possible_values_weighted.isEmpty()){
+            return Utils.getRandomValueWithWeights(random, possible_values_weighted);
+        } else {
+            return Utils.getAlphaNumericString(this.length, random);
+        }
     }
 
 

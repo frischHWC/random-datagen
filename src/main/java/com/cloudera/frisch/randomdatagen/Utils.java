@@ -6,6 +6,7 @@ import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.sink.*;
+import org.apache.avro.reflect.MapEntry;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.security.UserGroupInformation;
@@ -15,7 +16,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 
@@ -90,6 +93,23 @@ public class Utils {
     }
 
 
+    /**
+     * Using map of possible values weighted (between 0 and 100), it gives possible value
+     * @param random
+     * @param weights
+     * @return
+     */
+    public static String getRandomValueWithWeights(Random random, LinkedHashMap<String, Integer> weights) {
+        int randomIntPercentage = random.nextInt(100);
+        int sumOfWeight = 0;
+        for(Map.Entry<String, Integer> entry : weights.entrySet()) {
+            sumOfWeight = sumOfWeight + entry.getValue();
+            if(randomIntPercentage < sumOfWeight) {
+                return entry.getKey();
+            }
+        }
+        return "";
+    }
 
     /**
      * Login to kerberos using a given user and its associated keytab

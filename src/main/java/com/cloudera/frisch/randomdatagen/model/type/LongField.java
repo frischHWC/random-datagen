@@ -1,5 +1,6 @@
 package com.cloudera.frisch.randomdatagen.model.type;
 
+import com.cloudera.frisch.randomdatagen.Utils;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -10,19 +11,27 @@ import org.apache.kudu.client.PartialRow;
 import org.apache.orc.TypeDescription;
 
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class LongField extends Field<Long> {
 
-    LongField(String name, Integer length, List<Long> possibleValues) {
+    LongField(String name, Integer length, List<Long> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted) {
         this.name = name;
         this.length = length;
         this.possibleValues = possibleValues;
+        this.possible_values_weighted = possible_values_weighted;
     }
 
     public Long generateRandomValue() {
-        return possibleValues.isEmpty() ? random.nextLong() :
-        possibleValues.get(random.nextInt(possibleValues.size()));
+        if(!possibleValues.isEmpty()) {
+            return possibleValues.get(random.nextInt(possibleValues.size()));
+        } else if (!possible_values_weighted.isEmpty()){
+            String result = Utils.getRandomValueWithWeights(random, possible_values_weighted);
+            return result.isEmpty() ? 0L :  Long.parseLong(result);
+        } else {
+            return random.nextLong();
+        }
     }
 
     /*

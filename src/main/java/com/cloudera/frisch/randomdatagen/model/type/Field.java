@@ -15,7 +15,9 @@ import org.apache.orc.TypeDescription;
 import org.apache.solr.common.SolrInputDocument;
 
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -37,6 +39,10 @@ public abstract class Field<T> {
     @Getter
     @Setter
     public List<T> possibleValues;
+
+    @Getter
+    @Setter
+    public LinkedHashMap<String, Integer> possible_values_weighted;
 
     @Getter
     @Setter
@@ -81,7 +87,7 @@ public abstract class Field<T> {
      * @param columnQualifier Hbase column qualifier if there is one
      * @return Field instantiated or null if type has not been recognized
      */
-    public static Field instantiateField(String name, String type, Integer length, String columnQualifier, List<JsonNode> possibleValues) {
+    public static Field instantiateField(String name, String type, Integer length, String columnQualifier, List<JsonNode> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted) {
         if(name == null || name.isEmpty()) {
             throw new IllegalStateException("Name can not be null or empty for field: " + name);
         }
@@ -98,25 +104,25 @@ public abstract class Field<T> {
 
         switch (type.toUpperCase()) {
             case "STRING":
-                field = new StringField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
+                field = new StringField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()), possible_values_weighted);
                 break;
             case "STRINGAZ":
                 field = new StringAZField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
                 break;
             case "INTEGER":
-                field = new IntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()));
+                field = new IntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()), possible_values_weighted);
                 break;
             case "INCREMENT_INTEGER":
                 field = new IncrementIntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()));
                 break;
             case "BOOLEAN":
-                field = new BooleanField(name, length, possibleValues.stream().map(JsonNode::asBoolean).collect(Collectors.toList()));
+                field = new BooleanField(name, length, possibleValues.stream().map(JsonNode::asBoolean).collect(Collectors.toList()), possible_values_weighted);
                 break;
             case "FLOAT":
                 field = new FloatField(name, length, possibleValues.stream().map(j -> (float) j.asDouble()).collect(Collectors.toList()));
                 break;
             case "LONG":
-                field = new LongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()));
+                field = new LongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()), possible_values_weighted);
                 break;
             case "INCREMENT_LONG":
                 field = new IncrementLongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()));

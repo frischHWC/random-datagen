@@ -109,8 +109,18 @@ public class JsonParser<T extends Field> implements Parser {
             possibleValues = Collections.emptyList();
         }
 
+        JsonNode weightsObject = jsonField.get("possible_values_weighted");
+        LinkedHashMap<String, Integer> possible_values_weighted = new LinkedHashMap<>();
+        if(weightsObject!=null) {
+            Iterator<Map.Entry<String, JsonNode>> weightsIterator = weightsObject.fields();
+            while (weightsIterator.hasNext()) {
+                Map.Entry<String, JsonNode> weight = weightsIterator.next();
+                possible_values_weighted.put(weight.getKey(), weight.getValue().asInt());
+            }
+        }
+
         return (T) Field.instantiateField(jsonField.get("name").asText(), jsonField.get("type").asText(), length,
-                opsMap.get(jsonField.get("name").asText()), possibleValues);
+                opsMap.get(jsonField.get("name").asText()), possibleValues, possible_values_weighted);
     }
 
     private Map<String, String> mapColNameToColQual(String mapping) {
