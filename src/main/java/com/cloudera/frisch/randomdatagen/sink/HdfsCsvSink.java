@@ -48,6 +48,11 @@ public class HdfsCsvSink implements SinkInterface {
             logger.error("Could not access to HDFSCSV !", e);
         }
 
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
+            Utils.deleteAllHdfsFiles(fileSystem, (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH),
+                (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME), "csv");
+        }
+
         if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".csv");

@@ -5,12 +5,14 @@ import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.BaseHttpSolrClient;
 import org.apache.solr.client.solrj.impl.HttpClientUtil;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.impl.Krb5HttpClientBuilder;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,9 +60,18 @@ public class SolRSink implements SinkInterface {
 
         }
 
-        httpSolrClient = solrClientBuilder.build();
+        this.httpSolrClient = solrClientBuilder.build();
+        this.collection = (String) model.getTableNames().get(OptionsConverter.TableNames.SOLR_COLLECTION);
 
-        collection = (String) model.getTableNames().get(OptionsConverter.TableNames.SOLR_COLLECTION);
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
+            try {
+                httpSolrClient.request(
+                    CollectionAdminRequest.deleteCollection(collection));
+            } catch (SolrServerException| IOException e) {
+                logger.error("Could not delete previous collection: " + collection + " due to error: ", e);
+            }
+        }
+
         createSolRCollectionIfNotExists(collection, model);
 
         // Set base URL directly to the collection, note that this is required

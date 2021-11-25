@@ -1,5 +1,6 @@
 package com.cloudera.frisch.randomdatagen.sink;
 
+import com.cloudera.frisch.randomdatagen.Utils;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
@@ -36,6 +37,11 @@ public class ORCSink implements SinkInterface {
         schema = model.getOrcSchema();
         batch = schema.createRowBatch();
         vectors = model.createOrcVectors(batch);
+
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
+            Utils.deleteAllLocalFiles((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH),
+                (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) , "orc");
+        }
 
         if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             String filepath = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +

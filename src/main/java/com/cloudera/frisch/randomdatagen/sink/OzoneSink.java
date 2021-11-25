@@ -41,12 +41,14 @@ public class OzoneSink implements SinkInterface {
             }
 
 
-            ozClient = OzoneClientFactory.getRpcClient(PropertiesLoader.getProperty("ozone.service.id"), config);
+            this.ozClient = OzoneClientFactory.getRpcClient(PropertiesLoader.getProperty("ozone.service.id"), config);
+            this.objectStore = ozClient.getObjectStore();
 
-            objectStore = ozClient.getObjectStore();
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
+                objectStore.deleteVolume((String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME));
+            }
 
             createVolumeIfItDoesNotExist((String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME));
-
             volume = objectStore.getVolume((String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME));
 
         } catch (IOException e) {

@@ -8,11 +8,15 @@ import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.sink.*;
 import org.apache.avro.reflect.MapEntry;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.log4j.Logger;
 
 import javax.security.auth.Subject;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -144,6 +148,39 @@ public class Utils {
 
         System.setProperty("HADOOP_USER_NAME", PropertiesLoader.getProperty("hadoop.user"));
         System.setProperty("hadoop.home.dir", PropertiesLoader.getProperty("hadoop.home"));
+    }
+
+    /**
+     * Delete all local files in a specified directory with a specified extension and a name
+     * @param directory
+     * @param extension
+     */
+    public static void deleteAllLocalFiles(String directory, String name, String extension) {
+        File folder = new File(directory);
+        File[] files = folder.listFiles((dir,f) -> f.matches(name + ".*[.]" + extension));
+        for(File f: files){
+            logger.debug("Will delete file: " + f);
+            if(!f.delete()) { logger.warn("Could not delete file: " + f);}
+        }
+    }
+
+    /**
+     * Delete all HDFS files in a specified directory with a specified extension and a name
+     * @param directory
+     * @param extension
+     */
+    public static void deleteAllHdfsFiles(FileSystem fileSystem, String directory, String name, String extension) {
+        try {
+            RemoteIterator<LocatedFileStatus> fileiterator =  fileSystem.listFiles(new Path(directory), false);
+            while(fileiterator.hasNext()) {
+                LocatedFileStatus file = fileiterator.next();
+                if(file.getPath().getName().matches(name + ".*[.]" + extension)) {
+                    fileSystem.delete(file.getPath(), false);
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Could not delete files under " + directory + " due to error: ", e);
+        }
     }
 
 

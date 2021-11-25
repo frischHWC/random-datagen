@@ -10,10 +10,12 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.kafka.clients.CommonClientConfigs;
+import org.apache.kafka.clients.admin.KafkaAdminClient;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
@@ -103,6 +105,10 @@ public class KafkaSink implements SinkInterface {
         }
 
         topic = (String) model.getTableNames().get(OptionsConverter.TableNames.KAFKA_TOPIC);
+
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
+            KafkaAdminClient.create(props).deleteTopics(Arrays.asList(topic));
+        }
 
         if(messagetype==MessageType.AVRO) {
             producer = new KafkaProducer<>(props);

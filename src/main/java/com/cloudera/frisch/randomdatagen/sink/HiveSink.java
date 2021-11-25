@@ -70,6 +70,10 @@ public class HiveSink implements SinkInterface {
 
             hiveConnection.setSchema(database);
 
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
+                prepareAndExecuteStatement("DROP TABLE IF EXISTS " + tableName);
+            }
+
             logger.info("SQL schema for hive: " + model.getSQLSchema());
             prepareAndExecuteStatement("CREATE TABLE IF NOT EXISTS " + tableName + model.getSQLSchema());
 

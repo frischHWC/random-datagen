@@ -54,6 +54,10 @@ public class KuduSink implements SinkInterface {
             }
             session.setMutationBufferSpace((int) model.getOptionsOrDefault(OptionsConverter.Options.KUDU_BUFFER));
 
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
+               client.deleteTable((String) model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME));
+            }
+
             table = client.openTable((String) model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME));
 
         } catch (Exception e) {

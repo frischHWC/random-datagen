@@ -61,6 +61,11 @@ public class HdfsOrcSink implements SinkInterface {
         batch = schema.createRowBatch();
         vectors = model.createOrcVectors(batch);
 
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
+            Utils.deleteAllHdfsFiles(fileSystem, (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH),
+                (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME), "orc");
+        }
+
         if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             String filepath = PropertiesLoader.getProperty("hdfs.uri") + model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".orc";
@@ -87,14 +92,6 @@ public class HdfsOrcSink implements SinkInterface {
             logger.debug("Successfully created hdfs file : " + path);
         } catch (IOException e) {
             logger.error("Tried to create file : " + path + " with no success :", e);
-        }
-    }
-
-    void emptyDirectory(String path) {
-        try {
-            fileSystem.delete(new Path(path), true);
-        } catch (IOException e) {
-            logger.error("Unable to delete directory and subdirectories of : " + path + " due to error: ", e);
         }
     }
 

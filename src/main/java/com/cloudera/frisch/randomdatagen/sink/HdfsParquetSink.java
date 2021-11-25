@@ -53,6 +53,11 @@ public class HdfsParquetSink implements SinkInterface {
 
         schema = model.getAvroSchema();
 
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
+            Utils.deleteAllHdfsFiles(fileSystem, (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH),
+                (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME), "parquet");
+        }
+
         if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             String filepath = PropertiesLoader.getProperty("hdfs.uri") + model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".parquet";

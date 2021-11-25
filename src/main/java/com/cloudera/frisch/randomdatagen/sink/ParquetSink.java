@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.sink;
 
 
+import com.cloudera.frisch.randomdatagen.Utils;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
@@ -30,6 +31,11 @@ public class ParquetSink implements SinkInterface {
     public void init(Model model) {
 
         schema = model.getAvroSchema();
+
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
+            Utils.deleteAllLocalFiles((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH),
+                (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) , "parquet");
+        }
 
         if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             String filePath = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +

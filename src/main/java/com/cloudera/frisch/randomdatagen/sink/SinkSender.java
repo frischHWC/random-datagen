@@ -82,7 +82,7 @@ public class SinkSender {
                     sinkToInitAndStart = new ORCSink();
                     break;
                  default:
-                     logger.info("The sink " + sink.toString() + " provided has not been recognized as an expected sink");
+                     logger.info("The sink " + sink + " provided has not been recognized as an expected sink");
                      break;
             }
 

@@ -48,9 +48,12 @@ public class HbaseSink implements SinkInterface {
             String fullTableName = model.getTableNames().get(OptionsConverter.TableNames.HBASE_NAMESPACE) + ":" +
                     model.getTableNames().get(OptionsConverter.TableNames.HBASE_TABLE_NAME);
 
-            logger.warn("will create namespace");
-
             createNamespaceIfNotExists((String) model.getTableNames().get(OptionsConverter.TableNames.HBASE_NAMESPACE));
+
+            if (connection.getAdmin().tableExists(TableName.valueOf(fullTableName)) &&
+                (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
+                connection.getAdmin().deleteTable(TableName.valueOf(fullTableName));
+            }
 
             if (!connection.getAdmin().tableExists(TableName.valueOf(fullTableName))) {
 
