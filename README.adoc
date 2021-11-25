@@ -100,7 +100,91 @@ All available types are:
 - BLOB which is a byte array of default 1MB (length represents length of byte array) (Use it carefully) +
 - EMAIL which is a string as in form of (<name>.<name>|<AZ09><name>)@(google|outlook|yahoo|mail).com +
 
-Note that each field could have defined a set of "possible_values" that will limit values to be exactly these ones.
+Fields values could be also more "deterministic" by providing manually values, or providing values and give them a weight to choose repartition,
+or even create conditions based on other columns values.
+
+===== Possible values
+
+Each field could have defined a set of "possible_values" that will limit values to be exactly these.
+
+===== Possible values weighted
+
+A weight (choose between 0 & 100 and whose sums of all weights must be 100) could also be defined
+to make it less random and make each value having a percentage of appearance. (Only String, Boolean, Integer and Long supports weight).
+
+===== Minimum & Maximum
+
+It is possible for INTEGER and LONG type to define a minimum and a maximum.
+
+===== Conditionals
+
+Conditions must be make on previous defined columns.
+Two types of condition:
+
+1. Formula, possible for Float/Integer/Long
+Types must be compatible (int can be converted to long but not the invert).
+It is a simple expression evaluated with operators: * , + , - , /
+Output column must be of type STRING, Input columns (used to compute) must be INTEGER or LONG or FLOAT
+
+Example:
+        "conditionals": {
+            "always": "2 * $very_low_int + 56 - $low_int"
+        }
+
+Be careful of letting space in your expression to be parseable and evaluated.
+
+1. Value depend on other column's value, possible for Integer/Long/Float/String/Boolean (using these types)
+Support for && (= AND) and || (= OR).
+Conditions must be equals (=) or unequals (!=) or superior (>) or inferior (<).
+Multiple conditions is working on same line.
+Conditions are evaluated one by one like a "if ... else if ...", first one returning true is picked.
+Output column must be of type STRING, columns of input must be STRING or LONG or INTEGER or FLOAT
+
+Example:
+        "conditionals": {
+            "$country_of_provenance=FRANCE" : "Paris",
+            "$country_of_provenance=GERMANY | $increment_int<40" : "Berlin",
+            "$country_of_provenance=GERMANY & $increment_int>40" : "Berlin_40"
+        }
+
+_N.B.: Multiple conditions are evaluated using precedence of AND over OR, meaning: A & B | C will in fact be evaluated like (A & B) | C_
+
+===== Examples
+
+A simple definition of a field looks like this:
+
+    {
+      "name": "name",
+      "type": "NAME"
+    }
+
+A definition with restricted values:
+
+    {
+      "name": "credits_used",
+      "type": "INTEGER",
+      "possible_values": [0, 1, -1]
+    }
+
+A definition with weighted values to not generate even spread data:
+
+    {
+      "name": "country_of_provenance",
+      "type": "STRING",
+      "possible_values_weighted": {
+        "France": 40,
+        "Germany": 60
+      }
+    }
+
+A definition with minimum and maximum:
+
+    {
+      "name": "percentage",
+      "type": "INTEGER",
+      "min": 0,
+      "max": 100
+    }
 
 ==== Table Names:
 
@@ -126,6 +210,9 @@ corresponding to the name of field (multiple fields could be provided separated 
 - HBASE_PRIMARY_KEY +
 - OZONE_BUCKET +
 - OZONE_KEY +
+- KUDU_PRIMARY_KEYS +
+- KUDU_HASH_KEYS +
+- KUDU_RANGE_KEYS
 
 ==== Options:
 
@@ -134,6 +221,7 @@ An array of other options that could be required depending with which sinks it i
 This mapping must be in the form : "CF:col1,col2;CF2:col5" +
 - SOLR_SHARDS +
 - SOLR_REPLICAS +
+- KUDU_REPLICAS
 
 
 Note that all not required settings could be safely removed with no errors.

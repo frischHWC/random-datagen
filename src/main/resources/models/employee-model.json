@@ -32,17 +32,18 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/tmp/random_datagen/employee/"},
+    {"HDFS_FILE_PATH": "/tmp/random_datagen/hdfs/employee/"},
     {"HDFS_FILE_NAME": "employee"},
     {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/hive/employee/"},
     {"HBASE_TABLE_NAME": "employee"},
-    {"HBASE_NAMESPACE": "rd"},
+    {"HBASE_NAMESPACE": "random_datagen"},
     {"KAFKA_TOPIC": "employee"},
     {"OZONE_VOLUME": "employee"},
     {"SOLR_COLLECTION": "employee"},
     {"HIVE_DATABASE": "random_datagen"},
     {"HIVE_TABLE_NAME":  "employee"},
-    {"KUDU_TABLE_NAME":  "random_datagen.employee_kudu"},
+    {"HIVE_TEMPORARY_TABLE_NAME":  "employee_tmp_test"},
+    {"KUDU_TABLE_NAME":  "random_datagen.employee"},
     {"LOCAL_FILE_PATH":  "/root/random_datagen/employee/"},
     {"LOCAL_FILE_NAME":  "employee"},
     {"AVRO_NAME":  "employee"}
@@ -52,11 +53,14 @@
     {"HBASE_PRIMARY_KEY":  "id"},
     {"OZONE_BUCKET":  "department"},
     {"OZONE_KEY":  "id"},
-    {"KUDU_HASH_KEYS":  "id"}
+    {"KUDU_PRIMARY_KEYS":  "id"},
+    {"KUDU_HASH_KEYS":  "id"},
+    {"KUDU_RANGE_KEYS":  "last_connection"}
   ],
   "Options": [
     {"HBASE_COLUMN_FAMILIES_MAPPING": "details:name,country,birthdate,department;technicals:last_connection,seniority,id"},
     {"SOLR_SHARDS":  1},
-    {"SOLR_REPLICAS":  1}
+    {"SOLR_REPLICAS":  1},
+    {"KUDU_REPLICAS":  1}
   ]
 }

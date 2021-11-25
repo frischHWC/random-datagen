@@ -1,5 +1,6 @@
 package com.cloudera.frisch.randomdatagen.model.type;
 
+import com.cloudera.frisch.randomdatagen.Utils;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -10,19 +11,46 @@ import org.apache.kudu.client.PartialRow;
 import org.apache.orc.TypeDescription;
 
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class FloatField extends Field<Float> {
 
-    FloatField(String name, Integer length, List<Float> possibleValues) {
+    FloatField(String name, Integer length, List<Float> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals, Long min, Long max) {
+        if(length==null || length==-1) {
+            this.length = Integer.MAX_VALUE;
+        } else {
+            this.length = length;
+        }
+        if(max==null || max==-1) {
+            this.max = Long.MAX_VALUE;
+        } else {
+            this.max = max;
+        }
+        if(min==null || min==-1) {
+            this.min = Long.MIN_VALUE;
+        } else {
+            this.min = min;
+        }
         this.name = name;
-        this.length = length;
         this.possibleValues = possibleValues;
+        this.possible_values_weighted = possible_values_weighted;
+        this.conditionals = conditionals;
     }
 
     public Float generateRandomValue() {
-        return possibleValues.isEmpty() ? random.nextFloat() :
-        possibleValues.get(random.nextInt(possibleValues.size()));
+        if(!possibleValues.isEmpty()) {
+            return possibleValues.get(random.nextInt(possibleValues.size()));
+        } else if (!possible_values_weighted.isEmpty()){
+            String result = Utils.getRandomValueWithWeights(random, possible_values_weighted);
+            return result.isEmpty() ? 0f :  Float.parseFloat(result);
+        } else {
+            float randomFloat = random.nextFloat();
+            while(randomFloat < min && randomFloat > max) {
+                randomFloat = random.nextLong();
+            }
+            return randomFloat;
+        }
     }
 
     /*

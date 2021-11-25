@@ -46,7 +46,15 @@ public class KuduSink implements SinkInterface {
             createTableIfNotExists((String) model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME), model);
 
             session = client.newSession();
+            session.setFlushMode(SessionConfiguration.FlushMode.MANUAL_FLUSH);
+            session.setMutationBufferSpace(100001);
             table = client.openTable((String) model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME));
+
+            /*
+            MANUAL FLUSH: 488 564 ms
+            AUTO FLUSH: too long
+            BACKGROUND FLUSH: 491 579 ms
+             */
 
         } catch (Exception e) {
             logger.error("Could not connect to Kudu due to error: ", e);
@@ -55,9 +63,23 @@ public class KuduSink implements SinkInterface {
 
 
     private void createTableIfNotExists(String tableName, Model model) {
+        /*
+        try {
+            client.deleteTable(tableName);
+        }catch (KuduException e) {
+            logger.warn("Could not delete table: " + tableName);
+        }
+        */
+
         CreateTableOptions cto = new CreateTableOptions();
-        cto.setNumReplicas(1);
-        cto.addHashPartitions(model.getKuduHashKeys(), 8);
+        cto.setNumReplicas((int) model.getOptions().get(OptionsConverter.Options.KUDU_REPLICAS));
+
+        if(!model.getKuduRangeKeys().isEmpty()) {
+            cto.setRangePartitionColumns(model.getKuduRangeKeys());
+        }
+        if(!model.getKuduHashKeys().isEmpty()) {
+            cto.addHashPartitions(model.getKuduHashKeys(), 32);
+        }
 
         try {
             client.createTable(tableName, model.getKuduSchema(), cto);
@@ -71,11 +93,10 @@ public class KuduSink implements SinkInterface {
 
     }
 
-    // TODO: Handle properly end of kudu session
     public void terminate() {
         try {
-            session.flush();
             session.close();
+            client.shutdown();
         } catch (Exception e) {
             logger.error("Could not close connection to Kudu due to error: ", e);
         }

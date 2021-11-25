@@ -3,7 +3,7 @@ Albania
 Algeria
 Andorra
 Angola
-Antigua & Deps
+Antigua and Deps
 Argentina
 Armenia
 Australia
@@ -37,7 +37,6 @@ China
 Colombia
 Comoros
 Congo
-Congo {Democratic Rep}
 Costa Rica
 Croatia
 Cuba
@@ -77,7 +76,7 @@ India
 Indonesia
 Iran
 Iraq
-Ireland {Republic}
+Ireland
 Israel
 Italy
 Ivory Coast
@@ -119,7 +118,7 @@ Mongolia
 Montenegro
 Morocco
 Mozambique
-Myanmar, {Burma}
+Myanmar
 Namibia
 Nauru
 Nepal
@@ -143,12 +142,12 @@ Qatar
 Romania
 Russian Federation
 Rwanda
-St Kitts & Nevis
+St Kitts and Nevis
 St Lucia
 Saint Vincent & the Grenadines
 Samoa
 San Marino
-Sao Tome & Principe
+Sao Tome and Principe
 Saudi Arabia
 Senegal
 Serbia
@@ -175,7 +174,7 @@ Tanzania
 Thailand
 Togo
 Tonga
-Trinidad & Tobago
+Trinidad and Tobago
 Tunisia
 Turkey
 Turkmenistan

@@ -2,12 +2,38 @@
   "Fields": [
     {
       "name": "country_of_provenance",
-      "type": "COUNTRY",
-      "possible_values": ["France", "Germany"]
+      "type": "STRING",
+      "possible_values_weighted": {
+        "France": 30,
+        "Germany": 70
+      }
     },
     {
-      "name": "name",
-      "type": "NAME"
+      "name": "low_int",
+      "type": "INTEGER",
+      "length": 100
+    },
+    {
+      "name": "very_low_int",
+      "type": "INTEGER",
+      "length": 10
+    },
+    {
+      "name": "dependent_long",
+      "type": "LONG",
+      "conditionals": {
+        "always": "2 * $very_low_int + 56 - $low_int"
+      }
+    },
+    {
+      "name": "dependent_city",
+      "type": "STRING",
+      "conditionals": {
+        "$country_of_provenance=FRANCE" : "Paris",
+        "$country_of_provenance=GERMANY & $low_int<40" : "Berlin",
+        "$country_of_provenance!GERMANY | $very_low_int>$low_int" : "Berlin_40",
+        "default" : "toto"
+      }
     },
     {
       "name": "balance_used",
@@ -20,12 +46,12 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/tmp/random_datagen/test_model/"},
-    {"HDFS_FILE_NAME": "random_data"},
-    {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/test_model/hive/"},
-    {"HIVE_DATABASE": "random_data"},
-    {"HIVE_TABLE_NAME":  "person_balance"},
-    {"LOCAL_FILE_PATH":  "/root/random_datagen/"},
+    {"HDFS_FILE_PATH": "/tmp/random_datagen/hdfs/test_model/"},
+    {"HDFS_FILE_NAME": "test_model"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/hive/test_model_cond_1/"},
+    {"HIVE_DATABASE": "random_datagen"},
+    {"HIVE_TABLE_NAME":  "person_balance_test_cond_1"},
+    {"LOCAL_FILE_PATH":  "/tmp/"},
     {"LOCAL_FILE_NAME":  "random-datagen"},
     {"AVRO_NAME":  "randomdata"}
   ]

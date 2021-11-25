@@ -1,6 +1,5 @@
 package com.cloudera.frisch.randomdatagen.sink;
 
-import com.cloudera.frisch.randomdatagen.ShutdownHook;
 import com.cloudera.frisch.randomdatagen.config.ArgumentsParser;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import org.apache.log4j.Logger;
@@ -88,7 +87,6 @@ public class SinkSender {
             }
 
         });
-        Runtime.getRuntime().addShutdownHook(new ShutdownHook(sinkList));
         return sinkList;
     }
 

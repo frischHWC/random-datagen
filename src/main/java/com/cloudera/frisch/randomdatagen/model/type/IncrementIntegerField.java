@@ -1,6 +1,5 @@
 package com.cloudera.frisch.randomdatagen.model.type;
 
-import com.cloudera.frisch.randomdatagen.Utils;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -11,44 +10,25 @@ import org.apache.kudu.client.PartialRow;
 import org.apache.orc.TypeDescription;
 
 import java.sql.SQLException;
-import java.util.LinkedHashMap;
 import java.util.List;
 
-public class IntegerField extends Field<Integer> {
+public class IncrementIntegerField extends Field<Integer> {
 
-    IntegerField(String name, Integer length, List<Integer> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals, Long min, Long max) {
+    private Integer counter = 0;
+
+    IncrementIntegerField(String name, Integer length, List<Integer> possibleValues) {
         this.name = name;
         if(length==null || length==-1) {
             this.length = Integer.MAX_VALUE;
         } else {
             this.length = length;
         }
-        if(max==null || max==-1) {
-            this.max = Integer.MAX_VALUE;
-        } else {
-            this.max = max;
-        }
-        if(min==null || min==-1) {
-            this.min = Integer.MIN_VALUE;
-        } else {
-            this.min = min;
-        }
         this.possibleValues = possibleValues;
-        this.possible_values_weighted = possible_values_weighted;
-        this.conditionals = conditionals;
     }
 
     public Integer generateRandomValue() {
-        if(!possibleValues.isEmpty()) {
-            return possibleValues.get(random.nextInt(possibleValues.size()));
-        } else if (!possible_values_weighted.isEmpty()){
-            String result = Utils.getRandomValueWithWeights(random, possible_values_weighted);
-            return result.isEmpty() ? 0 :  Integer.parseInt(result);
-        } else if(min != Integer.MIN_VALUE) {
-            return random.nextInt((int) max - (int) min + 1 ) + (int) min;
-        } else {
-            return random.nextInt((int) max);
-        }
+        counter++;
+        return counter;
     }
 
     /*

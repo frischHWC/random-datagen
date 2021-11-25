@@ -22,6 +22,7 @@ public class NameField extends Field<String> {
 
     private List<String> nameDico;
 
+
     NameField(String name, Integer length, List<String> possibleValues) {
         this.name = name;
         this.length = length;

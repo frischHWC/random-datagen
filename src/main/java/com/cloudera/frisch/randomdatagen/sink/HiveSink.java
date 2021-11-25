@@ -20,7 +20,8 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * This a HiveSink, each instance manages its own session and a preparedStatement for insertion
- * An inner class @see{com.cloudera.frisch.randomy.sink.HiveSinkParallel} below, allows multi threaded inserts,
+ * It is recommended to use HDFS option that will create HDFS files before laoding them into Hive using a SQL statement.
+ * An inner class @see{com.cloudera.frisch.randomdatagen.sink.HiveSinkParallel} below, allows multi threaded inserts,
  * It is recommended to not insert too many rows as Hive is very slow on insertion and use the batch function,
  * with a high number of rows per batch and few batches (to avoid recreating connection to Hive each time)
  * and with a maximum of 20 threads (configurable in config.properties)
@@ -59,7 +60,8 @@ public class HiveSink implements SinkInterface {
 
             database = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE);
             tableName = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TABLE_NAME);
-            tableNameTemporary = tableName + "_tmp";
+            tableNameTemporary = model.getTableNames().get(OptionsConverter.TableNames.HIVE_TEMPORARY_TABLE_NAME)==null ?
+                tableName + "_tmp" : (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TEMPORARY_TABLE_NAME);
             String locationTemporaryTable = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH);
 
             prepareAndExecuteStatement("CREATE DATABASE IF NOT EXISTS " + database);
@@ -76,7 +78,7 @@ public class HiveSink implements SinkInterface {
                         model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH));
                 hdfsSink.init(model);
 
-                logger.info("Creating temporary table");
+                logger.info("Creating temporary table: " + tableNameTemporary);
                 prepareAndExecuteStatement(
                         "CREATE EXTERNAL TABLE IF NOT EXISTS " + tableNameTemporary + model.getSQLSchema() +
                                 " STORED AS PARQUET " +

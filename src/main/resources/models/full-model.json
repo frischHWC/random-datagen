@@ -5,14 +5,20 @@
       "type": "INTEGER"
     },
     {
-      "name": "percentage",
-      "type": "INTEGER",
-      "length": 100
-    },
-    {
       "name": "category",
       "type": "INTEGER",
       "possible_values": [0, 1, -1]
+    },
+    {
+      "name": "department",
+      "type": "STRING",
+      "possible_values": ["hr", "consulting", "marketing", "finance"]
+    },
+    {
+      "name": "percentage",
+      "type": "INTEGER",
+      "min": 0,
+      "max": 100
     },
     {
       "name": "abbreviation",
@@ -22,11 +28,6 @@
     {
       "name": "randomName",
       "type": "STRING"
-    },
-    {
-      "name": "department",
-      "type": "STRING",
-      "possible_values": ["hr", "consulting", "marketing", "finance"]
     },
     {
       "name": "userEmail",
@@ -82,21 +83,60 @@
     {
       "name": "country",
       "type": "COUNTRY"
+    },
+    {
+      "name": "longPercent",
+      "type": "LONG",
+      "min": 0,
+      "max": 100
+    },
+    {
+      "name": "onePlusOne",
+      "type": "INCREMENT_INTEGER"
+    },
+    {
+      "name": "onePlusTwo",
+      "type": "INCREMENT_LONG"
+    },
+    {
+      "name": "formula_1",
+      "type": "STRING",
+      "conditionals": {
+        "always": "2 * $longPercent + 42 - $onePlusOne"
+      }
+    },
+    {
+      "name": "condition_2",
+      "type": "STRING",
+      "conditionals": {
+        "$category=0" : "first_cond",
+        "$bool=true" : "second_cond",
+        "$category=1 & $longPercent<50" : "third_cond",
+        "$country!GERMANY | $longPercent>$onePlusTwo" : "fourth_cond",
+        "default" : "default"
+      }
+    },
+    {
+      "name": "recording_time",
+      "type": "INTEGER",
+      "min": 1606229803,
+      "max": 1637764585
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/tmp/random_datagen/full_model/"},
-    {"HDFS_FILE_NAME": "random_data"},
+    {"HDFS_FILE_PATH": "/tmp/random_datagen/hdfs/full_model/"},
+    {"HDFS_FILE_NAME": "full"},
     {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/hive/full_model/"},
-    {"HBASE_TABLE_NAME": "random_datagen"},
-    {"HBASE_NAMESPACE": "rd"},
+    {"HBASE_TABLE_NAME": "full_rd"},
+    {"HBASE_NAMESPACE": "random_datagen"},
     {"KAFKA_TOPIC": "random_datagen"},
     {"OZONE_VOLUME": "random-datagen"},
     {"SOLR_COLLECTION": "random_datagen"},
-    {"HIVE_DATABASE": "fake_data"},
-    {"HIVE_TABLE_NAME":  "random_datagen"},
-    {"KUDU_TABLE_NAME":  "random_datagen.rd_kudu"},
-    {"LOCAL_FILE_PATH":  "/root/random_datagen/"},
+    {"HIVE_DATABASE": "random_datagen"},
+    {"HIVE_TABLE_NAME":  "full_rd"},
+    {"HIVE_TEMPORARY_TABLE_NAME":  "full_tmp_test"},
+    {"KUDU_TABLE_NAME":  "random_datagen.full"},
+    {"LOCAL_FILE_PATH":  "/root/random_datagen/full/"},
     {"LOCAL_FILE_NAME":  "random-datagen"},
     {"AVRO_NAME":  "randomdata"}
   ],
@@ -105,11 +145,14 @@
     {"HBASE_PRIMARY_KEY":  "bool,progression"},
     {"OZONE_BUCKET":  "abbreviation"},
     {"OZONE_KEY":  "randomName"},
-    {"KUDU_HASH_KEYS":  "size"}
+    {"KUDU_PRIMARY_KEYS":  "size,category,department"},
+    {"KUDU_HASH_KEYS":  "size,department"},
+    {"KUDU_RANGE_KEYS":  "category"}
   ],
   "Options": [
-    {"HBASE_COLUMN_FAMILIES_MAPPING": "c:randomName,abbreviation,size,bool,progression,percentage,limitedName,userEmail,department;d:bytesLittleArray,bigSize,startDate,bytesArray,hash,birthdate,name,country,restrictedHash,category"},
+    {"HBASE_COLUMN_FAMILIES_MAPPING": "c:randomName,abbreviation,size,bool,progression,percentage,limitedName,userEmail,department;d:bytesLittleArray,bigSize,startDate,bytesArray,hash,birthdate,name,country,restrictedHash,category,e:longPercent,onePlusOne,onePlusTwo,formula_1,condition_2,recording_time"},
     {"SOLR_SHARDS":  1},
-    {"SOLR_REPLICAS":  1}
+    {"SOLR_REPLICAS":  1},
+    {"KUDU_REPLICAS":  1}
   ]
 }

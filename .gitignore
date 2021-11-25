@@ -8,3 +8,8 @@ target/
 src/main/resources/overall_launch.sh
 src/main/resources/create_release.sh
 src/main/resources/config.properties
+.factorypath
+.classpath
+.settings
+.project
+config.properties

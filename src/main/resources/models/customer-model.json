@@ -1,10 +1,6 @@
 {
   "Fields": [
     {
-      "name": "id",
-      "type": "LONG"
-    },  
-    {
       "name": "name",
       "type": "NAME"
     },
@@ -31,18 +27,18 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/tmp/random_datagen/customer/"},
+    {"HDFS_FILE_PATH": "/tmp/random_datagen/hdfs/customer/"},
     {"HDFS_FILE_NAME": "customer"},
-    {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/hive/customer"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/hive/customer/"},
     {"HBASE_TABLE_NAME": "customer"},
-    {"HBASE_NAMESPACE": "rd"},
+    {"HBASE_NAMESPACE": "random_datagen"},
     {"KAFKA_TOPIC": "customer"},
     {"OZONE_VOLUME": "customer"},
     {"SOLR_COLLECTION": "customer"},
-    {"HIVE_DATABASE": "fake_data"},
+    {"HIVE_DATABASE": "random_datagen"},
     {"HIVE_TABLE_NAME":  "customer"},
-    {"KUDU_TABLE_NAME":  "random_datagen.customer_kudu"},
-    {"LOCAL_FILE_PATH":  "/root/random_datagen/"},
+    {"KUDU_TABLE_NAME":  "random_datagen.customer"},
+    {"LOCAL_FILE_PATH":  "/root/random_datagen/customer/"},
     {"LOCAL_FILE_NAME":  "customer"},
     {"AVRO_NAME":  "customer"}
   ],
@@ -51,11 +47,15 @@
     {"HBASE_PRIMARY_KEY":  "id"},
     {"OZONE_BUCKET":  "country"},
     {"OZONE_KEY":  "id"},
-    {"KUDU_HASH_KEYS":  "id"}
+    {"KUDU_HASH_KEYS":  "id"},
+    {"KUDU_PRIMARY_KEYS":  "id"},
+    {"KUDU_HASH_KEYS":  "id"},
+    {"KUDU_RANGE_KEYS":  "country"}
   ],
   "Options": [
     {"HBASE_COLUMN_FAMILIES_MAPPING": "details:name,email,country,birthdate;technicals:last_connection,membership,id"},
     {"SOLR_SHARDS":  1},
-    {"SOLR_REPLICAS":  1}
+    {"SOLR_REPLICAS":  1},
+    {"KUDU_REPLICAS":  1}
   ]
 }
