@@ -26,6 +26,7 @@ public class ArgumentsParser {
     private static sinks stringToSink(String sink) {
         switch (sink.toUpperCase()) {
             case "HDFS-CSV": return sinks.HDFSCSV;
+            case "HDFS-JSON": return sinks.HDFSJSON;
             case "HDFS-PARQUET": return sinks.HDFSPARQUET;
             case "HDFS-ORC": return sinks.HDFSORC;
             case "HDFS-AVRO": return sinks.HDFSAVRO;
@@ -36,6 +37,7 @@ public class ArgumentsParser {
             case "SOLR": return sinks.SOLR;
             case "KUDU": return sinks.KUDU;
             case "CSV": return sinks.CSV;
+            case "JSON": return sinks.JSON;
             case "AVRO": return sinks.AVRO;
             case "PARQUET": return sinks.PARQUET;
             case "ORC": return sinks.ORC;
@@ -52,6 +54,7 @@ public class ArgumentsParser {
 
     public enum sinks {
         HDFSCSV,
+        HDFSJSON,
         HDFSPARQUET,
         HDFSORC,
         HDFSAVRO,
@@ -62,6 +65,7 @@ public class ArgumentsParser {
         SOLR,
         KUDU,
         CSV,
+        JSON,
         AVRO,
         PARQUET,
         ORC

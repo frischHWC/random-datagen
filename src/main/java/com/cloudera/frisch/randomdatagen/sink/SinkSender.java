@@ -36,6 +36,9 @@ public class SinkSender {
                 case HDFSCSV:
                     sinkToInitAndStart = new HdfsCsvSink();
                     break;
+                case HDFSJSON:
+                    sinkToInitAndStart = new HdfsJsonSink();
+                    break;
                 case HDFSAVRO:
                     sinkToInitAndStart = new HdfsAvroSink();
                     break;
@@ -65,6 +68,9 @@ public class SinkSender {
                     break;
                 case CSV:
                     sinkToInitAndStart = new CSVSink();
+                    break;
+                case JSON:
+                    sinkToInitAndStart = new JsonSink();
                     break;
                 case AVRO:
                     sinkToInitAndStart = new AvroSink();

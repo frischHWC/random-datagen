@@ -230,6 +230,17 @@ public class Utils {
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" +
                     String.format("%010d", numberOfBatches-1) + ".csv");
                 break;
+            case HDFSJSON:
+                logger.info("   - HDFS as JSON files of " + rowPerBatch + " rows, from : ");
+                logger.info("       " +
+                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-0000000000.json");
+                logger.info("       to : ");
+                logger.info("       " +
+                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" +
+                    String.format("%010d", numberOfBatches-1) + ".json");
+                break;
             case HDFSAVRO:
                 logger.info("   - HDFS as Avro files of " + rowPerBatch + " rows, from : ");
                 logger.info("       " +
@@ -301,6 +312,17 @@ public class Utils {
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" +
                     String.format("%010d", numberOfBatches-1) + ".csv");
+                break;
+            case JSON:
+                logger.info("   - JSON files of " + rowPerBatch + " rows, from : " );
+                logger.info("       " +
+                    model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
+                    model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-0000000000.json");
+                logger.info("       to : ");
+                logger.info("       " +
+                    model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
+                    model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" +
+                    String.format("%010d", numberOfBatches-1) + ".json");
                 break;
             case AVRO:
                 logger.info("   - Avro files of " + rowPerBatch + " rows, from : ");

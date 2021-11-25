@@ -84,6 +84,15 @@ public class Row<T extends Field> {
         return sb.toString();
     }
 
+    public String toJSON() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("{ ");
+        values.forEach((f, o) -> sb.append(f.toJSONString(o)));
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append(" }");
+        return sb.toString();
+    }
+
 
     public Map.Entry<String, GenericRecord> toKafkaMessage(Schema schema) {
         GenericRecord genericRecordRow = new GenericData.Record(schema);

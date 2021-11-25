@@ -195,6 +195,10 @@ public abstract class Field<T> {
         return "\"" + value.toString() + "\",";
     }
 
+    public String toJSONString(T value) {
+        return "\"" + name + "\" : " + "\"" + value.toString() + "\",";
+    }
+
     // This function needs to be overrided in each field
     public Put toHbasePut(T value, Put hbasePut) {
         //hbasePut.addColumn(Bytes.toBytes(hbaseColumnQualifier), Bytes.toBytes(name), Bytes.toBytes(value));
