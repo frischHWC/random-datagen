@@ -18,7 +18,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
-
+import static com.hortonworks.registries.schemaregistry.serdes.avro.AvroSnapshotSerializer.SERDES_PROTOCOL_VERSION;
+import static com.hortonworks.registries.schemaregistry.serdes.avro.SerDesProtocolHandlerRegistry.METADATA_ID_VERSION_PROTOCOL;
 
 /**
  * This is a Kafka Sink
@@ -40,12 +41,27 @@ public class KafkaSink implements SinkInterface {
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
 
         if(PropertiesLoader.getProperty("kafka.messages").equalsIgnoreCase("avro")) {
-          props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
-              "com.hortonworks.registries.schemaregistry.serdes.avro.kafka.KafkaAvroSerializer");
-          props.put(
-              SchemaRegistryClient.Configuration.SCHEMA_REGISTRY_URL.name(),
-              "http://" + PropertiesLoader.getProperty("schema.registry.url") +
-                  "/api/v1");
+            String schemaRegistryProtocol = "http";
+          // SSL configs
+            if (Boolean.parseBoolean(PropertiesLoader.getProperty("schema.registry.tls"))) {
+                System.setProperty("javax.net.ssl.trustStore",
+                    PropertiesLoader.getProperty("kafka.truststore.location"));
+                System.setProperty("javax.net.ssl.trustStorePassword",
+                    PropertiesLoader.getProperty("kafka.truststore.password"));
+                System.setProperty("javax.net.ssl.keyStore",
+                    PropertiesLoader.getProperty("kafka.keystore.location"));
+                System.setProperty("javax.net.ssl.keyStorePassword",
+                    PropertiesLoader.getProperty("kafka.keystore.pasword"));
+                schemaRegistryProtocol = "https";
+            }
+
+            props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                "com.hortonworks.registries.schemaregistry.serdes.avro.kafka.KafkaAvroSerializer");
+            props.put(
+                SchemaRegistryClient.Configuration.SCHEMA_REGISTRY_URL.name(),
+                schemaRegistryProtocol + "://" + PropertiesLoader.getProperty("schema.registry.url") + "/api/v1");
+            props.put(SERDES_PROTOCOL_VERSION, METADATA_ID_VERSION_PROTOCOL);
+
         } else {
           props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
               "org.apache.kafka.common.serialization.StringSerializer");
@@ -130,7 +146,7 @@ public class KafkaSink implements SinkInterface {
     }
 
     /**
-     * Goal is to not overflow kafka brokers and verify they have well received data sent before going further
+     * Goal is to not overflow kafka brokers and verify they well received data sent before going further
      *
      * @param queue
      * @return
