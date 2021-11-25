@@ -67,7 +67,7 @@ public class Condition {
             columnName2 + " is " + this.columnType2);
         System.exit(1);
       } else {
-        logger.info("Comparison will be made between " + columnName1 + " and " +
+        logger.debug("Comparison will be made between " + columnName1 + " and " +
             columnName2 + " which are both " + this.columnType1);
       }
     }
@@ -91,7 +91,7 @@ public class Condition {
         System.exit(1);
       }
 
-      logger.info("Comparison will be made between " + columnName1 + " and " + value2 + " which are both " + this.columnType1);
+      logger.debug("Comparison will be made between " + columnName1 + " and " + value2 + " which are both " + this.columnType1);
     }
 
   }

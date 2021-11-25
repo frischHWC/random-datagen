@@ -31,13 +31,13 @@ public class KafkaSink implements SinkInterface {
 
     private Producer<String, GenericRecord> producer;
     private Producer<String, String> producerString;
-    private String topic;
-    private Schema schema;
-    private MessageType messagetype;
+    private final String topic;
+    private final Schema schema;
+    private final MessageType messagetype;
 
-    public void init(Model model) {
-
-        schema = model.getAvroSchema();
+    KafkaSink(Model model) {
+        this.topic =  (String) model.getTableNames().get(OptionsConverter.TableNames.KAFKA_TOPIC);
+        this.schema = model.getAvroSchema();
         this.messagetype = convertStringToMessageType((String) model.getOptions().get(OptionsConverter.Options.KAFKA_MESSAGE_TYPE));
 
         Properties props = new Properties();
@@ -104,19 +104,18 @@ public class KafkaSink implements SinkInterface {
             props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, PropertiesLoader.getProperty("kafka.truststore.password"));
         }
 
-        topic = (String) model.getTableNames().get(OptionsConverter.TableNames.KAFKA_TOPIC);
-
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
-            KafkaAdminClient.create(props).deleteTopics(Arrays.asList(topic));
+            KafkaAdminClient.create(props).deleteTopics(List.of(topic));
         }
 
         if(messagetype==MessageType.AVRO) {
-            producer = new KafkaProducer<>(props);
+            this.producer = new KafkaProducer<>(props);
         } else {
-            producerString = new KafkaProducer<>(props);
+            this.producerString = new KafkaProducer<>(props);
         }
     }
 
+    @Override
     public void terminate() {
         if(messagetype==MessageType.AVRO) {
             producer.close();
@@ -125,6 +124,7 @@ public class KafkaSink implements SinkInterface {
         }
     }
 
+    @Override
     public void sendOneBatchOfRows(List<Row> rows) {
         ConcurrentLinkedQueue<Future<RecordMetadata>> queue = new ConcurrentLinkedQueue<>();
         if(messagetype==MessageType.AVRO) {

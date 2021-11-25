@@ -23,11 +23,14 @@ import java.util.stream.Collectors;
  */
 public class SolRSink implements SinkInterface {
 
-    private HttpSolrClient httpSolrClient;
-    private String collection;
+    private final HttpSolrClient httpSolrClient;
+    private final String collection;
+    private final Model model;
 
 
-    public void init(Model model) {
+    SolRSink(Model model) {
+        this.collection = (String) model.getTableNames().get(OptionsConverter.TableNames.SOLR_COLLECTION);
+        this.model = model;
 
         String protocol = "http";
 
@@ -61,24 +64,19 @@ public class SolRSink implements SinkInterface {
         }
 
         this.httpSolrClient = solrClientBuilder.build();
-        this.collection = (String) model.getTableNames().get(OptionsConverter.TableNames.SOLR_COLLECTION);
 
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
-            try {
-                httpSolrClient.request(
-                    CollectionAdminRequest.deleteCollection(collection));
-            } catch (SolrServerException| IOException e) {
-                logger.error("Could not delete previous collection: " + collection + " due to error: ", e);
-            }
+            deleteSolrCollection();
         }
 
-        createSolRCollectionIfNotExists(collection, model);
+        createSolRCollectionIfNotExists();
 
         // Set base URL directly to the collection, note that this is required
         httpSolrClient.setBaseURL(protocol + "://" + PropertiesLoader.getProperty("solr.server.url") + ":" +
                 PropertiesLoader.getProperty("solr.server.port") + "/solr/" + collection);
     }
 
+    @Override
     public void terminate() {
         try {
             httpSolrClient.close();
@@ -87,6 +85,7 @@ public class SolRSink implements SinkInterface {
         }
     }
 
+    @Override
     public void sendOneBatchOfRows(List<Row> rows) {
         try {
             httpSolrClient.add(
@@ -99,7 +98,7 @@ public class SolRSink implements SinkInterface {
         }
     }
 
-    private void createSolRCollectionIfNotExists(String collection, Model model) {
+    private void createSolRCollectionIfNotExists() {
         try {
             logger.debug("Creating collection : " + collection + " in SolR");
             httpSolrClient.request(
@@ -116,6 +115,14 @@ public class SolRSink implements SinkInterface {
             }
         } catch (Exception e) {
             logger.error("Could not create SolR collection : " + collection + " due to error: ", e);
+        }
+    }
+
+    private void deleteSolrCollection() {
+        try {
+            httpSolrClient.request(CollectionAdminRequest.deleteCollection(collection));
+        } catch (SolrServerException| IOException e) {
+            logger.error("Could not delete previous collection: " + collection + " due to error: ", e);
         }
     }
 }

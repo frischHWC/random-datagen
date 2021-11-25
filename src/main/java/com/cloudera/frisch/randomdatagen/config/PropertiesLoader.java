@@ -11,7 +11,6 @@ public class PropertiesLoader {
     private PropertiesLoader() { throw new IllegalStateException("Could not initialize this class"); }
 
     private static final Logger logger = Logger.getLogger(PropertiesLoader.class);
-
     private static final Properties properties = loadProperties();
 
     private static Properties loadProperties() {
@@ -37,6 +36,7 @@ public class PropertiesLoader {
         } catch (Exception e) {
             logger.warn("Could not get property : " + key + " due to following error: ", e);
         }
+        logger.debug("For key: " + key + " returning property: " + property);
         return property;
     }
 }

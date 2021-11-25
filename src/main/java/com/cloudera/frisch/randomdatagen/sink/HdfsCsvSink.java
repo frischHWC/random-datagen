@@ -18,20 +18,30 @@ import java.util.stream.Collectors;
 
 /**
  * This is an HDFSCSV sink using Hadoop 3.2 API
- * Each instance manages one connection to a file system and one specific file
+ * Each instance manages one connection to a file system
  */
 public class HdfsCsvSink implements SinkInterface {
 
     private FileSystem fileSystem;
     private FSDataOutputStream fsDataOutputStream;
     private int counter;
-    private Model model;
+    private final Model model;
+    private final String directoryName;
+    private final String fileName;
+    private final Boolean oneFilePerIteration;
+    private final short replicationFactor;
 
     /**
      * Initiate HDFSCSV connection with Kerberos or not
-     * @return filesystem connection to HDFSCSV
      */
-    public void init(Model model) {
+    HdfsCsvSink(Model model) {
+        this.counter = 0;
+        this.model = model;
+        this.directoryName = (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH);
+        this.fileName = (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME);
+        this.oneFilePerIteration = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION);
+        this.replicationFactor = (short) model.getOptionsOrDefault(OptionsConverter.Options.HDFS_REPLICATION_FACTOR);
+
         Configuration config = new Configuration();
         Utils.setupHadoopEnv(config);
 
@@ -41,56 +51,26 @@ public class HdfsCsvSink implements SinkInterface {
                     PropertiesLoader.getProperty("hdfs.auth.kerberos.keytab"),config);
         }
 
-        logger.debug("Setting up access to HDFSCSV");
         try {
             fileSystem = FileSystem.get(URI.create(PropertiesLoader.getProperty("hdfs.uri")), config);
         } catch (IOException e) {
             logger.error("Could not access to HDFSCSV !", e);
         }
 
+        Utils.createHdfsDirectory(fileSystem, directoryName);
+
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
-            Utils.deleteAllHdfsFiles(fileSystem, (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH),
-                (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME), "csv");
+            Utils.deleteAllHdfsFiles(fileSystem, directoryName, fileName, "csv");
         }
 
-        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-            createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".csv");
-
+        if (!oneFilePerIteration) {
+            createFileWithOverwrite(directoryName + fileName + ".csv");
             appendCSVHeader(model);
-        } else {
-            createDirectory((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH));
-            counter = 0;
-            this.model = model;
         }
 
     }
 
-    void createFileWithOverwrite(String path) {
-        try {
-            fsDataOutputStream = fileSystem.create(new Path(path), true);
-            logger.debug("Successfully created hdfs file : " + path);
-        } catch (IOException e) {
-            logger.error("Tried to create hdfs file : " + path + " with no success :", e);
-        }
-    }
-
-    void emptyDirectory(String path) {
-        try {
-            fileSystem.delete(new Path(path), true);
-        } catch (IOException e) {
-            logger.error("Unable to delete directory and subdirectories of : " + path + " due to error: ", e);
-        }
-    }
-
-    void createDirectory(String path) {
-        try {
-            fileSystem.mkdirs(new Path(path));
-        } catch (IOException e) {
-            logger.error("Unable to create directory of : " + path + " due to error: ", e);
-        }
-    }
-
+    @Override
     public void terminate() {
         try {
         fsDataOutputStream.close();
@@ -99,11 +79,11 @@ public class HdfsCsvSink implements SinkInterface {
         }
     }
 
+    @Override
     public void sendOneBatchOfRows(List<Row> rows){
         try {
-            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-                createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                        model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" + String.format("%010d", counter) + ".csv");
+            if (oneFilePerIteration) {
+                createFileWithOverwrite(directoryName + fileName + "-" + String.format("%010d", counter) + ".csv");
                 appendCSVHeader(model);
                 counter++;
             }
@@ -112,7 +92,7 @@ public class HdfsCsvSink implements SinkInterface {
             fsDataOutputStream.writeChars(String.join(System.getProperty("line.separator"), rowsInString));
             fsDataOutputStream.writeChars(System.getProperty("line.separator"));
 
-            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if (oneFilePerIteration) {
                 fsDataOutputStream.close();
             }
         } catch (IOException e) {
@@ -129,6 +109,16 @@ public class HdfsCsvSink implements SinkInterface {
             }
         } catch (IOException e) {
             logger.error("Can not write header to the hdfs file due to error: ", e);
+        }
+    }
+
+    void createFileWithOverwrite(String path) {
+        try {
+            Utils.deleteHdfsFile(fileSystem, path);
+            fsDataOutputStream = fileSystem.create(new Path(path), replicationFactor);
+            logger.debug("Successfully created hdfs file : " + path);
+        } catch (IOException e) {
+            logger.error("Tried to create hdfs file : " + path + " with no success :", e);
         }
     }
 

@@ -2,7 +2,6 @@ package com.cloudera.frisch.randomdatagen.sink;
 
 
 import com.cloudera.frisch.randomdatagen.Utils;
-import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
@@ -14,50 +13,46 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * This is a CSV sink
- * Its goal is to write into ONE single csv file data randomly generated
+ * This is a CSV sink to write to one or multiple CSV files locally
+ *
  */
 public class CSVSink implements SinkInterface {
 
     private FileOutputStream outputStream;
     private int counter;
-    private Model model;
+    private final Model model;
+    private final String lineSeparator;
+    private final String directoryName;
+    private final String fileName;
+    private final Boolean oneFilePerIteration;
 
     /**
      * Init local CSV file with header
      */
-    public void init(Model model) {
+    CSVSink(Model model) {
+        this.model = model;
+        this.counter = 0;
+        this.lineSeparator = System.getProperty("line.separator");
+        this.directoryName = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH);
+        this.fileName = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME);
+        this.oneFilePerIteration = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION);
+
+        Utils.createLocalDirectory(directoryName);
 
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
-            Utils.deleteAllLocalFiles((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH),
-                (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) , "csv");
+            Utils.deleteAllLocalFiles(directoryName, fileName , "csv");
         }
 
-        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-            createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + ".csv");
-
+        if (!oneFilePerIteration) {
+            createFileWithOverwrite(directoryName + fileName + ".csv");
             appendCSVHeader(model);
-        } else {
-            counter = 0;
-            this.model = model;
         }
     }
 
-    void createFileWithOverwrite(String path) {
-        try {
-            File file = new File(path);
-            if(file.createNewFile()) { logger.warn("Could not create file");}
-            outputStream = new FileOutputStream(path, false);
-            logger.debug("Successfully created local file : " + path);
-        } catch (IOException e) {
-            logger.error("Tried to create file : " + path + " with no success :", e);
-        }
-    }
-
+    @Override
     public void terminate() {
         try {
-            if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if (!oneFilePerIteration) {
                 outputStream.close();
             }
         } catch (IOException e) {
@@ -65,20 +60,20 @@ public class CSVSink implements SinkInterface {
         }
     }
 
+    @Override
     public void sendOneBatchOfRows(List<Row> rows) {
         try {
-            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-                createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
-                        model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" + String.format("%010d", counter) + ".csv");
+            if (oneFilePerIteration) {
+                createFileWithOverwrite(directoryName + fileName + "-" + String.format("%010d", counter) + ".csv");
                 appendCSVHeader(model);
                 counter++;
             }
 
             List<String> rowsInString = rows.stream().map(Row::toCSV).collect(Collectors.toList());
-            outputStream.write(String.join(System.getProperty("line.separator"), rowsInString).getBytes());
-            outputStream.write(System.getProperty("line.separator").getBytes());
+            outputStream.write(String.join(lineSeparator, rowsInString).getBytes());
+            outputStream.write(lineSeparator.getBytes());
 
-            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if (oneFilePerIteration) {
                 outputStream.close();
             }
         } catch (IOException e) {
@@ -91,10 +86,21 @@ public class CSVSink implements SinkInterface {
             if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.CSV_HEADER)) {
                 outputStream.write(model.getCsvHeader().getBytes());
                 outputStream.write(
-                    System.getProperty("line.separator").getBytes());
+                    lineSeparator.getBytes());
             }
         } catch (IOException e) {
             logger.error("Can not write header to the local file due to error: ", e);
+        }
+    }
+
+    void createFileWithOverwrite(String path) {
+        try {
+            File file = new File(path);
+            if(file.createNewFile()) { logger.warn("Could not create file");}
+            outputStream = new FileOutputStream(path, false);
+            logger.debug("Successfully created local file : " + path);
+        } catch (IOException e) {
+            logger.error("Tried to create file : " + path + " with no success :", e);
         }
     }
 

@@ -99,7 +99,7 @@ public class OptionsConverter {
         SOLR_SHARDS,
         SOLR_REPLICAS,
         KUDU_REPLICAS,
-        LOCAL_FILE_ONE_PER_ITERATION,
+        ONE_FILE_PER_ITERATION,
         KAFKA_MESSAGE_TYPE,
         HIVE_THREAD_NUMBER,
         HIVE_ON_HDFS,
@@ -115,6 +115,8 @@ public class OptionsConverter {
         KUDU_BUCKETS,
         KUDU_BUFFER,
         KUDU_FLUSH,
+        OZONE_REPLICATION_FACTOR,
+        HDFS_REPLICATION_FACTOR
     }
 
     static Options convertOptionToOption(String option) {
@@ -128,7 +130,7 @@ public class OptionsConverter {
             case "KUDU_REPLICAS":
                 return Options.KUDU_REPLICAS;
             case "LOCAL_FILE_ONE_PER_ITERATION":
-                return Options.LOCAL_FILE_ONE_PER_ITERATION;
+                return Options.ONE_FILE_PER_ITERATION;
             case "KAFKA_MESSAGE_TYPE":
                 return Options.KAFKA_MESSAGE_TYPE;
             case "HIVE_THREAD_NUMBER":
@@ -159,6 +161,10 @@ public class OptionsConverter {
                 return Options.KUDU_BUFFER;
             case "KUDU_FLUSH":
                 return Options.KUDU_FLUSH;
+            case "OZONE_REPLICATION_FACTOR":
+                return Options.OZONE_REPLICATION_FACTOR;
+            case "HDFS_REPLICATION_FACTOR":
+                return Options.HDFS_REPLICATION_FACTOR;
             default:
                 logger.warn("Option was not recognized: " + option + " , please verify your JSON");
                 return null;

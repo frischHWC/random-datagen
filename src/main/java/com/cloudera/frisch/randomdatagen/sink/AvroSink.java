@@ -5,7 +5,6 @@ import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
 import org.apache.avro.Schema;
-import org.apache.avro.file.CodecFactory;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
@@ -15,57 +14,49 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-
+/**
+ * Avro Sink to create Local Avro files
+ */
 public class AvroSink implements SinkInterface {
 
     private File file;
-    private Schema schema;
+    private final Schema schema;
     private DataFileWriter<GenericRecord> dataFileWriter;
-    private DatumWriter<GenericRecord> datumWriter;
+    private final DatumWriter<GenericRecord> datumWriter;
     private int counter;
-    private Model model;
+    private final Model model;
+    private final String directoryName;
+    private final String fileName;
+    private final Boolean oneFilePerIteration;
 
     /**
      * Init local Avro file with header
      */
-    public void init(Model model) {
-
+    AvroSink(Model model) {
         this.schema = model.getAvroSchema();
         this.datumWriter = new GenericDatumWriter<>(schema);
+        this.model = model;
+        this.counter = 0;
+        this.directoryName = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH);
+        this.fileName = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME);
+        this.oneFilePerIteration = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION);
+
+        Utils.createLocalDirectory(directoryName);
 
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
-            Utils.deleteAllLocalFiles((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH),
-                (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) , "avro");
+            Utils.deleteAllLocalFiles(directoryName, fileName , "avro");
         }
 
-        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-
-            createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + ".avro");
-
-            appendAvscHeader(model);
-
-        } else {
-            this.model = model;
-            counter = 0;
-        }
-
-    }
-
-    void createFileWithOverwrite(String path) {
-        try {
-            file = new File(path);
-            if(!file.createNewFile()) { logger.warn("Could not create file");}
-            dataFileWriter = new DataFileWriter<>(datumWriter);
-            logger.debug("Successfully created local file : " + path);
-        } catch (IOException e) {
-            logger.error("Tried to create file : " + path + " with no success :", e);
+        if (!oneFilePerIteration) {
+            createFileWithOverwrite(directoryName + fileName + ".avro");
+            appendAvscHeader();
         }
     }
 
+    @Override
     public void terminate() {
         try {
-            if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if (!oneFilePerIteration) {
                 dataFileWriter.close();
             }
         } catch (IOException e) {
@@ -73,13 +64,12 @@ public class AvroSink implements SinkInterface {
         }
     }
 
+    @Override
     public void sendOneBatchOfRows(List<Row> rows) {
 
-        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-            createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" + String.format("%010d", counter) + ".avro");
-
-            appendAvscHeader(model);
+        if (oneFilePerIteration) {
+            createFileWithOverwrite(directoryName + fileName + "-" + String.format("%010d", counter) + ".avro");
+            appendAvscHeader();
             counter++;
         }
 
@@ -91,7 +81,7 @@ public class AvroSink implements SinkInterface {
             }
         });
 
-        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if (oneFilePerIteration) {
             try {
                 dataFileWriter.close();
             } catch (IOException e) {
@@ -106,7 +96,18 @@ public class AvroSink implements SinkInterface {
         }
     }
 
-    void appendAvscHeader(Model model) {
+    void createFileWithOverwrite(String path) {
+        try {
+            file = new File(path);
+            if(!file.createNewFile()) { logger.warn("Could not create file");}
+            dataFileWriter = new DataFileWriter<>(datumWriter);
+            logger.debug("Successfully created local file : " + path);
+        } catch (IOException e) {
+            logger.error("Tried to create file : " + path + " with no success :", e);
+        }
+    }
+
+    void appendAvscHeader() {
         try {
             dataFileWriter.create(schema, file);
         } catch (IOException e) {

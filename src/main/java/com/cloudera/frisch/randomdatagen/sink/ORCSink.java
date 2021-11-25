@@ -1,7 +1,6 @@
 package com.cloudera.frisch.randomdatagen.sink;
 
 import com.cloudera.frisch.randomdatagen.Utils;
-import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
@@ -14,66 +13,57 @@ import org.apache.orc.OrcFile;
 import org.apache.orc.TypeDescription;
 import org.apache.orc.Writer;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * ORC File sink
+ */
+@SuppressWarnings("unchecked")
 public class ORCSink implements SinkInterface {
 
-    private TypeDescription schema;
+    private final TypeDescription schema;
     private Writer writer;
-    private Map<? extends Field, ColumnVector> vectors;
-    private VectorizedRowBatch batch;
+    private final Map<? extends Field, ColumnVector> vectors;
+    private final VectorizedRowBatch batch;
     private int counter;
-    private Model model;
+    private final Model model;
+    private final String directoryName;
+    private final String fileName;
+    private final Boolean oneFilePerIteration;
 
 
     /**
-     * Init local CSV file with header
+     * Init local ORC file
      */
-    public void init(Model model) {
+    ORCSink(Model model) {
+        this.counter = 0;
+        this.model = model;
+        this.directoryName = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH);
+        this.fileName = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME);
+        this.oneFilePerIteration = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION);
+        this.schema = model.getOrcSchema();
+        this.batch = schema.createRowBatch();
+        this.vectors = model.createOrcVectors(batch);
 
-        schema = model.getOrcSchema();
-        batch = schema.createRowBatch();
-        vectors = model.createOrcVectors(batch);
+        Utils.createLocalDirectory(directoryName);
 
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
-            Utils.deleteAllLocalFiles((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH),
-                (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) , "orc");
+            Utils.deleteAllLocalFiles(directoryName, fileName, "orc");
         }
 
-        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-            String filepath = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + ".orc";
-
-            deleteFile(filepath);
-
-            try {
-                writer = OrcFile.createWriter(new Path(filepath),
-                        OrcFile.writerOptions(new Configuration())
-                                .setSchema(schema));
-            } catch (IOException e) {
-                logger.warn("Could not create writer to ORC file due to error:", e);
-            }
-        } else {
-            counter = 0;
-            this.model = model;
+        if (!oneFilePerIteration) {
+            creatFileWithOverwrite(directoryName + fileName + ".orc");
         }
     }
 
-    private void deleteFile(String path) {
-        try {
-            File fileTodelete = new File(path);
-            if(fileTodelete.delete()) { logger.warn("Could not delete file");}
-        } catch (Exception e) {
-            logger.warn("Could not delete file : " + path + " due to error: ", e);
-        }
-    }
 
+    @Override
     public void terminate() {
         try {
-            if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if (!oneFilePerIteration) {
                 writer.close();
             }
         } catch (IOException e) {
@@ -83,20 +73,10 @@ public class ORCSink implements SinkInterface {
         }
     }
 
+    @Override
     public void sendOneBatchOfRows(List<Row> rows) {
-        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-            String filepath = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" + String.format("%010d", counter) + ".orc";
-
-            deleteFile(filepath);
-
-            try {
-                writer = OrcFile.createWriter(new Path(filepath),
-                        OrcFile.writerOptions(new Configuration())
-                                .setSchema(schema));
-            } catch (IOException e) {
-                logger.warn("Could not create writer to ORC file due to error:", e);
-            }
+        if (oneFilePerIteration) {
+            creatFileWithOverwrite(directoryName + fileName + "-" + String.format("%010d", counter) + ".orc");
             counter++;
         }
 
@@ -122,12 +102,23 @@ public class ORCSink implements SinkInterface {
             logger.error("Can not write data to the local file due to error: ", e);
         }
 
-        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
             try {
                 writer.close();
             } catch (IOException e) {
                 logger.error(" Unable to close local file with error :", e);
             }
+        }
+    }
+
+    private void creatFileWithOverwrite(String path) {
+        try {
+            Utils.deleteLocalFile(path);
+            writer = OrcFile.createWriter(new Path(path),
+                OrcFile.writerOptions(new Configuration())
+                    .setSchema(schema));
+        } catch (IOException e) {
+            logger.warn("Could not create writer to ORC HDFS file due to error:", e);
         }
     }
 

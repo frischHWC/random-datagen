@@ -27,8 +27,15 @@ public class HbaseSink implements SinkInterface {
 
     private Connection connection;
     private Table table;
+    private final String fullTableName;
+    private final TableName tableName;
+    private Admin admin;
 
-    public void init(Model model) {
+    HbaseSink(Model model) {
+        this.fullTableName = model.getTableNames().get(OptionsConverter.TableNames.HBASE_NAMESPACE) + ":" +
+            model.getTableNames().get(OptionsConverter.TableNames.HBASE_TABLE_NAME);
+        this.tableName = TableName.valueOf(fullTableName);
+
         Configuration config = HBaseConfiguration.create();
         config.set("hbase.zookeeper.quorum", PropertiesLoader.getProperty("hbase.zookeeper.quorum"));
         config.set("hbase.zookeeper.property.clientPort", PropertiesLoader.getProperty("hbase.zookeeper.property.clientPort"));
@@ -43,21 +50,18 @@ public class HbaseSink implements SinkInterface {
         }
 
         try {
-            connection = ConnectionFactory.createConnection(config);
-
-            String fullTableName = model.getTableNames().get(OptionsConverter.TableNames.HBASE_NAMESPACE) + ":" +
-                    model.getTableNames().get(OptionsConverter.TableNames.HBASE_TABLE_NAME);
+            this.connection = ConnectionFactory.createConnection(config);
+            this.admin = connection.getAdmin();
 
             createNamespaceIfNotExists((String) model.getTableNames().get(OptionsConverter.TableNames.HBASE_NAMESPACE));
 
-            if (connection.getAdmin().tableExists(TableName.valueOf(fullTableName)) &&
-                (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
-                connection.getAdmin().deleteTable(TableName.valueOf(fullTableName));
+            if (admin.tableExists(tableName) && (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
+                admin.deleteTable(tableName);
             }
 
-            if (!connection.getAdmin().tableExists(TableName.valueOf(fullTableName))) {
+            if (!admin.tableExists(tableName)) {
 
-                TableDescriptorBuilder tbdesc = TableDescriptorBuilder.newBuilder(TableName.valueOf(fullTableName));
+                TableDescriptorBuilder tbdesc = TableDescriptorBuilder.newBuilder(tableName);
 
                 model.getHBaseColumnFamilyList().forEach(cf ->
                         tbdesc.setColumnFamily(ColumnFamilyDescriptorBuilder.newBuilder(Bytes.toBytes((String) cf)).build())
@@ -68,7 +72,7 @@ public class HbaseSink implements SinkInterface {
                 connection.getAdmin().createTable(tbdesc.build());
             }
 
-            table = connection.getTable(TableName.valueOf(fullTableName));
+            this.table = connection.getTable(tableName);
 
         } catch (IOException e) {
             logger.error("Could not initiate HBase connection due to error: ", e);
@@ -76,6 +80,7 @@ public class HbaseSink implements SinkInterface {
         }
     }
 
+    @Override
     public void terminate() {
         try {
             table.close();
@@ -89,7 +94,9 @@ public class HbaseSink implements SinkInterface {
     @Override
     public void sendOneBatchOfRows(List<com.cloudera.frisch.randomdatagen.model.Row> rows) {
         try {
-            List<Put> putList = rows.parallelStream().map(com.cloudera.frisch.randomdatagen.model.Row::toHbasePut).collect(Collectors.toList());
+            List<Put> putList = rows.parallelStream()
+                .map(com.cloudera.frisch.randomdatagen.model.Row::toHbasePut)
+                .collect(Collectors.toList());
             table.put(putList);
         } catch (Exception e) {
             logger.error("Could not write to HBase rows with error : ", e);
@@ -98,7 +105,6 @@ public class HbaseSink implements SinkInterface {
 
     private void createNamespaceIfNotExists(String namespace) {
         try {
-            Admin admin = connection.getAdmin();
             try {
                 admin.getNamespaceDescriptor(namespace);
             } catch (NamespaceNotFoundException e) {

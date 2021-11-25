@@ -20,24 +20,62 @@ public class JsonSink implements SinkInterface {
 
     private FileOutputStream outputStream;
     private int counter;
-    private Model model;
+    private final Model model;
+    private final String directoryName;
+    private final String fileName;
+    private final Boolean oneFilePerIteration;
+    private final String lineSeparator;
 
     /**
      * Init local JSON file
      */
-    public void init(Model model) {
+    public JsonSink(Model model) {
+        this.directoryName = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH);
+        this.fileName = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME);
+        this.oneFilePerIteration = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION);
+        this.model = model;
+        this.counter = 0;
+        this.lineSeparator = System.getProperty("line.separator");
+
+        Utils.createLocalDirectory(directoryName);
 
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
-            Utils.deleteAllLocalFiles((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH),
-                (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) , "json");
+            Utils.deleteAllLocalFiles(directoryName, fileName , "json");
         }
 
-        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-            createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + ".json");
-        } else {
-            counter = 0;
-            this.model = model;
+        if (!oneFilePerIteration) {
+            createFileWithOverwrite(directoryName + fileName + ".json");
+        }
+    }
+
+    @Override
+    public void terminate() {
+        try {
+            if (!oneFilePerIteration) {
+                outputStream.close();
+            }
+        } catch (IOException e) {
+            logger.error(" Unable to close local file with error :", e);
+        }
+    }
+
+    @Override
+    public void sendOneBatchOfRows(List<Row> rows) {
+        try {
+            if (oneFilePerIteration) {
+                createFileWithOverwrite(directoryName + fileName + "-" + String.format("%010d", counter) + ".json");
+                counter++;
+            }
+
+            List<String> rowsInString = rows.stream().map(Row::toJSON).collect(Collectors.toList());
+            outputStream.write(String.join(lineSeparator, rowsInString).getBytes());
+            outputStream.write(lineSeparator.getBytes());
+
+            if (oneFilePerIteration) {
+                outputStream.close();
+            }
+        } catch (IOException e) {
+            logger.error("Can not write data to the local file due to error: ", e);
         }
     }
 
@@ -49,36 +87,6 @@ public class JsonSink implements SinkInterface {
             logger.debug("Successfully created local file : " + path);
         } catch (IOException e) {
             logger.error("Tried to create file : " + path + " with no success :", e);
-        }
-    }
-
-    public void terminate() {
-        try {
-            if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-                outputStream.close();
-            }
-        } catch (IOException e) {
-            logger.error(" Unable to close local file with error :", e);
-        }
-    }
-
-    public void sendOneBatchOfRows(List<Row> rows) {
-        try {
-            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-                createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
-                        model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" + String.format("%010d", counter) + ".json");
-                counter++;
-            }
-
-            List<String> rowsInString = rows.stream().map(Row::toJSON).collect(Collectors.toList());
-            outputStream.write(String.join(System.getProperty("line.separator"), rowsInString).getBytes());
-            outputStream.write(System.getProperty("line.separator").getBytes());
-
-            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-                outputStream.close();
-            }
-        } catch (IOException e) {
-            logger.error("Can not write data to the local file due to error: ", e);
         }
     }
 

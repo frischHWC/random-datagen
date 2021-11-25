@@ -34,61 +34,60 @@ public class SinkSender {
             SinkInterface sinkToInitAndStart = null;
             switch (sink) {
                 case HDFSCSV:
-                    sinkToInitAndStart = new HdfsCsvSink();
+                    sinkToInitAndStart = new HdfsCsvSink(model);
                     break;
                 case HDFSJSON:
-                    sinkToInitAndStart = new HdfsJsonSink();
+                    sinkToInitAndStart = new HdfsJsonSink(model);
                     break;
                 case HDFSAVRO:
-                    sinkToInitAndStart = new HdfsAvroSink();
+                    sinkToInitAndStart = new HdfsAvroSink(model);
                     break;
                 case HDFSORC:
-                    sinkToInitAndStart = new HdfsOrcSink();
+                    sinkToInitAndStart = new HdfsOrcSink(model);
                     break;
                 case HDFSPARQUET:
-                    sinkToInitAndStart = new HdfsParquetSink();
+                    sinkToInitAndStart = new HdfsParquetSink(model);
                     break;
                 case HBASE:
-                    sinkToInitAndStart = new HbaseSink();
+                    sinkToInitAndStart = new HbaseSink(model);
                     break;
                 case HIVE:
-                    sinkToInitAndStart = new HiveSink();
+                    sinkToInitAndStart = new HiveSink(model);
                     break;
                 case OZONE:
-                    sinkToInitAndStart = new OzoneSink();
+                    sinkToInitAndStart = new OzoneSink(model);
                     break;
                 case SOLR:
-                    sinkToInitAndStart = new SolRSink();
+                    sinkToInitAndStart = new SolRSink(model);
                     break;
                 case KAFKA:
-                    sinkToInitAndStart = new KafkaSink();
+                    sinkToInitAndStart = new KafkaSink(model);
                     break;
                 case KUDU:
-                    sinkToInitAndStart = new KuduSink();
+                    sinkToInitAndStart = new KuduSink(model);
                     break;
                 case CSV:
-                    sinkToInitAndStart = new CSVSink();
+                    sinkToInitAndStart = new CSVSink(model);
                     break;
                 case JSON:
-                    sinkToInitAndStart = new JsonSink();
+                    sinkToInitAndStart = new JsonSink(model);
                     break;
                 case AVRO:
-                    sinkToInitAndStart = new AvroSink();
+                    sinkToInitAndStart = new AvroSink(model);
                     break;
                 case PARQUET:
-                    sinkToInitAndStart = new ParquetSink();
+                    sinkToInitAndStart = new ParquetSink(model);
                     break;
                 case ORC:
-                    sinkToInitAndStart = new ORCSink();
+                    sinkToInitAndStart = new ORCSink(model);
                     break;
                  default:
-                     logger.info("The sink " + sink + " provided has not been recognized as an expected sink");
+                     logger.warn("The sink " + sink + " provided has not been recognized as an expected sink");
                      break;
             }
 
             if(sinkToInitAndStart != null) {
                 logger.info(sinkToInitAndStart.getClass().getSimpleName() + " is added to the list of sink");
-                sinkToInitAndStart.init(model);
                 sinkList.add(sinkToInitAndStart);
             }
 

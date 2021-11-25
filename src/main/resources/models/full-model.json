@@ -77,6 +77,12 @@
       "type": "BIRTHDATE"
     },
     {
+      "name": "birthdate_old",
+      "type": "BIRTHDATE",
+      "min": "1/1/1900",
+      "max": "1/1/1950"
+    },
+    {
       "name": "name",
       "type": "NAME"
     },
@@ -154,7 +160,7 @@
     {"SOLR_SHARDS":  1},
     {"SOLR_REPLICAS":  1},
     {"KUDU_REPLICAS":  1},
-    {"LOCAL_FILE_ONE_PER_ITERATION":  true},
+    {"ONE_FILE_PER_ITERATION":  true},
     {"KAFKA_MESSAGE_TYPE":  "json"},
     {"HIVE_THREAD_NUMBER":  1},
     {"HIVE_ON_HDFS":  true},
@@ -170,5 +176,7 @@
     {"KUDU_BUCKETS":  32},
     {"KUDU_BUFFER":  100001},
     {"KUDU_FLUSH":  "MANUAL_FLUSH"},
+    {"OZONE_REPLICATION_FACTOR":  3},
+    {"HDFS_REPLICATION_FACTOR":  3}
   ]
 }

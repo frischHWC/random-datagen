@@ -28,28 +28,31 @@ public class OzoneSink implements SinkInterface {
     private OzoneClient ozClient;
     private ObjectStore objectStore;
     private OzoneVolume volume;
+    private final String volumeName;
+    private final ReplicationFactor replicationFactor;
 
 
-    public void init(Model model) {
+    OzoneSink(Model model) {
+        this.volumeName = (String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME);
+        this.replicationFactor = ReplicationFactor.valueOf((int) model.getOptionsOrDefault(OptionsConverter.Options.OZONE_REPLICATION_FACTOR));
+
         try {
             OzoneConfiguration config = new OzoneConfiguration();
             Utils.setupHadoopEnv(config);
 
-            if (Boolean.valueOf(PropertiesLoader.getProperty("ozone.auth.kerberos"))) {
+            if (Boolean.parseBoolean(PropertiesLoader.getProperty("ozone.auth.kerberos"))) {
                 Utils.loginUserWithKerberos(PropertiesLoader.getProperty("ozone.auth.kerberos.user"),
                         PropertiesLoader.getProperty("ozone.auth.kerberos.keytab"), config);
             }
-
 
             this.ozClient = OzoneClientFactory.getRpcClient(PropertiesLoader.getProperty("ozone.service.id"), config);
             this.objectStore = ozClient.getObjectStore();
 
             if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
-                objectStore.deleteVolume((String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME));
+                deleteEverythingUnderAVolume(volumeName);
             }
-
-            createVolumeIfItDoesNotExist((String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME));
-            volume = objectStore.getVolume((String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME));
+            createVolumeIfItDoesNotExist(volumeName);
+            this.volume = objectStore.getVolume(volumeName);
 
         } catch (IOException e) {
             logger.error("Could not connect and create Volume into Ozone, due to error: ", e);
@@ -57,7 +60,7 @@ public class OzoneSink implements SinkInterface {
 
     }
 
-
+    @Override
     public void terminate() {
         try {
             ozClient.close();
@@ -66,13 +69,14 @@ public class OzoneSink implements SinkInterface {
         }
     }
 
+    @Override
     public void sendOneBatchOfRows(List<Row> rows) {
         rows.parallelStream().forEach(row -> {
             OzoneObject ob = row.toOzoneObject();
             createBucketIfNotExist(ob.getBucket());
             try {
                 OzoneBucket bucket = volume.getBucket(ob.getBucket());
-                OzoneOutputStream os = bucket.createKey(ob.getKey(), ob.getValue().length(), ReplicationType.RATIS, ReplicationFactor.ONE, new HashMap<>());
+                OzoneOutputStream os = bucket.createKey(ob.getKey(), ob.getValue().length(), ReplicationType.RATIS, replicationFactor, new HashMap<>());
                 os.write(ob.getValue().getBytes());
                 os.getOutputStream().flush();
                 os.close();

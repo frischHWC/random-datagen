@@ -15,19 +15,26 @@ import java.util.List;
 /**
  * This is a kudu sink based on Kudu 1.11.0 API
  */
+@SuppressWarnings("unchecked")
 public class KuduSink implements SinkInterface {
 
     private KuduTable table;
     private KuduSession session;
     private KuduClient client;
+    private final String tableName;
+    private final Model model;
 
-    public void init(Model model) {
+
+    KuduSink(Model model) {
+        this.tableName = (String) model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME);
+        this.model = model;
+
         try {
 
             System.setProperty("javax.net.ssl.trustStore", PropertiesLoader.getProperty("kudu.truststore.location"));
             System.setProperty("javax.net.ssl.trustStorePassword", PropertiesLoader.getProperty("kudu.truststore.password"));
 
-            if (Boolean.valueOf(PropertiesLoader.getProperty("kudu.auth.kerberos"))) {
+            if (Boolean.parseBoolean(PropertiesLoader.getProperty("kudu.auth.kerberos"))) {
                 Utils.loginUserWithKerberos(PropertiesLoader.getProperty("kudu.security.user"),
                         PropertiesLoader.getProperty("kudu.security.keytab"), new Configuration());
 
@@ -40,41 +47,59 @@ public class KuduSink implements SinkInterface {
                             }
                         });
             } else {
-                client = new KuduClient.KuduClientBuilder(PropertiesLoader.getProperty("kudu.master.server")).build();
+                this.client = new KuduClient.KuduClientBuilder(PropertiesLoader.getProperty("kudu.master.server")).build();
             }
 
-            createTableIfNotExists((String) model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME), model);
+            createTableIfNotExists();
 
-            session = client.newSession();
+            this.session = client.newSession();
 
             switch ((String) model.getOptionsOrDefault(OptionsConverter.Options.KUDU_REPLICAS)) {
-            case "AUTO_FLUSH_SYNC": session.setFlushMode(SessionConfiguration.FlushMode.AUTO_FLUSH_SYNC); break;
-            case "AUTO_FLUSH_BACKGROUND": session.setFlushMode(SessionConfiguration.FlushMode.AUTO_FLUSH_BACKGROUND); break;
-            case "MANUAL_FLUSH": session.setFlushMode(SessionConfiguration.FlushMode.MANUAL_FLUSH); break;
+                case "AUTO_FLUSH_SYNC": session.setFlushMode(SessionConfiguration.FlushMode.AUTO_FLUSH_SYNC); break;
+                case "AUTO_FLUSH_BACKGROUND": session.setFlushMode(SessionConfiguration.FlushMode.AUTO_FLUSH_BACKGROUND); break;
+                case "MANUAL_FLUSH": session.setFlushMode(SessionConfiguration.FlushMode.MANUAL_FLUSH); break;
             }
             session.setMutationBufferSpace((int) model.getOptionsOrDefault(OptionsConverter.Options.KUDU_BUFFER));
 
             if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
-               client.deleteTable((String) model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME));
+               client.deleteTable(tableName);
             }
 
-            table = client.openTable((String) model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME));
+            this.table = client.openTable(tableName);
 
         } catch (Exception e) {
             logger.error("Could not connect to Kudu due to error: ", e);
         }
     }
 
-
-    private void createTableIfNotExists(String tableName, Model model) {
-        /*
+    @Override
+    public void terminate() {
         try {
-            client.deleteTable(tableName);
-        }catch (KuduException e) {
-            logger.warn("Could not delete table: " + tableName);
+            session.close();
+            client.shutdown();
+        } catch (Exception e) {
+            logger.error("Could not close connection to Kudu due to error: ", e);
         }
-        */
+    }
 
+    @Override
+    public void sendOneBatchOfRows(List<Row> rows) {
+        try {
+            rows.parallelStream().map(row -> row.toKuduInsert(table)).forEach(insert -> {
+                try {
+                    session.apply(insert);
+                } catch (KuduException e) {
+                    logger.error("Could not insert row for kudu in table : " + table + " due to error:", e );
+                }
+            });
+            session.flush();
+        } catch (Exception e) {
+            logger.error("Could not send rows to kudu due to error: ", e);
+        }
+
+    }
+
+    private void createTableIfNotExists() {
         CreateTableOptions cto = new CreateTableOptions();
         cto.setNumReplicas((int) model.getOptionsOrDefault(OptionsConverter.Options.KUDU_REPLICAS));
 
@@ -97,28 +122,4 @@ public class KuduSink implements SinkInterface {
 
     }
 
-    public void terminate() {
-        try {
-            session.close();
-            client.shutdown();
-        } catch (Exception e) {
-            logger.error("Could not close connection to Kudu due to error: ", e);
-        }
-    }
-
-    public void sendOneBatchOfRows(List<Row> rows) {
-        try {
-            rows.parallelStream().map(row -> row.toKuduInsert(table)).forEach(insert -> {
-                try {
-                    session.apply(insert);
-                } catch (KuduException e) {
-                    logger.error("Could not insert row for kudu in table : " + table + " due to error:", e );
-                }
-            });
-            session.flush();
-        } catch (Exception e) {
-            logger.error("Could not send rows to kudu due to error: ", e);
-        }
-
-    }
 }

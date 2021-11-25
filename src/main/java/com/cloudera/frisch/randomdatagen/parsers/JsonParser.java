@@ -97,16 +97,16 @@ public class JsonParser<T extends Field> implements Parser {
             length = null;
         }
 
-        Long min;
+        String min;
         try {
-            min = jsonField.get("min").asLong();
+            min = jsonField.get("min").asText();
         } catch (NullPointerException e) {
             min = null;
         }
 
-        Long max;
+        String max;
         try {
-            max = jsonField.get("max").asLong();
+            max = jsonField.get("max").asText();
         } catch (NullPointerException e) {
             max = null;
         }

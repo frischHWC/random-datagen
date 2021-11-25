@@ -28,13 +28,27 @@ public class HdfsParquetSink implements SinkInterface {
     private Schema schema;
     private ParquetWriter<GenericRecord> writer;
     private int counter;
-    private Model model;
+    private final Model model;
+    private final String directoryName;
+    private final String fileName;
+    private final Boolean oneFilePerIteration;
+    private final short replicationFactor;
+    private final Configuration conf;
 
     /**
      * Initiate HDFS connection with Kerberos or not
      * @return filesystem connection to HDFS
      */
-    public void init(Model model) {
+    public HdfsParquetSink(Model model) {
+        this.directoryName = (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH);
+        this.fileName = (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME);
+        this.oneFilePerIteration = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION);
+        this.model = model;
+        this.counter = 0;
+        this.replicationFactor = (short) model.getOptionsOrDefault(OptionsConverter.Options.HDFS_REPLICATION_FACTOR);
+        this.conf = new Configuration();
+        conf.set("dfs.replication", String.valueOf(replicationFactor));
+
         org.apache.hadoop.conf.Configuration config = new org.apache.hadoop.conf.Configuration();
         Utils.setupHadoopEnv(config);
 
@@ -44,65 +58,28 @@ public class HdfsParquetSink implements SinkInterface {
                     PropertiesLoader.getProperty("hdfs.auth.kerberos.keytab"),config);
         }
 
-        logger.debug("Setting up access to HDFS PARQUET");
         try {
-            fileSystem = FileSystem.get(URI.create(PropertiesLoader.getProperty("hdfs.uri")), config);
+            this.fileSystem = FileSystem.get(URI.create(PropertiesLoader.getProperty("hdfs.uri")), config);
         } catch (IOException e) {
             logger.error("Could not access to HDFS PARQUET !", e);
         }
 
-        schema = model.getAvroSchema();
+        this.schema = model.getAvroSchema();
+
+        Utils.createHdfsDirectory(fileSystem, directoryName);
 
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
-            Utils.deleteAllHdfsFiles(fileSystem, (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH),
-                (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME), "parquet");
+            Utils.deleteAllHdfsFiles(fileSystem, directoryName, fileName, "parquet");
         }
 
-        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-            String filepath = PropertiesLoader.getProperty("hdfs.uri") + model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".parquet";
-
-            deleteFile(filepath);
-
-            try {
-                writer = AvroParquetWriter
-                        .<GenericRecord>builder(new Path(filepath))
-                        .withSchema(schema)
-                        .withConf(new Configuration())
-                        .withCompressionCodec(CompressionCodecName.SNAPPY)
-                        .withPageSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_PAGE_SIZE))
-                        .withDictionaryEncoding((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_DICTIONARY_ENCODING))
-                        .withDictionaryPageSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_DICTIONARY_PAGE_SIZE))
-                        .withRowGroupSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_ROW_GROUP_SIZE))
-                        .build();
-            } catch (IOException e) {
-                logger.warn("Could not create ParquetWriter", e);
-            }
-
-        } else {
-            counter = 0;
-            this.model = model;
+        if (!oneFilePerIteration) {
+            createFileWithOverwrite(PropertiesLoader.getProperty("hdfs.uri") + directoryName + fileName + ".parquet");
         }
 
     }
 
-    void deleteFile(String path) {
-        try {
-            fileSystem.delete(new Path(path), true);
-            logger.debug("Successfully created hdfs file : " + path);
-        } catch (IOException e) {
-            logger.error("Tried to create file : " + path + " with no success :", e);
-        }
-    }
 
-    void emptyDirectory(String path) {
-        try {
-            fileSystem.delete(new Path(path), true);
-        } catch (IOException e) {
-            logger.error("Unable to delete directory and subdirectories of : " + path + " due to error: ", e);
-        }
-    }
-
+    @Override
     public void terminate() {
         try {
         writer.close();
@@ -111,24 +88,11 @@ public class HdfsParquetSink implements SinkInterface {
         }
     }
 
+    @Override
     public void sendOneBatchOfRows(List<Row> rows){
         try {
-            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-                String filepath =  PropertiesLoader.getProperty("hdfs.uri") + model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                        model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" + String.format("%010d", counter) + ".parquet";
-
-                deleteFile(filepath);
-
-                try {
-                    writer = AvroParquetWriter
-                            .<GenericRecord>builder(new Path(filepath))
-                            .withSchema(schema)
-                            .withConf(new Configuration())
-                            .withCompressionCodec(CompressionCodecName.SNAPPY)
-                            .build();
-                } catch (IOException e) {
-                    logger.warn("Could not create ParquetWriter", e);
-                }
+            if (oneFilePerIteration) {
+                createFileWithOverwrite(PropertiesLoader.getProperty("hdfs.uri") + directoryName + fileName + "-" + String.format("%010d", counter) + ".parquet");
                 counter++;
             }
 
@@ -140,11 +104,31 @@ public class HdfsParquetSink implements SinkInterface {
                 }
             });
 
-            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if (oneFilePerIteration) {
                 writer.close();
             }
         } catch (IOException e) {
             logger.error("Can not write data to the HDFS PARQUET file due to error: ", e);
+        }
+    }
+
+    private void createFileWithOverwrite(String path) {
+        try {
+            Utils.deleteHdfsFile(fileSystem, path);
+            this.writer = AvroParquetWriter
+                .<GenericRecord>builder(new Path(path))
+                .withSchema(schema)
+                .withConf(conf)
+                .withCompressionCodec(CompressionCodecName.SNAPPY)
+                .withPageSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_PAGE_SIZE))
+                .withDictionaryEncoding((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_DICTIONARY_ENCODING))
+                .withDictionaryPageSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_DICTIONARY_PAGE_SIZE))
+                .withRowGroupSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_ROW_GROUP_SIZE))
+                .build();
+            logger.debug("Successfully created local Parquet file : " + path);
+
+        } catch (IOException e) {
+            logger.error("Tried to create Parquet local file : " + path + " with no success :", e);
         }
     }
 

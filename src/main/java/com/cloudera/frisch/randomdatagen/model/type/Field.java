@@ -104,7 +104,7 @@ public abstract class Field<T> {
      */
     public static Field instantiateField(String name, String type, Integer length, String columnQualifier, List<JsonNode> possibleValues,
                                          LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals,
-                                         Long min, Long max) {
+                                         String min, String max) {
         if(name == null || name.isEmpty()) {
             throw new IllegalStateException("Name can not be null or empty for field: " + name);
         }
@@ -127,7 +127,7 @@ public abstract class Field<T> {
                 field = new StringAZField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
                 break;
             case "INTEGER":
-                field = new IntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()), possible_values_weighted, conditionals, min, max);
+                field = new IntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()), possible_values_weighted, conditionals, Long.parseLong(min), Long.parseLong(max));
                 break;
             case "INCREMENT_INTEGER":
                 field = new IncrementIntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()));
@@ -136,10 +136,10 @@ public abstract class Field<T> {
                 field = new BooleanField(name, length, possibleValues.stream().map(JsonNode::asBoolean).collect(Collectors.toList()), possible_values_weighted);
                 break;
             case "FLOAT":
-                field = new FloatField(name, length, possibleValues.stream().map(j -> (float) j.asDouble()).collect(Collectors.toList()), possible_values_weighted, conditionals, min, max);
+                field = new FloatField(name, length, possibleValues.stream().map(j -> (float) j.asDouble()).collect(Collectors.toList()), possible_values_weighted, conditionals, Long.parseLong(min), Long.parseLong(max));
                 break;
             case "LONG":
-                field = new LongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()), possible_values_weighted, conditionals, min, max);
+                field = new LongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()), possible_values_weighted, conditionals, Long.parseLong(min), Long.parseLong(max));
                 break;
             case "INCREMENT_LONG":
                 field = new IncrementLongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()));
@@ -154,7 +154,7 @@ public abstract class Field<T> {
                 field = new HashMd5Field(name, length, possibleValues.stream().map(j -> j.asText().getBytes()).collect(Collectors.toList()));
                 break;
             case "BIRTHDATE":
-                field = new BirthdateField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
+                field = new BirthdateField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()), min, max);
                 break;
             case "NAME":
                 field = new NameField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
@@ -176,6 +176,10 @@ public abstract class Field<T> {
         // If hbase column qualifier is not precised, it should be let as is (default is "cq")
         if (columnQualifier != null && !columnQualifier.isEmpty()) {
             field.setHbaseColumnQualifier(columnQualifier);
+        }
+
+        if(logger.isDebugEnabled()) {
+            logger.debug("Field has been created: " + field);
         }
 
         return field;

@@ -18,7 +18,6 @@ public class ConditionalEvaluator {
   @Setter
   public Map<String, LinkedList<ConditionsLine>> conditions;
 
-
   @Getter
   @Setter
   public Map<String, String> mapOfFieldTypes;
@@ -33,13 +32,14 @@ public class ConditionalEvaluator {
 
     for(Field field: fields) {
       if(field.conditionals!= null && !field.conditionals.isEmpty()) {
-        logger.info("Field has been marked as conditional: " + field);
+        logger.debug("Field has been marked as conditional: " + field);
 
         LinkedList<ConditionsLine> condLineList = new LinkedList<>();
         Iterator<Map.Entry> condIterator = field.conditionals.entrySet().iterator();
         while(condIterator.hasNext()) {
           Map.Entry<String, String> condLine = condIterator.next();
           condLineList.add(new ConditionsLine(condLine.getKey(), condLine.getValue(), model));
+          logger.debug("For field: " + field.getName() + " added condition line: " + condLine.getKey() + " : " + condLine.getValue());
         }
         conditions.put(field.name, condLineList);
       }
@@ -49,8 +49,16 @@ public class ConditionalEvaluator {
 
 
   // Use this evaluator to satisfy conditions before adding it to rows list
+
+  /**
+   * Evaluate all conditions on a row
+   * @param row
+   * @param model
+   * @return
+   */
   public Row evaluateConditions(Row row, Model model) {
     if(!conditions.isEmpty()) {
+      logger.debug("Will evaluate conditions as Row: " + row.toString() + " has some");
       Iterator<Map.Entry<String, LinkedList<ConditionsLine>>> conditionIterator = conditions.entrySet().iterator();
 
       while (conditionIterator.hasNext()){

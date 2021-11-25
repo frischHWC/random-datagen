@@ -16,6 +16,9 @@ import org.apache.orc.TypeDescription;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.cloudera.frisch.randomdatagen.model.OptionsConverter.Options.CSV_HEADER;
+import static com.cloudera.frisch.randomdatagen.model.OptionsConverter.Options.PARQUET_DICTIONARY_ENCODING;
+
 /**
  * This class represents a model, that will be used to describe:
  * - all fields
@@ -125,6 +128,9 @@ public class Model<T extends Field> {
             row.setValues(valuesMap);
             row.populatePksValues(primaryKeys);
             rows.add(conditionalEvaluator.evaluateConditions(row, this));
+            if(logger.isDebugEnabled()) {
+                logger.debug("Created random row: " + row);
+            }
         }
 
         return rows;
@@ -176,10 +182,18 @@ public class Model<T extends Field> {
                 if (op == OptionsConverter.Options.HBASE_COLUMN_FAMILIES_MAPPING) {
                     optionsFormatted.put(op, convertHbaseColFamilyOption(v));
                 } else if (op == OptionsConverter.Options.SOLR_REPLICAS || op == OptionsConverter.Options.SOLR_SHARDS
-                    || op == OptionsConverter.Options.KUDU_REPLICAS || op == OptionsConverter.Options.HIVE_THREAD_NUMBER) {
+                    || op == OptionsConverter.Options.KUDU_REPLICAS || op == OptionsConverter.Options.HIVE_THREAD_NUMBER
+                    || op == OptionsConverter.Options.PARQUET_PAGE_SIZE || op == OptionsConverter.Options.PARQUET_DICTIONARY_PAGE_SIZE
+                    || op == OptionsConverter.Options.PARQUET_ROW_GROUP_SIZE || op == OptionsConverter.Options.KAFKA_RETRIES_CONFIG
+                    || op == OptionsConverter.Options.OZONE_REPLICATION_FACTOR || op == OptionsConverter.Options.KUDU_BUCKETS
+                    || op == OptionsConverter.Options.KUDU_BUFFER ) {
                     optionsFormatted.put(op, Integer.valueOf(v));
-                } else if (op == OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION || op == OptionsConverter.Options.HIVE_ON_HDFS) {
+                } else if (op == OptionsConverter.Options.ONE_FILE_PER_ITERATION || op == OptionsConverter.Options.HIVE_ON_HDFS
+                            || op == OptionsConverter.Options.CSV_HEADER || op == OptionsConverter.Options.PARQUET_DICTIONARY_ENCODING
+                            || op == OptionsConverter.Options.DELETE_PREVIOUS) {
                     optionsFormatted.put(op, Boolean.valueOf(v));
+                } else if (op == OptionsConverter.Options.HDFS_REPLICATION_FACTOR) {
+                    optionsFormatted.put(op, Short.valueOf(v));
                 } else {
                     optionsFormatted.put(op, v);
                 }
@@ -208,8 +222,11 @@ public class Model<T extends Field> {
             case CSV_HEADER:
             case PARQUET_DICTIONARY_ENCODING:
             case HIVE_ON_HDFS:
-            case LOCAL_FILE_ONE_PER_ITERATION:
+            case ONE_FILE_PER_ITERATION:
                 optionResult = true;
+                break;
+            case KAFKA_ACKS_CONFIG:
+                optionResult = "all";
                 break;
             case KAFKA_MESSAGE_TYPE:
                 optionResult = "json";
@@ -228,7 +245,11 @@ public class Model<T extends Field> {
                 optionResult = 134217728;
                 break;
             case KAFKA_RETRIES_CONFIG:
+            case OZONE_REPLICATION_FACTOR:
                 optionResult = 3;
+                break;
+            case HDFS_REPLICATION_FACTOR:
+                optionResult = (short) 3;
                 break;
             case KUDU_BUCKETS:
                 optionResult= 32;
@@ -243,7 +264,6 @@ public class Model<T extends Field> {
             default: break;
             }
         }
-
         return optionResult;
     }
 

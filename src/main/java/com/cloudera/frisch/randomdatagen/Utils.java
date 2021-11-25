@@ -159,7 +159,7 @@ public class Utils {
         File folder = new File(directory);
         File[] files = folder.listFiles((dir,f) -> f.matches(name + ".*[.]" + extension));
         for(File f: files){
-            logger.debug("Will delete file: " + f);
+            logger.debug("Will delete local file: " + f);
             if(!f.delete()) { logger.warn("Could not delete file: " + f);}
         }
     }
@@ -175,11 +175,64 @@ public class Utils {
             while(fileiterator.hasNext()) {
                 LocatedFileStatus file = fileiterator.next();
                 if(file.getPath().getName().matches(name + ".*[.]" + extension)) {
+                    logger.debug("Will delete HDFS file: " + file.getPath());
                     fileSystem.delete(file.getPath(), false);
                 }
             }
         } catch (Exception e) {
             logger.warn("Could not delete files under " + directory + " due to error: ", e);
+        }
+    }
+
+    /**
+     * Creates a directory on HDFS
+     * @param fileSystem
+     * @param path
+     */
+    public static void createHdfsDirectory(FileSystem fileSystem, String path) {
+        try {
+            fileSystem.mkdirs(new Path(path));
+        } catch (IOException e) {
+            logger.error("Unable to create hdfs directory of : " + path + " due to error: ", e);
+        }
+    }
+
+    /**
+     * Creates a directory locally
+     * @param path
+     */
+    public static void createLocalDirectory(String path) {
+        try {
+            new File(path).mkdirs();
+        } catch (Exception e) {
+            logger.error("Unable to create directory of : " + path + " due to error: ", e);
+        }
+    }
+
+    /**
+     * Delete a file locally
+     * @param path
+     */
+    public static void deleteLocalFile(String path) {
+        try {
+            new File(path).delete();
+            logger.debug("Successfully delete local file : " + path);
+        } catch (Exception e) {
+            logger.error("Tried to delete file : " + path + " with no success :", e);
+        }
+    }
+
+    /**
+     * Delete an HDFS file
+     * @param fileSystem
+     * @param path
+     */
+    public static void deleteHdfsFile(FileSystem fileSystem, String path) {
+        try {
+            fileSystem.delete(new Path(path), true);
+            logger.debug("Successfully deleted hdfs file : " + path);
+        } catch (IOException e) {
+            logger.error("Tried to delete hdfs file : " + path + " with no success :", e);
         }
     }
 

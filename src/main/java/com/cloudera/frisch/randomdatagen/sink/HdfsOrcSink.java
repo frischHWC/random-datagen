@@ -28,19 +28,33 @@ import java.util.Map;
 public class HdfsOrcSink implements SinkInterface {
 
     private FileSystem fileSystem;
-    private TypeDescription schema;
+    private final TypeDescription schema;
     private Writer writer;
-    private Map<? extends Field, ColumnVector> vectors;
-    private VectorizedRowBatch batch;
+    private final Map<? extends Field, ColumnVector> vectors;
+    private final VectorizedRowBatch batch;
     private int counter;
-    private Model model;
+    private final Model model;
+    private final String directoryName;
+    private final String fileName;
+    private final Boolean oneFilePerIteration;
+    private final short replicationFactor;
+    private final Configuration conf;
 
     /**
      * Initiate HDFS connection with Kerberos or not
      *
      * @return filesystem connection to HDFS
      */
-    public void init(Model model) {
+    public HdfsOrcSink(Model model) {
+        this.model = model;
+        this.counter = 0;
+        this.directoryName = (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH);
+        this.fileName = (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME);
+        this.oneFilePerIteration = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION);
+        this.replicationFactor = (short) model.getOptionsOrDefault(OptionsConverter.Options.HDFS_REPLICATION_FACTOR);
+        this.conf = new Configuration();
+        conf.set("dfs.replication", String.valueOf(replicationFactor));
+
         org.apache.hadoop.conf.Configuration config = new org.apache.hadoop.conf.Configuration();
         Utils.setupHadoopEnv(config);
 
@@ -50,54 +64,32 @@ public class HdfsOrcSink implements SinkInterface {
                     PropertiesLoader.getProperty("hdfs.auth.kerberos.keytab"), config);
         }
 
-        logger.debug("Setting up access to ORC HDFS");
         try {
             fileSystem = FileSystem.get(URI.create(PropertiesLoader.getProperty("hdfs.uri")), config);
         } catch (IOException e) {
             logger.error("Could not access to ORC HDFS !", e);
         }
 
-        schema = model.getOrcSchema();
-        batch = schema.createRowBatch();
-        vectors = model.createOrcVectors(batch);
+        this.schema = model.getOrcSchema();
+        this.batch = schema.createRowBatch();
+        this.vectors = model.createOrcVectors(batch);
+
+        Utils.createHdfsDirectory(fileSystem, directoryName);
 
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
-            Utils.deleteAllHdfsFiles(fileSystem, (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH),
-                (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME), "orc");
+            Utils.deleteAllHdfsFiles(fileSystem, directoryName, fileName, "orc");
         }
 
-        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-            String filepath = PropertiesLoader.getProperty("hdfs.uri") + model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".orc";
-
-            deleteFile(filepath);
-
-            try {
-                writer = OrcFile.createWriter(new Path(filepath),
-                        OrcFile.writerOptions(new Configuration())
-                                .setSchema(schema));
-            } catch (IOException e) {
-                logger.warn("Could not create writer to ORC HDFS file due to error:", e);
-            }
-        } else {
-            counter = 0;
-            this.model = model;
+        if (!oneFilePerIteration) {
+            creatFileWithOverwrite(PropertiesLoader.getProperty("hdfs.uri") + directoryName + fileName + ".orc");
         }
 
     }
 
-    void deleteFile(String path) {
-        try {
-            fileSystem.delete(new Path(path), true);
-            logger.debug("Successfully created hdfs file : " + path);
-        } catch (IOException e) {
-            logger.error("Tried to create file : " + path + " with no success :", e);
-        }
-    }
-
+    @Override
     public void terminate() {
         try {
-            if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if (!oneFilePerIteration) {
                 writer.close();
             }
         } catch (IOException e) {
@@ -105,20 +97,10 @@ public class HdfsOrcSink implements SinkInterface {
         }
     }
 
+    @Override
     public void sendOneBatchOfRows(List<Row> rows) {
-        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-            String filepath = PropertiesLoader.getProperty("hdfs.uri") + model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" + String.format("%010d", counter) + ".orc";
-
-            deleteFile(filepath);
-
-            try {
-                writer = OrcFile.createWriter(new Path(filepath),
-                        OrcFile.writerOptions(new Configuration())
-                                .setSchema(schema));
-            } catch (IOException e) {
-                logger.warn("Could not create writer to ORC HDFS file due to error:", e);
-            }
+        if (oneFilePerIteration) {
+            creatFileWithOverwrite(PropertiesLoader.getProperty("hdfs.uri") + directoryName + fileName + "-" + String.format("%010d", counter) + ".orc");
             counter++;
         }
 
@@ -144,7 +126,7 @@ public class HdfsOrcSink implements SinkInterface {
             logger.error("Can not write data to the ORC HDFS file due to error: ", e);
         }
 
-        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if (oneFilePerIteration) {
             try {
                 writer.close();
             } catch (IOException e) {
@@ -152,6 +134,16 @@ public class HdfsOrcSink implements SinkInterface {
             }
         }
 
+    }
 
+    private void creatFileWithOverwrite(String path) {
+        try {
+            Utils.deleteHdfsFile(fileSystem, path);
+            writer = OrcFile.createWriter(new Path(path),
+                OrcFile.writerOptions(conf)
+                    .setSchema(schema));
+        } catch (IOException e) {
+            logger.warn("Could not create writer to ORC HDFS file due to error:", e);
+        }
     }
 }

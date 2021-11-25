@@ -33,7 +33,7 @@ public class Formula {
     for(Field field: (LinkedList<Field>) model.getFields()) {
       if(formula.contains(field.getName())) {
         listOfColsToEvaluate.add(field.getName());
-        logger.info("Add Field : " + field + " to be in the formula");
+        logger.debug("Add Field : " + field + " to be in the formula");
       }
     }
     formulaToEvaluate = formula.replaceAll("[$]", "");
@@ -56,7 +56,7 @@ public class Formula {
     Object value = 0f;
     try {
        value = scriptEngine.eval(formula);
-       logger.info("Evaluating formula: " + formula + " to: " + value);
+       logger.debug("Evaluating formula: " + formula + " to: " + value);
     } catch (ScriptException e) {
       logger.warn("Could not evaluate expression: " + formula + " due to error: ", e);
     }

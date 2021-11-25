@@ -20,25 +20,35 @@ import java.net.URI;
 import java.util.List;
 
 /**
- * This is an HDFSCSV sink using Hadoop 3.2 API
- * Each instance manages one connection to a file system and one specific file
+ * This is an HDFS Avro sink using Hadoop 3.2 API
+ * Each instance manages one connection to a file system
  */
 public class HdfsAvroSink implements SinkInterface {
 
-    private Schema schema;
+    private final Schema schema;
     private DataFileWriter<GenericRecord> dataFileWriter;
-    private DatumWriter<GenericRecord> datumWriter;
+    private final DatumWriter<GenericRecord> datumWriter;
     private FileSystem fileSystem;
     private FSDataOutputStream fsDataOutputStream;
     private int counter;
-    private Model model;
+    private final Model model;
+    private final String directoryName;
+    private final String fileName;
+    private final Boolean oneFilePerIteration;
+    private final short replicationFactor;
 
     /**
-     * Initiate HDFSCSV connection with Kerberos or not
+     * Initiate HDFS-AVRO connection with Kerberos or not
      *
-     * @return filesystem connection to HDFSCSV
      */
-    public void init(Model model) {
+    HdfsAvroSink(Model model) {
+        this.counter = 0;
+        this.model = model;
+        this.directoryName = (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH);
+        this.fileName = (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME);
+        this.oneFilePerIteration = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION);
+        this.replicationFactor = (short) model.getOptionsOrDefault(OptionsConverter.Options.HDFS_REPLICATION_FACTOR);
+
         org.apache.hadoop.conf.Configuration config = new org.apache.hadoop.conf.Configuration();
         Utils.setupHadoopEnv(config);
 
@@ -48,7 +58,6 @@ public class HdfsAvroSink implements SinkInterface {
                     PropertiesLoader.getProperty("hdfs.auth.kerberos.keytab"), config);
         }
 
-        logger.debug("Setting up access to HDFSAVRO");
         try {
             this.fileSystem = FileSystem.get(URI.create(PropertiesLoader.getProperty("hdfs.uri")), config);
         } catch (IOException e) {
@@ -58,40 +67,20 @@ public class HdfsAvroSink implements SinkInterface {
         this.schema = model.getAvroSchema();
         this.datumWriter = new GenericDatumWriter<>(schema);
 
+        Utils.createHdfsDirectory(fileSystem, directoryName);
+
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
-            Utils.deleteAllHdfsFiles(fileSystem, (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH),
-                (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME), "avro");
+            Utils.deleteAllHdfsFiles(fileSystem, directoryName, fileName, "avro");
         }
 
-        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-            createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".avro");
+        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
+            createFileWithOverwrite(directoryName + fileName + ".avro");
             appendAvscHeader(model);
-        } else {
-            this.counter = 0;
-            this.model = model;
         }
 
     }
 
-    void createFileWithOverwrite(String path) {
-        try {
-            fsDataOutputStream = fileSystem.create(new Path(path), true);
-            dataFileWriter = new DataFileWriter<>(datumWriter);
-            logger.debug("Successfully created hdfs file : " + path);
-        } catch (IOException e) {
-            logger.error("Tried to create hdfs file : " + path + " with no success :", e);
-        }
-    }
-
-    void emptyDirectory(String path) {
-        try {
-            fileSystem.delete(new Path(path), true);
-        } catch (IOException e) {
-            logger.error("Unable to delete directory and subdirectories of : " + path + " due to error: ", e);
-        }
-    }
-
+    @Override
     public void terminate() {
         try {
             dataFileWriter.close();
@@ -101,10 +90,10 @@ public class HdfsAvroSink implements SinkInterface {
         }
     }
 
+    @Override
     public void sendOneBatchOfRows(List<Row> rows) {
-        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
-            createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" + String.format("%010d", counter) + ".avro");
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
+            createFileWithOverwrite(directoryName + fileName + "-" + String.format("%010d", counter) + ".avro");
             appendAvscHeader(model);
             counter++;
         }
@@ -117,7 +106,7 @@ public class HdfsAvroSink implements SinkInterface {
             }
         });
 
-        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if (oneFilePerIteration) {
             try {
                 dataFileWriter.close();
                 fsDataOutputStream.close();
@@ -131,6 +120,17 @@ public class HdfsAvroSink implements SinkInterface {
             } catch (IOException e) {
                 logger.error(" Unable to flush hdfs file with error :", e);
             }
+        }
+    }
+
+    void createFileWithOverwrite(String path) {
+        try {
+            Utils.deleteHdfsFile(fileSystem, path);
+            fsDataOutputStream = fileSystem.create(new Path(path), replicationFactor);
+            dataFileWriter = new DataFileWriter<>(datumWriter);
+            logger.debug("Successfully created hdfs file : " + path);
+        } catch (IOException e) {
+            logger.error("Tried to create hdfs file : " + path + " with no success :", e);
         }
     }
 

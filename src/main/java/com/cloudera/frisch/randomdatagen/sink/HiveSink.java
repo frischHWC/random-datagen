@@ -26,20 +26,30 @@ import java.util.concurrent.CountDownLatch;
  * with a high number of rows per batch and few batches (to avoid recreating connection to Hive each time)
  * and with a maximum of 20 threads (configurable in config.properties)
  */
+@SuppressWarnings("unchecked")
 public class HiveSink implements SinkInterface {
 
-    private int threads_number;
+    private final int threads_number;
     private Connection hiveConnection;
     private HdfsParquetSink hdfsSink;
-    private String database;
-    private String tableName;
-    private String tableNameTemporary;
+    private final String database;
+    private final String tableName;
+    private final String tableNameTemporary;
     private String insertStatement;
-    private boolean hiveOnHDFS;
+    private final boolean hiveOnHDFS;
+    private final String queue;
 
-    public void init(Model model) {
+
+    HiveSink(Model model) {
         this.hiveOnHDFS = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.HIVE_ON_HDFS);
         this.threads_number = (Integer) model.getOptionsOrDefault(OptionsConverter.Options.HIVE_THREAD_NUMBER);
+        this.database = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE);
+        this.tableName = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TABLE_NAME);
+        this.tableNameTemporary = model.getTableNames().get(OptionsConverter.TableNames.HIVE_TEMPORARY_TABLE_NAME)==null ?
+            tableName + "_tmp" : (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TEMPORARY_TABLE_NAME);
+        this.queue = (String) model.getOptionsOrDefault(OptionsConverter.Options.HIVE_TEZ_QUEUE_NAME);
+        String locationTemporaryTable = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH);
+
         try {
             if (Boolean.parseBoolean(PropertiesLoader.getProperty("hive.auth.kerberos"))) {
                 Utils.loginUserWithKerberos(PropertiesLoader.getProperty("hive.security.user"),
@@ -50,21 +60,15 @@ public class HiveSink implements SinkInterface {
             System.setProperty("javax.net.ssl.trustStorePassword", PropertiesLoader.getProperty("hive.truststore.password"));
 
             java.util.Properties properties = new Properties();
-            properties.put("tez.queue.name", model.getOptionsOrDefault(OptionsConverter.Options.HIVE_TEZ_QUEUE_NAME));
+            properties.put("tez.queue.name", queue);
 
-            hiveConnection = DriverManager.getConnection("jdbc:hive2://" +
+            this.hiveConnection = DriverManager.getConnection("jdbc:hive2://" +
                             PropertiesLoader.getProperty("hive.zookeeper.server") + ":" +
                             PropertiesLoader.getProperty("hive.zookeeper.port") + "/" +
                             ";serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" +
                             PropertiesLoader.getProperty("hive.zookeeper.namespace") +
-                            "?tez.queue.name=" + model.getOptionsOrDefault(OptionsConverter.Options.HIVE_TEZ_QUEUE_NAME)
+                            "?tez.queue.name=" + queue
                     , properties);
-
-            database = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE);
-            tableName = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TABLE_NAME);
-            tableNameTemporary = model.getTableNames().get(OptionsConverter.TableNames.HIVE_TEMPORARY_TABLE_NAME)==null ?
-                tableName + "_tmp" : (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TEMPORARY_TABLE_NAME);
-            String locationTemporaryTable = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH);
 
             prepareAndExecuteStatement("CREATE DATABASE IF NOT EXISTS " + database);
 
@@ -79,10 +83,9 @@ public class HiveSink implements SinkInterface {
 
             if (hiveOnHDFS) {
                 // If using an HDFS sink, we want it to use the Hive HDFS File path and not the Hdfs file path
-                hdfsSink = new HdfsParquetSink();
                 model.getTableNames().put(OptionsConverter.TableNames.HDFS_FILE_PATH,
-                        model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH));
-                hdfsSink.init(model);
+                    model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH));
+                this.hdfsSink = new HdfsParquetSink(model);
 
                 logger.info("Creating temporary table: " + tableNameTemporary);
                 prepareAndExecuteStatement(
@@ -100,6 +103,7 @@ public class HiveSink implements SinkInterface {
         }
     }
 
+    @Override
     public void terminate() {
         try {
             if (hiveOnHDFS) {
@@ -121,6 +125,7 @@ public class HiveSink implements SinkInterface {
      *
      * @param rows list of rows to write to Hive
      */
+    @Override
     public void sendOneBatchOfRows(List<Row> rows) {
         if (hiveOnHDFS) {
             hdfsSink.sendOneBatchOfRows(rows);
@@ -128,6 +133,7 @@ public class HiveSink implements SinkInterface {
             senOneBatchOfRowsDirectlyToHive(rows);
         }
     }
+
 
     /**
      * As Hive insertions are very slow, this function has been designed to send request to Hive through many threads synchronously
