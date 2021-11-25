@@ -104,7 +104,7 @@ public class KuduSink implements SinkInterface {
 
     public void sendOneBatchOfRows(List<Row> rows) {
         try {
-            rows.stream().map(row -> row.toKuduInsert(table)).forEach(insert -> {
+            rows.parallelStream().map(row -> row.toKuduInsert(table)).forEach(insert -> {
                 try {
                     session.apply(insert);
                 } catch (KuduException e) {

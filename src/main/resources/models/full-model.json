@@ -5,15 +5,20 @@
       "type": "INTEGER"
     },
     {
+      "name": "category",
+      "type": "INTEGER",
+      "possible_values": [0, 1, -1]
+    },
+    {
+      "name": "department",
+      "type": "STRING",
+      "possible_values": ["hr", "consulting", "marketing", "finance"]
+    },
+    {
       "name": "percentage",
       "type": "INTEGER",
       "min": 0,
       "max": 100
-    },
-    {
-      "name": "category",
-      "type": "INTEGER",
-      "possible_values": [0, 1, -1]
     },
     {
       "name": "abbreviation",
@@ -23,11 +28,6 @@
     {
       "name": "randomName",
       "type": "STRING"
-    },
-    {
-      "name": "department",
-      "type": "STRING",
-      "possible_values": ["hr", "consulting", "marketing", "finance"]
     },
     {
       "name": "userEmail",
