@@ -28,16 +28,18 @@ import java.util.concurrent.CountDownLatch;
  */
 public class HiveSink implements SinkInterface {
 
-    private static final int NUMBER_OF_THREADS = Integer.parseInt(PropertiesLoader.getProperty("hive.threads.number"));
+    private int threads_number;
     private Connection hiveConnection;
     private HdfsParquetSink hdfsSink;
     private String database;
     private String tableName;
     private String tableNameTemporary;
     private String insertStatement;
-    private final boolean hiveOnHDFS = Boolean.parseBoolean(PropertiesLoader.getProperty("hive.on.hdfs"));
+    private boolean hiveOnHDFS;
 
     public void init(Model model) {
+        this.hiveOnHDFS = (Boolean) model.getOptions().get(OptionsConverter.Options.HIVE_ON_HDFS);
+        this.threads_number = (Integer) model.getOptions().get(OptionsConverter.Options.HIVE_THREAD_NUMBER);
         try {
             if (Boolean.parseBoolean(PropertiesLoader.getProperty("hive.auth.kerberos"))) {
                 Utils.loginUserWithKerberos(PropertiesLoader.getProperty("hive.security.user"),
@@ -48,14 +50,14 @@ public class HiveSink implements SinkInterface {
             System.setProperty("javax.net.ssl.trustStorePassword", PropertiesLoader.getProperty("hive.truststore.password"));
 
             java.util.Properties properties = new Properties();
-            properties.put("tez.queue.name", "root.default");
+            properties.put("tez.queue.name", model.getOptions().get(OptionsConverter.Options.HIVE_TEZ_QUEUE_NAME));
 
             hiveConnection = DriverManager.getConnection("jdbc:hive2://" +
                             PropertiesLoader.getProperty("hive.zookeeper.server") + ":" +
                             PropertiesLoader.getProperty("hive.zookeeper.port") + "/" +
                             ";serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" +
                             PropertiesLoader.getProperty("hive.zookeeper.namespace") +
-                            "?tez.queue.name=" + PropertiesLoader.getProperty("tez.queue.name")
+                            "?tez.queue.name=" + model.getOptions().get(OptionsConverter.Options.HIVE_TEZ_QUEUE_NAME)
                     , properties);
 
             database = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE);
@@ -129,10 +131,10 @@ public class HiveSink implements SinkInterface {
      * @param rows list of rows to write to Hive
      */
     private void senOneBatchOfRowsDirectlyToHive(List<Row> rows) {
-        int lengthToTake = rows.size() / NUMBER_OF_THREADS;
-        CountDownLatch latch = new CountDownLatch(NUMBER_OF_THREADS);
+        int lengthToTake = rows.size() / threads_number;
+        CountDownLatch latch = new CountDownLatch(threads_number);
 
-        for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+        for (int i = 0; i < threads_number; i++) {
             HiveSinkParallel oneHiveSinkThread = new HiveSinkParallel(rows.subList(i * lengthToTake, i * lengthToTake + lengthToTake), latch);
             oneHiveSinkThread.setName("Thread-" + i);
             oneHiveSinkThread.start();

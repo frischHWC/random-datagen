@@ -164,8 +164,13 @@ public class Model<T extends Field> {
             if (op != null) {
                 if (op == OptionsConverter.Options.HBASE_COLUMN_FAMILIES_MAPPING) {
                     optionsFormatted.put(op, convertHbaseColFamilyOption(v));
-                } else if (op == OptionsConverter.Options.SOLR_REPLICAS || op == OptionsConverter.Options.SOLR_SHARDS || op == OptionsConverter.Options.KUDU_REPLICAS) {
+                } else if (op == OptionsConverter.Options.SOLR_REPLICAS || op == OptionsConverter.Options.SOLR_SHARDS
+                    || op == OptionsConverter.Options.KUDU_REPLICAS || op == OptionsConverter.Options.HIVE_THREAD_NUMBER) {
                     optionsFormatted.put(op, Integer.valueOf(v));
+                } else if (op == OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION || op == OptionsConverter.Options.HIVE_ON_HDFS) {
+                    optionsFormatted.put(op, Boolean.valueOf(v));
+                } else {
+                    optionsFormatted.put(op, v);
                 }
             }
         });

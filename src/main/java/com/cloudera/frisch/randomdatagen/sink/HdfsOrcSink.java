@@ -61,7 +61,7 @@ public class HdfsOrcSink implements SinkInterface {
         batch = schema.createRowBatch();
         vectors = model.createOrcVectors(batch);
 
-        if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("false")) {
+        if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             String filepath = PropertiesLoader.getProperty("hdfs.uri") + model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".orc";
 
@@ -100,7 +100,7 @@ public class HdfsOrcSink implements SinkInterface {
 
     public void terminate() {
         try {
-            if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("false")) {
+            if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 writer.close();
             }
         } catch (IOException e) {
@@ -109,7 +109,7 @@ public class HdfsOrcSink implements SinkInterface {
     }
 
     public void sendOneBatchOfRows(List<Row> rows) {
-        if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("true")) {
+        if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             String filepath = PropertiesLoader.getProperty("hdfs.uri") + model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" + String.format("%010d", counter) + ".orc";
 
@@ -147,7 +147,7 @@ public class HdfsOrcSink implements SinkInterface {
             logger.error("Can not write data to the ORC HDFS file due to error: ", e);
         }
 
-        if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("true")) {
+        if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             try {
                 writer.close();
             } catch (IOException e) {

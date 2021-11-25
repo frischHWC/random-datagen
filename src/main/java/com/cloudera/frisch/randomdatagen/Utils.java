@@ -281,7 +281,7 @@ public class Utils {
             case HIVE:
                 logger.info("   - Hive in database: " + model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE) +
                     " in table : " + model.getTableNames().get(OptionsConverter.TableNames.HIVE_TABLE_NAME));
-                if(Boolean.parseBoolean(PropertiesLoader.getProperty("hive.on.hdfs"))) {
+                if((Boolean) model.getOptions().get(OptionsConverter.Options.HIVE_ON_HDFS)) {
                     String tableNameTemporary = model.getTableNames().get(OptionsConverter.TableNames.HIVE_TEMPORARY_TABLE_NAME)==null ?
                         (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TABLE_NAME) + "_tmp" :
                         (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TEMPORARY_TABLE_NAME);

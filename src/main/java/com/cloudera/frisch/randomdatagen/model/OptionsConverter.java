@@ -98,7 +98,12 @@ public class OptionsConverter {
         HBASE_COLUMN_FAMILIES_MAPPING,
         SOLR_SHARDS,
         SOLR_REPLICAS,
-        KUDU_REPLICAS
+        KUDU_REPLICAS,
+        LOCAL_FILE_ONE_PER_ITERATION,
+        KAFKA_MESSAGES_TYPE,
+        HIVE_THREAD_NUMBER,
+        HIVE_ON_HDFS,
+        HIVE_TEZ_QUEUE_NAME
     }
 
     static Options convertOptionToOption(String option) {
@@ -111,6 +116,16 @@ public class OptionsConverter {
                 return Options.SOLR_REPLICAS;
             case "KUDU_REPLICAS":
                 return Options.KUDU_REPLICAS;
+            case "LOCAL_FILE_ONE_PER_ITERATION":
+                return Options.LOCAL_FILE_ONE_PER_ITERATION;
+            case "KAFKA_MESSAGES_TYPE":
+                return Options.KAFKA_MESSAGES_TYPE;
+            case "HIVE_THREAD_NUMBER":
+                return Options.HIVE_THREAD_NUMBER;
+            case "HIVE_ON_HDFS":
+                return Options.HIVE_ON_HDFS;
+            case "HIVE_TEZ_QUEUE_NAME":
+                return Options.HIVE_TEZ_QUEUE_NAME;
             default:
                 logger.warn("Option was not recognized: " + option + " , please verify your JSON");
                 return null;

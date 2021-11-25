@@ -33,7 +33,7 @@ public class AvroSink implements SinkInterface {
 
         datumWriter = new GenericDatumWriter<>(schema);
 
-        if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("false")) {
+        if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
 
             createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + ".avro");
@@ -60,7 +60,7 @@ public class AvroSink implements SinkInterface {
 
     public void terminate() {
         try {
-            if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("false")) {
+            if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 dataFileWriter.close();
             }
         } catch (IOException e) {
@@ -70,7 +70,7 @@ public class AvroSink implements SinkInterface {
 
     public void sendOneBatchOfRows(List<Row> rows) {
 
-        if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("true")) {
+        if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" + String.format("%010d", counter) + ".avro");
 
@@ -86,7 +86,7 @@ public class AvroSink implements SinkInterface {
             }
         });
 
-        if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("true")) {
+        if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             try {
                 dataFileWriter.close();
             } catch (IOException e) {

@@ -36,7 +36,7 @@ public class HdfsJsonSink implements SinkInterface {
         Utils.setupHadoopEnv(config);
 
         // Set all kerberos if needed (Note that connection will require a user and its appropriate keytab with right privileges to access folders and files on HDFSCSV)
-        if (Boolean.valueOf(PropertiesLoader.getProperty("hdfs.auth.kerberos"))) {
+        if (Boolean.parseBoolean(PropertiesLoader.getProperty("hdfs.auth.kerberos"))) {
             Utils.loginUserWithKerberos(PropertiesLoader.getProperty("hdfs.auth.kerberos.user"),
                     PropertiesLoader.getProperty("hdfs.auth.kerberos.keytab"),config);
         }
@@ -48,7 +48,7 @@ public class HdfsJsonSink implements SinkInterface {
             logger.error("Could not access to HDFSJSON !", e);
         }
 
-        if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("false")) {
+        if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".json");
 
@@ -95,7 +95,7 @@ public class HdfsJsonSink implements SinkInterface {
 
     public void sendOneBatchOfRows(List<Row> rows){
         try {
-            if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("true")) {
+            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                         model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" + String.format("%010d", counter) + ".json");
                 counter++;
@@ -105,7 +105,7 @@ public class HdfsJsonSink implements SinkInterface {
             fsDataOutputStream.writeChars(String.join(System.getProperty("line.separator"), rowsInString));
             fsDataOutputStream.writeChars(System.getProperty("line.separator"));
 
-            if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("true")) {
+            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 fsDataOutputStream.close();
             }
         } catch (IOException e) {

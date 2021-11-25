@@ -39,7 +39,7 @@ public class HdfsParquetSink implements SinkInterface {
         Utils.setupHadoopEnv(config);
 
         // Set all kerberos if needed (Note that connection will require a user and its appropriate keytab with right privileges to access folders and files on HDFSCSV)
-        if (Boolean.valueOf(PropertiesLoader.getProperty("hdfs.auth.kerberos"))) {
+        if (Boolean.parseBoolean(PropertiesLoader.getProperty("hdfs.auth.kerberos"))) {
             Utils.loginUserWithKerberos(PropertiesLoader.getProperty("hdfs.auth.kerberos.user"),
                     PropertiesLoader.getProperty("hdfs.auth.kerberos.keytab"),config);
         }
@@ -53,7 +53,7 @@ public class HdfsParquetSink implements SinkInterface {
 
         schema = model.getAvroSchema();
 
-        if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("false")) {
+        if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             String filepath = PropertiesLoader.getProperty("hdfs.uri") + model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".parquet";
 
@@ -104,7 +104,7 @@ public class HdfsParquetSink implements SinkInterface {
 
     public void sendOneBatchOfRows(List<Row> rows){
         try {
-            if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("true")) {
+            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 String filepath =  PropertiesLoader.getProperty("hdfs.uri") + model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                         model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" + String.format("%010d", counter) + ".parquet";
 
@@ -131,7 +131,7 @@ public class HdfsParquetSink implements SinkInterface {
                 }
             });
 
-            if (PropertiesLoader.getProperty("file.one.per.iteration").equalsIgnoreCase("true")) {
+            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 writer.close();
             }
         } catch (IOException e) {

@@ -153,6 +153,11 @@
     {"HBASE_COLUMN_FAMILIES_MAPPING": "c:randomName,abbreviation,size,bool,progression,percentage,limitedName,userEmail,department;d:bytesLittleArray,bigSize,startDate,bytesArray,hash,birthdate,name,country,restrictedHash,category,e:longPercent,onePlusOne,onePlusTwo,formula_1,condition_2,recording_time"},
     {"SOLR_SHARDS":  1},
     {"SOLR_REPLICAS":  1},
-    {"KUDU_REPLICAS":  1}
+    {"KUDU_REPLICAS":  1},
+    {"LOCAL_FILE_ONE_PER_ITERATION":  true},
+    {"KAFKA_MESSAGE_TYPE":  "json"},
+    {"HIVE_THREAD_NUMBER":  1},
+    {"HIVE_ON_HDFS":  true},
+    {"HIVE_TEZ_QUEUE_NAME":  "root.default"}
   ]
 }

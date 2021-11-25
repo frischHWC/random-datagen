@@ -15,6 +15,7 @@ import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
@@ -30,17 +31,19 @@ public class KafkaSink implements SinkInterface {
     private Producer<String, String> producerString;
     private String topic;
     private Schema schema;
+    private MessageType messagetype;
 
     public void init(Model model) {
 
         schema = model.getAvroSchema();
+        this.messagetype = convertStringToMessageType((String) model.getOptions().get(OptionsConverter.Options.KAFKA_MESSAGES_TYPE));
 
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, PropertiesLoader.getProperty("kafka.brokers"));
         props.put(ProducerConfig.ACKS_CONFIG, "all");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
 
-        if(PropertiesLoader.getProperty("kafka.messages").equalsIgnoreCase("avro")) {
+        if(messagetype==MessageType.AVRO) {
             String schemaRegistryProtocol = "http";
           // SSL configs
             if (Boolean.parseBoolean(PropertiesLoader.getProperty("schema.registry.tls"))) {
@@ -98,7 +101,7 @@ public class KafkaSink implements SinkInterface {
 
         topic = (String) model.getTableNames().get(OptionsConverter.TableNames.KAFKA_TOPIC);
 
-        if(PropertiesLoader.getProperty("kafka.messages").equalsIgnoreCase("avro")) {
+        if(messagetype==MessageType.AVRO) {
             producer = new KafkaProducer<>(props);
         } else {
             producerString = new KafkaProducer<>(props);
@@ -106,7 +109,7 @@ public class KafkaSink implements SinkInterface {
     }
 
     public void terminate() {
-        if(PropertiesLoader.getProperty("kafka.messages").equalsIgnoreCase("avro")) {
+        if(messagetype==MessageType.AVRO) {
             producer.close();
         } else {
             producerString.close();
@@ -115,7 +118,7 @@ public class KafkaSink implements SinkInterface {
 
     public void sendOneBatchOfRows(List<Row> rows) {
         ConcurrentLinkedQueue<Future<RecordMetadata>> queue = new ConcurrentLinkedQueue<>();
-        if(PropertiesLoader.getProperty("kafka.messages").equalsIgnoreCase("avro")) {
+        if(messagetype==MessageType.AVRO) {
             rows.parallelStream()
                 .map(row -> row.toKafkaMessage(schema))
                 .forEach(keyValue ->
@@ -130,7 +133,7 @@ public class KafkaSink implements SinkInterface {
                 );
         } else {
             rows.parallelStream()
-                .map(row -> row.toKafkaMessageString())
+                .map(row -> row.toKafkaMessageString(messagetype))
                 .forEach(keyValue ->
                     queue.add(
                         producerString.send(
@@ -157,6 +160,21 @@ public class KafkaSink implements SinkInterface {
             if (!metadata.isDone()) {
                 queue.add(metadata);
             }
+        }
+    }
+
+    public enum MessageType {
+        AVRO,
+        CSV,
+        JSON
+    }
+
+    private MessageType convertStringToMessageType(String messageType) {
+        switch (messageType.toUpperCase()) {
+        case "AVRO": return MessageType.AVRO;
+        case "CSV": return MessageType.CSV;
+        case "JSON":
+        default: return MessageType.JSON;
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.model;
 
 import com.cloudera.frisch.randomdatagen.model.type.Field;
+import com.cloudera.frisch.randomdatagen.sink.KafkaSink;
 import com.cloudera.frisch.randomdatagen.sink.storedobjects.OzoneObject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -100,9 +101,13 @@ public class Row<T extends Field> {
         return new AbstractMap.SimpleEntry<>(pksValues.get(OptionsConverter.PrimaryKeys.KAFKA_MSG_KEY).toString(), genericRecordRow);
     }
 
-    public Map.Entry<String, String> toKafkaMessageString() {
+    public Map.Entry<String, String> toKafkaMessageString(KafkaSink.MessageType messageType) {
         StringBuilder sb = new StringBuilder();
-        values.forEach((f,o) -> sb.append(f.toCSVString(o)));
+        if(messageType == KafkaSink.MessageType.CSV) {
+            values.forEach((f, o) -> sb.append(f.toCSVString(o)));
+        } else {
+            values.forEach((f, o) -> sb.append(f.toJSONString(o)));
+        }
         return new AbstractMap.SimpleEntry<>(pksValues.get(OptionsConverter.PrimaryKeys.KAFKA_MSG_KEY).toString(), sb.toString());
     }
 
