@@ -11,7 +11,9 @@ public class OptionsConverter {
         HBASE_PRIMARY_KEY,
         OZONE_BUCKET,
         OZONE_KEY,
-        KUDU_HASH_KEYS
+        KUDU_HASH_KEYS,
+        KUDU_RANGE_KEYS,
+        KUDU_PRIMARY_KEYS
     }
 
     static PrimaryKeys convertOptionToPrimaryKey(String option) {
@@ -24,8 +26,12 @@ public class OptionsConverter {
                 return PrimaryKeys.OZONE_BUCKET;
             case "OZONE_KEY":
                 return PrimaryKeys.OZONE_KEY;
+            case "KUDU_PRIMARY_KEYS":
+                return PrimaryKeys.KUDU_PRIMARY_KEYS;
             case "KUDU_HASH_KEYS":
                 return PrimaryKeys.KUDU_HASH_KEYS;
+            case "KUDU_RANGE_KEYS":
+                return PrimaryKeys.KUDU_RANGE_KEYS;
             default:
                 logger.warn("Option was not recognized: " + option + " , please verify your JSON");
                 return null;
@@ -91,7 +97,8 @@ public class OptionsConverter {
     public enum Options {
         HBASE_COLUMN_FAMILIES_MAPPING,
         SOLR_SHARDS,
-        SOLR_REPLICAS
+        SOLR_REPLICAS,
+        KUDU_REPLICAS
     }
 
     static Options convertOptionToOption(String option) {
@@ -102,6 +109,8 @@ public class OptionsConverter {
                 return Options.SOLR_SHARDS;
             case "SOLR_REPLICAS":
                 return Options.SOLR_REPLICAS;
+            case "KUDU_REPLICAS":
+                return Options.KUDU_REPLICAS;
             default:
                 logger.warn("Option was not recognized: " + option + " , please verify your JSON");
                 return null;

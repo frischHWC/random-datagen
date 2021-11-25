@@ -97,6 +97,20 @@ public class JsonParser<T extends Field> implements Parser {
             length = null;
         }
 
+        Long min;
+        try {
+            min = jsonField.get("min").asLong();
+        } catch (NullPointerException e) {
+            min = null;
+        }
+
+        Long max;
+        try {
+            max = jsonField.get("max").asLong();
+        } catch (NullPointerException e) {
+            max = null;
+        }
+
         JsonNode possibleValuesArray = jsonField.get("possible_values");
         List<JsonNode> possibleValues = new ArrayList<>();
         try {
@@ -119,8 +133,19 @@ public class JsonParser<T extends Field> implements Parser {
             }
         }
 
+        JsonNode conditionalsObject = jsonField.get("conditionals");
+        LinkedHashMap<String, String> conditionals = new LinkedHashMap<>();
+        if(conditionalsObject!=null) {
+            Iterator<Map.Entry<String, JsonNode>> conditionalsIterator = conditionalsObject.fields();
+            while (conditionalsIterator.hasNext()) {
+                Map.Entry<String, JsonNode> conditional = conditionalsIterator.next();
+                conditionals.put(conditional.getKey(), conditional.getValue().asText());
+            }
+        }
+
         return (T) Field.instantiateField(jsonField.get("name").asText(), jsonField.get("type").asText(), length,
-                opsMap.get(jsonField.get("name").asText()), possibleValues, possible_values_weighted);
+                opsMap.get(jsonField.get("name").asText()), possibleValues, possible_values_weighted, conditionals,
+                min, max);
     }
 
     private Map<String, String> mapColNameToColQual(String mapping) {

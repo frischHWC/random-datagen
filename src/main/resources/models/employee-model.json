@@ -36,7 +36,7 @@
     {"HDFS_FILE_NAME": "employee"},
     {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/hive/employee/"},
     {"HBASE_TABLE_NAME": "employee"},
-    {"HBASE_NAMESPACE": "rd"},
+    {"HBASE_NAMESPACE": "random_datagen"},
     {"KAFKA_TOPIC": "employee"},
     {"OZONE_VOLUME": "employee"},
     {"SOLR_COLLECTION": "employee"},
@@ -53,11 +53,14 @@
     {"HBASE_PRIMARY_KEY":  "id"},
     {"OZONE_BUCKET":  "department"},
     {"OZONE_KEY":  "id"},
-    {"KUDU_HASH_KEYS":  "id"}
+    {"KUDU_PRIMARY_KEYS":  "id"},
+    {"KUDU_HASH_KEYS":  "id"},
+    {"KUDU_RANGE_KEYS":  "last_connection"}
   ],
   "Options": [
     {"HBASE_COLUMN_FAMILIES_MAPPING": "details:name,country,birthdate,department;technicals:last_connection,seniority,id"},
     {"SOLR_SHARDS":  1},
-    {"SOLR_REPLICAS":  1}
+    {"SOLR_REPLICAS":  1},
+    {"KUDU_REPLICAS":  1}
   ]
 }

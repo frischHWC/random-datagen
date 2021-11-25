@@ -12,6 +12,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.log4j.Logger;
 
+import javax.security.auth.Subject;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;

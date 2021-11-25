@@ -16,15 +16,26 @@ import java.util.List;
 
 public class IntegerField extends Field<Integer> {
 
-    IntegerField(String name, Integer length, List<Integer> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted) {
+    IntegerField(String name, Integer length, List<Integer> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals, Long min, Long max) {
         this.name = name;
         if(length==null || length==-1) {
             this.length = Integer.MAX_VALUE;
         } else {
             this.length = length;
         }
+        if(max==null || max==-1) {
+            this.max = Integer.MAX_VALUE;
+        } else {
+            this.max = max;
+        }
+        if(min==null || min==-1) {
+            this.min = Integer.MIN_VALUE;
+        } else {
+            this.min = min;
+        }
         this.possibleValues = possibleValues;
         this.possible_values_weighted = possible_values_weighted;
+        this.conditionals = conditionals;
     }
 
     public Integer generateRandomValue() {
@@ -33,8 +44,10 @@ public class IntegerField extends Field<Integer> {
         } else if (!possible_values_weighted.isEmpty()){
             String result = Utils.getRandomValueWithWeights(random, possible_values_weighted);
             return result.isEmpty() ? 0 :  Integer.parseInt(result);
+        } else if(min != Integer.MIN_VALUE) {
+            return random.nextInt((int) max - (int) min + 1 ) + (int) min;
         } else {
-            return random.nextInt();
+            return random.nextInt((int) max);
         }
     }
 

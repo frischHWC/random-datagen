@@ -17,6 +17,7 @@ public class PropertiesLoader {
     private static Properties loadProperties() {
         // Load config file
         java.util.Properties properties = new java.util.Properties();
+
         try {
             FileInputStream fileInputStream = new FileInputStream("config.properties");
             properties.load(fileInputStream);

@@ -44,15 +44,30 @@ public abstract class Field<T> {
     @Setter
     public LinkedHashMap<String, Integer> possible_values_weighted;
 
+    // This HashMap represents the condition and then the value associated to this condition
     @Getter
     @Setter
-    public String hbaseColumnQualifier = "cq";
+    public LinkedHashMap<String, String> conditionals;
 
     // Default length is -1, if user does not provide a strict superior to 0 length,
     // each Extended field class should by default override it to a number strictly superior to 0
     @Getter
     @Setter
     public int length = -1;
+
+    // Minimum possible value for Int/Long
+    @Getter
+    @Setter
+    public long min;
+
+    // Maximum possible value Int/Long
+    @Getter
+    @Setter
+    public long max;
+
+    @Getter
+    @Setter
+    public String hbaseColumnQualifier = "cq";
 
     public abstract T generateRandomValue();
 
@@ -87,7 +102,9 @@ public abstract class Field<T> {
      * @param columnQualifier Hbase column qualifier if there is one
      * @return Field instantiated or null if type has not been recognized
      */
-    public static Field instantiateField(String name, String type, Integer length, String columnQualifier, List<JsonNode> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted) {
+    public static Field instantiateField(String name, String type, Integer length, String columnQualifier, List<JsonNode> possibleValues,
+                                         LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals,
+                                         Long min, Long max) {
         if(name == null || name.isEmpty()) {
             throw new IllegalStateException("Name can not be null or empty for field: " + name);
         }
@@ -104,13 +121,13 @@ public abstract class Field<T> {
 
         switch (type.toUpperCase()) {
             case "STRING":
-                field = new StringField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()), possible_values_weighted);
+                field = new StringField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()), possible_values_weighted, conditionals);
                 break;
             case "STRINGAZ":
                 field = new StringAZField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
                 break;
             case "INTEGER":
-                field = new IntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()), possible_values_weighted);
+                field = new IntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()), possible_values_weighted, conditionals, min, max);
                 break;
             case "INCREMENT_INTEGER":
                 field = new IncrementIntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()));
@@ -119,10 +136,10 @@ public abstract class Field<T> {
                 field = new BooleanField(name, length, possibleValues.stream().map(JsonNode::asBoolean).collect(Collectors.toList()), possible_values_weighted);
                 break;
             case "FLOAT":
-                field = new FloatField(name, length, possibleValues.stream().map(j -> (float) j.asDouble()).collect(Collectors.toList()));
+                field = new FloatField(name, length, possibleValues.stream().map(j -> (float) j.asDouble()).collect(Collectors.toList()), possible_values_weighted, conditionals, min, max);
                 break;
             case "LONG":
-                field = new LongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()), possible_values_weighted);
+                field = new LongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()), possible_values_weighted, conditionals, min, max);
                 break;
             case "INCREMENT_LONG":
                 field = new IncrementLongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()));

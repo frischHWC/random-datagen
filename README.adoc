@@ -105,12 +105,16 @@ or even create conditions based on other columns values.
 
 ===== Possible values
 
-Note that each field could have defined a set of "possible_values" that will limit values to be exactly these.
+Each field could have defined a set of "possible_values" that will limit values to be exactly these.
 
 ===== Possible values weighted
 
-Note that a weight (choose between 0 & 100 and whose sums of all weights must be 100) could also be defined
+A weight (choose between 0 & 100 and whose sums of all weights must be 100) could also be defined
 to make it less random and make each value having a percentage of appearance. (Only String, Boolean, Integer and Long supports weight).
+
+===== Minimum & Maximum
+
+It is possible for INTEGER and LONG type to define a minimum and a maximum.
 
 ===== Conditionals
 
@@ -120,24 +124,30 @@ Two types of condition:
 1. Formula, possible for Float/Integer/Long
 Types must be compatible (int can be converted to long but not the invert).
 It is a simple expression evaluated with operators: * , + , - , /
+Output column must be of type STRING, Input columns (used to compute) must be INTEGER or LONG or FLOAT
 
 Example:
         "conditionals": {
-            "always": "2 * increment_long + 56 - increment_int"
+            "always": "2 * $very_low_int + 56 - $low_int"
         }
+
+Be careful of letting space in your expression to be parseable and evaluated.
 
 1. Value depend on other column's value, possible for Integer/Long/Float/String/Boolean (using these types)
 Support for && (= AND) and || (= OR).
-Conditions must be equals (=) or superior (>) or inferior (<).
+Conditions must be equals (=) or unequals (!=) or superior (>) or inferior (<).
 Multiple conditions is working on same line.
 Conditions are evaluated one by one like a "if ... else if ...", first one returning true is picked.
+Output column must be of type STRING, columns of input must be STRING or LONG or INTEGER or FLOAT
 
 Example:
         "conditionals": {
-            "country_of_provenance=FRANCE" : "Paris",
-            "country_of_provenance=GERMANY || increment_int<40" : "Berlin",
-            "country_of_provenance=GERMANY && increment_int>40" : "Berlin_40"
+            "$country_of_provenance=FRANCE" : "Paris",
+            "$country_of_provenance=GERMANY | $increment_int<40" : "Berlin",
+            "$country_of_provenance=GERMANY & $increment_int>40" : "Berlin_40"
         }
+
+_N.B.: Multiple conditions are evaluated using precedence of AND over OR, meaning: A & B | C will in fact be evaluated like (A & B) | C_
 
 ===== Examples
 
@@ -167,6 +177,15 @@ A definition with weighted values to not generate even spread data:
       }
     }
 
+A definition with minimum and maximum:
+
+    {
+      "name": "percentage",
+      "type": "INTEGER",
+      "min": 0,
+      "max": 100
+    }
+
 ==== Table Names:
 
 An array of following properties self-describing: +
@@ -191,6 +210,9 @@ corresponding to the name of field (multiple fields could be provided separated 
 - HBASE_PRIMARY_KEY +
 - OZONE_BUCKET +
 - OZONE_KEY +
+- KUDU_PRIMARY_KEYS +
+- KUDU_HASH_KEYS +
+- KUDU_RANGE_KEYS
 
 ==== Options:
 
@@ -199,6 +221,7 @@ An array of other options that could be required depending with which sinks it i
 This mapping must be in the form : "CF:col1,col2;CF2:col5" +
 - SOLR_SHARDS +
 - SOLR_REPLICAS +
+- KUDU_REPLICAS
 
 
 Note that all not required settings could be safely removed with no errors.

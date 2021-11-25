@@ -16,11 +16,26 @@ import java.util.List;
 
 public class LongField extends Field<Long> {
 
-    LongField(String name, Integer length, List<Long> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted) {
+    LongField(String name, Integer length, List<Long> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals, Long min, Long max) {
+        if(length==null || length==-1) {
+            this.length = Integer.MAX_VALUE;
+        } else {
+            this.length = length;
+        }
+        if(max==null || max==-1) {
+            this.max = Long.MAX_VALUE;
+        } else {
+            this.max = max;
+        }
+        if(min==null || min==-1) {
+            this.min = Long.MIN_VALUE;
+        } else {
+            this.min = min;
+        }
         this.name = name;
-        this.length = length;
         this.possibleValues = possibleValues;
         this.possible_values_weighted = possible_values_weighted;
+        this.conditionals = conditionals;
     }
 
     public Long generateRandomValue() {
@@ -30,7 +45,11 @@ public class LongField extends Field<Long> {
             String result = Utils.getRandomValueWithWeights(random, possible_values_weighted);
             return result.isEmpty() ? 0L :  Long.parseLong(result);
         } else {
-            return random.nextLong();
+            long randomLong = random.nextLong();
+            while(randomLong < min && randomLong > max) {
+                randomLong = random.nextLong();
+            }
+            return randomLong;
         }
     }
 

@@ -40,6 +40,8 @@ public class Model<T extends Field> {
     private Map<OptionsConverter.TableNames, String> tableNames;
     @Getter @Setter
     private Map<OptionsConverter.Options, Object> options;
+    @Getter @Setter
+    private ConditionalEvaluator conditionalEvaluator;
 
     /**
      * Constructor that initializes the model and populates it completely
@@ -55,6 +57,7 @@ public class Model<T extends Field> {
         this.primaryKeys = convertPrimaryKeys(primaryKeys);
         this.tableNames = convertTableNames(tableNames);
         this.options = convertOptions(options);
+        this.conditionalEvaluator = new ConditionalEvaluator(this);
 
         // Using Options passed, fields should be updated to take into account extra options passed
         setupFieldHbaseColQualifier((Map<T, String>) this.options.get(OptionsConverter.Options.HBASE_COLUMN_FAMILIES_MAPPING));
@@ -120,7 +123,7 @@ public class Model<T extends Field> {
             }
             row.setValues(valuesMap);
             row.populatePksValues(primaryKeys);
-            rows.add(row);
+            rows.add(conditionalEvaluator.evaluateConditions(row, this));
         }
 
         return rows;
@@ -161,7 +164,7 @@ public class Model<T extends Field> {
             if (op != null) {
                 if (op == OptionsConverter.Options.HBASE_COLUMN_FAMILIES_MAPPING) {
                     optionsFormatted.put(op, convertHbaseColFamilyOption(v));
-                } else if (op == OptionsConverter.Options.SOLR_REPLICAS || op == OptionsConverter.Options.SOLR_SHARDS) {
+                } else if (op == OptionsConverter.Options.SOLR_REPLICAS || op == OptionsConverter.Options.SOLR_SHARDS || op == OptionsConverter.Options.KUDU_REPLICAS) {
                     optionsFormatted.put(op, Integer.valueOf(v));
                 }
             }
@@ -196,7 +199,7 @@ public class Model<T extends Field> {
         return new HashSet<>(colFamiliesMap.values());
     }
 
-    private T findFieldWhoseNameIs(String name) {
+    T findFieldWhoseNameIs(String name) {
         T fieldToFind = null;
         for (T f : fields) {
             if (f.name.equalsIgnoreCase(name)) {
@@ -210,6 +213,20 @@ public class Model<T extends Field> {
         return fieldToFind;
     }
 
+    public Field findFieldasFieldWhoseNameIs(String name) {
+        Field fieldToFind = null;
+        for (Field f : fields) {
+            if (f.name.equalsIgnoreCase(name)) {
+                fieldToFind = f;
+            }
+        }
+        if (fieldToFind == null) {
+            logger.warn("The field specified in options " + name + " has not been found !!! " +
+                "=> A review of JSON file should be made to ensure it is consistent");
+        }
+        return fieldToFind;
+    }
+
     private void setupFieldHbaseColQualifier(Map<T, String> fieldHbaseColMap) {
         if(fieldHbaseColMap!=null && !fieldHbaseColMap.isEmpty()) {
             fieldHbaseColMap.forEach(Field::setHbaseColumnQualifier);
@@ -217,27 +234,43 @@ public class Model<T extends Field> {
     }
 
     public Schema getKuduSchema() {
-        List<ColumnSchema> columns = new ArrayList<>(fields.size());
+        List<ColumnSchema> columns = new LinkedList<>();
         fields.forEach(f -> {
-            for (T k : primaryKeys.get(OptionsConverter.PrimaryKeys.KUDU_HASH_KEYS)) {
-                if (k.name.equalsIgnoreCase(f.name)) {
-                    columns.add(new ColumnSchema.ColumnSchemaBuilder(f.name, f.getKuduType())
-                            .key(true)
-                            .build());
-                } else {
-                    columns.add(new ColumnSchema.ColumnSchemaBuilder(f.name, f.getKuduType())
-                            .build());
-                }
+            boolean isaPK = false;
+            for (String k : getKuduPrimaryKeys()) {
+                if (k.equalsIgnoreCase(f.name)) {isaPK = true;}
+            }
+            if (isaPK) {
+                columns.add(new ColumnSchema.ColumnSchemaBuilder(f.name, f.getKuduType())
+                    .key(true)
+                    .build());
+            } else {
+                columns.add(new ColumnSchema.ColumnSchemaBuilder(f.name, f.getKuduType())
+                    .build());
             }
         });
 
         return new Schema(columns);
     }
 
-    public List<String> getKuduHashKeys() {
-        List<T> kuduPrimaryKeys = primaryKeys.get(OptionsConverter.PrimaryKeys.KUDU_HASH_KEYS);
+    public List<String> getKuduPrimaryKeys() {
+        List<T> kuduPrimaryKeys = primaryKeys.get(OptionsConverter.PrimaryKeys.KUDU_PRIMARY_KEYS);
         List<String> hashKeys = new ArrayList<>(kuduPrimaryKeys.size());
         kuduPrimaryKeys.forEach(f -> hashKeys.add(f.name));
+        return hashKeys;
+    }
+
+    public List<String> getKuduRangeKeys() {
+        List<T> kuduRangeKeys = primaryKeys.get(OptionsConverter.PrimaryKeys.KUDU_RANGE_KEYS);
+        List<String> hashKeys = new ArrayList<>(kuduRangeKeys.size());
+        kuduRangeKeys.forEach(f -> hashKeys.add(f.name));
+        return hashKeys;
+    }
+
+    public List<String> getKuduHashKeys() {
+        List<T> kuduHashKeys = primaryKeys.get(OptionsConverter.PrimaryKeys.KUDU_HASH_KEYS);
+        List<String> hashKeys = new ArrayList<>(kuduHashKeys.size());
+        kuduHashKeys.forEach(f -> hashKeys.add(f.name));
         return hashKeys;
     }
 

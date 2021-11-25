@@ -12,3 +12,4 @@ src/main/resources/config.properties
 .classpath
 .settings
 .project
+config.properties
