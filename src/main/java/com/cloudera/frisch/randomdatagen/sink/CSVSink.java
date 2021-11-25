@@ -27,7 +27,7 @@ public class CSVSink implements SinkInterface {
      */
     public void init(Model model) {
 
-        if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + ".csv");
 
@@ -51,7 +51,7 @@ public class CSVSink implements SinkInterface {
 
     public void terminate() {
         try {
-            if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 outputStream.close();
             }
         } catch (IOException e) {
@@ -61,7 +61,7 @@ public class CSVSink implements SinkInterface {
 
     public void sendOneBatchOfRows(List<Row> rows) {
         try {
-            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                         model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" + String.format("%010d", counter) + ".csv");
                 appendCSVHeader(model);
@@ -72,7 +72,7 @@ public class CSVSink implements SinkInterface {
             outputStream.write(String.join(System.getProperty("line.separator"), rowsInString).getBytes());
             outputStream.write(System.getProperty("line.separator").getBytes());
 
-            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 outputStream.close();
             }
         } catch (IOException e) {
@@ -82,8 +82,11 @@ public class CSVSink implements SinkInterface {
 
     void appendCSVHeader(Model model) {
         try {
-            outputStream.write(model.getCsvHeader().getBytes());
-            outputStream.write(System.getProperty("line.separator").getBytes());
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.CSV_HEADER)) {
+                outputStream.write(model.getCsvHeader().getBytes());
+                outputStream.write(
+                    System.getProperty("line.separator").getBytes());
+            }
         } catch (IOException e) {
             logger.error("Can not write header to the local file due to error: ", e);
         }

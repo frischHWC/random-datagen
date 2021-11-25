@@ -53,7 +53,7 @@ public class HdfsParquetSink implements SinkInterface {
 
         schema = model.getAvroSchema();
 
-        if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             String filepath = PropertiesLoader.getProperty("hdfs.uri") + model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".parquet";
 
@@ -65,6 +65,10 @@ public class HdfsParquetSink implements SinkInterface {
                         .withSchema(schema)
                         .withConf(new Configuration())
                         .withCompressionCodec(CompressionCodecName.SNAPPY)
+                        .withPageSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_PAGE_SIZE))
+                        .withDictionaryEncoding((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_DICTIONARY_ENCODING))
+                        .withDictionaryPageSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_DICTIONARY_PAGE_SIZE))
+                        .withRowGroupSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_ROW_GROUP_SIZE))
                         .build();
             } catch (IOException e) {
                 logger.warn("Could not create ParquetWriter", e);
@@ -104,7 +108,7 @@ public class HdfsParquetSink implements SinkInterface {
 
     public void sendOneBatchOfRows(List<Row> rows){
         try {
-            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 String filepath =  PropertiesLoader.getProperty("hdfs.uri") + model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                         model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" + String.format("%010d", counter) + ".parquet";
 
@@ -131,7 +135,7 @@ public class HdfsParquetSink implements SinkInterface {
                 }
             });
 
-            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 writer.close();
             }
         } catch (IOException e) {

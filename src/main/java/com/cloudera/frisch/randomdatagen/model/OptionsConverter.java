@@ -100,10 +100,21 @@ public class OptionsConverter {
         SOLR_REPLICAS,
         KUDU_REPLICAS,
         LOCAL_FILE_ONE_PER_ITERATION,
-        KAFKA_MESSAGES_TYPE,
+        KAFKA_MESSAGE_TYPE,
         HIVE_THREAD_NUMBER,
         HIVE_ON_HDFS,
-        HIVE_TEZ_QUEUE_NAME
+        HIVE_TEZ_QUEUE_NAME,
+        CSV_HEADER,
+        DELETE_PREVIOUS,
+        PARQUET_PAGE_SIZE,
+        PARQUET_ROW_GROUP_SIZE,
+        PARQUET_DICTIONARY_PAGE_SIZE,
+        PARQUET_DICTIONARY_ENCODING,
+        KAFKA_ACKS_CONFIG,
+        KAFKA_RETRIES_CONFIG,
+        KUDU_BUCKETS,
+        KUDU_BUFFER,
+        KUDU_FLUSH,
     }
 
     static Options convertOptionToOption(String option) {
@@ -118,14 +129,36 @@ public class OptionsConverter {
                 return Options.KUDU_REPLICAS;
             case "LOCAL_FILE_ONE_PER_ITERATION":
                 return Options.LOCAL_FILE_ONE_PER_ITERATION;
-            case "KAFKA_MESSAGES_TYPE":
-                return Options.KAFKA_MESSAGES_TYPE;
+            case "KAFKA_MESSAGE_TYPE":
+                return Options.KAFKA_MESSAGE_TYPE;
             case "HIVE_THREAD_NUMBER":
                 return Options.HIVE_THREAD_NUMBER;
             case "HIVE_ON_HDFS":
                 return Options.HIVE_ON_HDFS;
             case "HIVE_TEZ_QUEUE_NAME":
                 return Options.HIVE_TEZ_QUEUE_NAME;
+            case "CSV_HEADER":
+                return Options.CSV_HEADER;
+            case "DELETE_PREVIOUS":
+                return Options.DELETE_PREVIOUS;
+            case "PARQUET_PAGE_SIZE":
+                return Options.PARQUET_PAGE_SIZE;
+            case "PARQUET_ROW_GROUP_SIZE":
+                return Options.PARQUET_ROW_GROUP_SIZE;
+            case "PARQUET_DICTIONARY_PAGE_SIZE":
+                return Options.PARQUET_DICTIONARY_PAGE_SIZE;
+            case "PARQUET_DICTIONARY_ENCODING":
+                return Options.PARQUET_DICTIONARY_ENCODING;
+            case "KAFKA_ACKS_CONFIG":
+                return Options.KAFKA_ACKS_CONFIG;
+            case "KAFKA_RETRIES_CONFIG":
+                return Options.KAFKA_RETRIES_CONFIG;
+            case "KUDU_BUCKETS":
+                return Options.KUDU_BUCKETS;
+            case "KUDU_BUFFER":
+                return Options.KUDU_BUFFER;
+            case "KUDU_FLUSH":
+                return Options.KUDU_FLUSH;
             default:
                 logger.warn("Option was not recognized: " + option + " , please verify your JSON");
                 return null;

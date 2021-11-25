@@ -36,11 +36,14 @@ public class KafkaSink implements SinkInterface {
     public void init(Model model) {
 
         schema = model.getAvroSchema();
-        this.messagetype = convertStringToMessageType((String) model.getOptions().get(OptionsConverter.Options.KAFKA_MESSAGES_TYPE));
+        this.messagetype = convertStringToMessageType((String) model.getOptions().get(OptionsConverter.Options.KAFKA_MESSAGE_TYPE));
 
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, PropertiesLoader.getProperty("kafka.brokers"));
-        props.put(ProducerConfig.ACKS_CONFIG, "all");
+        props.put(ProducerConfig.ACKS_CONFIG, model.getOptionsOrDefault(
+            OptionsConverter.Options.KAFKA_ACKS_CONFIG));
+        props.put(ProducerConfig.RETRIES_CONFIG, model.getOptionsOrDefault(
+            OptionsConverter.Options.KAFKA_RETRIES_CONFIG));
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
 
         if(messagetype==MessageType.AVRO) {

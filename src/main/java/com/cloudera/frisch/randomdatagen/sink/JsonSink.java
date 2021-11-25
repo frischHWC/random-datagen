@@ -1,7 +1,6 @@
 package com.cloudera.frisch.randomdatagen.sink;
 
 
-import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
@@ -27,7 +26,7 @@ public class JsonSink implements SinkInterface {
      */
     public void init(Model model) {
 
-        if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + ".json");
         } else {
@@ -49,7 +48,7 @@ public class JsonSink implements SinkInterface {
 
     public void terminate() {
         try {
-            if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 outputStream.close();
             }
         } catch (IOException e) {
@@ -59,7 +58,7 @@ public class JsonSink implements SinkInterface {
 
     public void sendOneBatchOfRows(List<Row> rows) {
         try {
-            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                         model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" + String.format("%010d", counter) + ".json");
                 counter++;
@@ -69,7 +68,7 @@ public class JsonSink implements SinkInterface {
             outputStream.write(String.join(System.getProperty("line.separator"), rowsInString).getBytes());
             outputStream.write(System.getProperty("line.separator").getBytes());
 
-            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 outputStream.close();
             }
         } catch (IOException e) {

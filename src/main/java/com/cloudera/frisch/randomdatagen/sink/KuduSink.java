@@ -46,15 +46,15 @@ public class KuduSink implements SinkInterface {
             createTableIfNotExists((String) model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME), model);
 
             session = client.newSession();
-            session.setFlushMode(SessionConfiguration.FlushMode.MANUAL_FLUSH);
-            session.setMutationBufferSpace(100001);
-            table = client.openTable((String) model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME));
 
-            /*
-            MANUAL FLUSH: 488 564 ms
-            AUTO FLUSH: too long
-            BACKGROUND FLUSH: 491 579 ms
-             */
+            switch ((String) model.getOptionsOrDefault(OptionsConverter.Options.KUDU_REPLICAS)) {
+            case "AUTO_FLUSH_SYNC": session.setFlushMode(SessionConfiguration.FlushMode.AUTO_FLUSH_SYNC); break;
+            case "AUTO_FLUSH_BACKGROUND": session.setFlushMode(SessionConfiguration.FlushMode.AUTO_FLUSH_BACKGROUND); break;
+            case "MANUAL_FLUSH": session.setFlushMode(SessionConfiguration.FlushMode.MANUAL_FLUSH); break;
+            }
+            session.setMutationBufferSpace((int) model.getOptionsOrDefault(OptionsConverter.Options.KUDU_BUFFER));
+
+            table = client.openTable((String) model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME));
 
         } catch (Exception e) {
             logger.error("Could not connect to Kudu due to error: ", e);
@@ -72,13 +72,13 @@ public class KuduSink implements SinkInterface {
         */
 
         CreateTableOptions cto = new CreateTableOptions();
-        cto.setNumReplicas((int) model.getOptions().get(OptionsConverter.Options.KUDU_REPLICAS));
+        cto.setNumReplicas((int) model.getOptionsOrDefault(OptionsConverter.Options.KUDU_REPLICAS));
 
         if(!model.getKuduRangeKeys().isEmpty()) {
             cto.setRangePartitionColumns(model.getKuduRangeKeys());
         }
         if(!model.getKuduHashKeys().isEmpty()) {
-            cto.addHashPartitions(model.getKuduHashKeys(), 32);
+            cto.addHashPartitions(model.getKuduHashKeys(), (int) model.getOptionsOrDefault(OptionsConverter.Options.KUDU_BUCKETS));
         }
 
         try {

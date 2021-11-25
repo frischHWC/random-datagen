@@ -93,8 +93,8 @@ public class SolRSink implements SinkInterface {
             logger.debug("Creating collection : " + collection + " in SolR");
             httpSolrClient.request(
                     CollectionAdminRequest.createCollection(collection,
-                            (Integer) model.getOptions().get(OptionsConverter.Options.SOLR_SHARDS),
-                            (Integer) model.getOptions().get(OptionsConverter.Options.SOLR_REPLICAS))
+                            (Integer) model.getOptionsOrDefault(OptionsConverter.Options.SOLR_SHARDS),
+                            (Integer) model.getOptionsOrDefault(OptionsConverter.Options.SOLR_REPLICAS))
             );
             logger.debug("Finished to create collection : " + collection + " in SolR");
         } catch (BaseHttpSolrClient.RemoteSolrException e) {

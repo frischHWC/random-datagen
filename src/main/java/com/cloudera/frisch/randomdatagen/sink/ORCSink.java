@@ -37,7 +37,7 @@ public class ORCSink implements SinkInterface {
         batch = schema.createRowBatch();
         vectors = model.createOrcVectors(batch);
 
-        if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             String filepath = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + ".orc";
 
@@ -67,7 +67,7 @@ public class ORCSink implements SinkInterface {
 
     public void terminate() {
         try {
-            if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 writer.close();
             }
         } catch (IOException e) {
@@ -78,7 +78,7 @@ public class ORCSink implements SinkInterface {
     }
 
     public void sendOneBatchOfRows(List<Row> rows) {
-        if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             String filepath = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" + String.format("%010d", counter) + ".orc";
 
@@ -116,7 +116,7 @@ public class ORCSink implements SinkInterface {
             logger.error("Can not write data to the local file due to error: ", e);
         }
 
-        if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             try {
                 writer.close();
             } catch (IOException e) {

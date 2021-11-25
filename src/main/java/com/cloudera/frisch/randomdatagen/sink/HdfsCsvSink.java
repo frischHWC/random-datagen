@@ -48,7 +48,7 @@ public class HdfsCsvSink implements SinkInterface {
             logger.error("Could not access to HDFSCSV !", e);
         }
 
-        if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".csv");
 
@@ -66,7 +66,7 @@ public class HdfsCsvSink implements SinkInterface {
             fsDataOutputStream = fileSystem.create(new Path(path), true);
             logger.debug("Successfully created hdfs file : " + path);
         } catch (IOException e) {
-            logger.error("Tried to create file : " + path + " with no success :", e);
+            logger.error("Tried to create hdfs file : " + path + " with no success :", e);
         }
     }
 
@@ -96,7 +96,7 @@ public class HdfsCsvSink implements SinkInterface {
 
     public void sendOneBatchOfRows(List<Row> rows){
         try {
-            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                         model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" + String.format("%010d", counter) + ".csv");
                 appendCSVHeader(model);
@@ -107,7 +107,7 @@ public class HdfsCsvSink implements SinkInterface {
             fsDataOutputStream.writeChars(String.join(System.getProperty("line.separator"), rowsInString));
             fsDataOutputStream.writeChars(System.getProperty("line.separator"));
 
-            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 fsDataOutputStream.close();
             }
         } catch (IOException e) {
@@ -117,10 +117,13 @@ public class HdfsCsvSink implements SinkInterface {
 
     void appendCSVHeader(Model model) {
         try {
-            fsDataOutputStream.writeChars(model.getCsvHeader());
-            fsDataOutputStream.writeChars(System.getProperty("line.separator"));
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.CSV_HEADER)) {
+                fsDataOutputStream.writeChars(model.getCsvHeader());
+                fsDataOutputStream.writeChars(
+                    System.getProperty("line.separator"));
+            }
         } catch (IOException e) {
-            logger.error("Can not write header to the local file due to error: ", e);
+            logger.error("Can not write header to the hdfs file due to error: ", e);
         }
     }
 

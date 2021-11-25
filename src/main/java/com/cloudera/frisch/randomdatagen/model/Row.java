@@ -160,11 +160,13 @@ public class Row<T extends Field> {
     public void fillinOrcVector(int rowNumber, Map<T, ? extends ColumnVector> vectors) {
         vectors.forEach((field, cv) -> {
             switch (field.getClass().getSimpleName()) {
+                case "IncrementLongField":
                 case "LongField":
                 case "TimestampField":
                     LongColumnVector longColumnVector = (LongColumnVector) cv;
                     longColumnVector.vector[rowNumber] = (long) values.get(field);
                     break;
+                case "IncrementIntegerField":
                 case "IntegerField":
                     LongColumnVector longColumnVectorInt = (LongColumnVector) cv;
                     longColumnVectorInt.vector[rowNumber] = Integer.toUnsignedLong((int) values.get(field));

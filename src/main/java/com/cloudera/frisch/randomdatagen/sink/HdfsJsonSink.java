@@ -48,7 +48,7 @@ public class HdfsJsonSink implements SinkInterface {
             logger.error("Could not access to HDFSJSON !", e);
         }
 
-        if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".json");
 
@@ -95,7 +95,7 @@ public class HdfsJsonSink implements SinkInterface {
 
     public void sendOneBatchOfRows(List<Row> rows){
         try {
-            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                         model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" + String.format("%010d", counter) + ".json");
                 counter++;
@@ -105,11 +105,11 @@ public class HdfsJsonSink implements SinkInterface {
             fsDataOutputStream.writeChars(String.join(System.getProperty("line.separator"), rowsInString));
             fsDataOutputStream.writeChars(System.getProperty("line.separator"));
 
-            if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 fsDataOutputStream.close();
             }
         } catch (IOException e) {
-            logger.error("Can not write data to the HDFSCSV file due to error: ", e);
+            logger.error("Can not write data to the HDFSJSON file due to error: ", e);
         }
     }
 

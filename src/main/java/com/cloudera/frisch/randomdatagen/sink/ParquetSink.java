@@ -31,7 +31,7 @@ public class ParquetSink implements SinkInterface {
 
         schema = model.getAvroSchema();
 
-        if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             String filePath = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + ".parquet";
 
@@ -66,7 +66,7 @@ public class ParquetSink implements SinkInterface {
 
     public void terminate() {
         try {
-            if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+            if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
                 writer.close();
             }
         } catch (IOException e) {
@@ -75,7 +75,7 @@ public class ParquetSink implements SinkInterface {
     }
 
     public void sendOneBatchOfRows(List<Row> rows) {
-        if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             String filePath = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" + String.format("%010d", counter) + ".parquet";
 
@@ -87,6 +87,10 @@ public class ParquetSink implements SinkInterface {
                         .withSchema(schema)
                         .withConf(new Configuration())
                         .withCompressionCodec(CompressionCodecName.SNAPPY)
+                        .withPageSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_PAGE_SIZE))
+                        .withDictionaryEncoding((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_DICTIONARY_ENCODING))
+                        .withDictionaryPageSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_DICTIONARY_PAGE_SIZE))
+                        .withRowGroupSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_ROW_GROUP_SIZE))
                         .build();
             } catch (IOException e) {
                 logger.warn("Could not create ParquetWriter", e);
@@ -100,7 +104,7 @@ public class ParquetSink implements SinkInterface {
                 logger.error("Can not write data to the local file due to error: ", e);
             }
         });
-        if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             try {
                 writer.close();
             } catch (IOException e) {

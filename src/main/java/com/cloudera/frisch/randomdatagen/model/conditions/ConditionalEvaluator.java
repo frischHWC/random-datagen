@@ -1,7 +1,8 @@
-package com.cloudera.frisch.randomdatagen.model;
+package com.cloudera.frisch.randomdatagen.model.conditions;
 
 
-import com.cloudera.frisch.randomdatagen.model.conditions.ConditionsLine;
+import com.cloudera.frisch.randomdatagen.model.Model;
+import com.cloudera.frisch.randomdatagen.model.Row;
 import com.cloudera.frisch.randomdatagen.model.type.Field;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,10 +18,6 @@ public class ConditionalEvaluator {
   @Setter
   public Map<String, LinkedList<ConditionsLine>> conditions;
 
-  // TODO: Check if its still needed after
-  @Getter
-  @Setter
-  public Map<String, LinkedHashMap<String, String>> mapOfConditions;
 
   @Getter
   @Setter
@@ -29,8 +26,7 @@ public class ConditionalEvaluator {
   // TODO: Refactor project to be simpler and more efficient by using a Map of key=column_name to value=value on the column
 
 
-  ConditionalEvaluator(Model model) {
-    mapOfConditions = new HashMap<>();
+  public ConditionalEvaluator(Model model) {
     conditions = new HashMap<>();
 
     LinkedList<Field> fields =  (LinkedList<Field>) model.getFields();
@@ -38,7 +34,6 @@ public class ConditionalEvaluator {
     for(Field field: fields) {
       if(field.conditionals!= null && !field.conditionals.isEmpty()) {
         logger.info("Field has been marked as conditional: " + field);
-        mapOfConditions.put(field.name, field.conditionals);
 
         LinkedList<ConditionsLine> condLineList = new LinkedList<>();
         Iterator<Map.Entry> condIterator = field.conditionals.entrySet().iterator();

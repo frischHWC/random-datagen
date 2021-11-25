@@ -38,8 +38,8 @@ public class HiveSink implements SinkInterface {
     private boolean hiveOnHDFS;
 
     public void init(Model model) {
-        this.hiveOnHDFS = (Boolean) model.getOptions().get(OptionsConverter.Options.HIVE_ON_HDFS);
-        this.threads_number = (Integer) model.getOptions().get(OptionsConverter.Options.HIVE_THREAD_NUMBER);
+        this.hiveOnHDFS = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.HIVE_ON_HDFS);
+        this.threads_number = (Integer) model.getOptionsOrDefault(OptionsConverter.Options.HIVE_THREAD_NUMBER);
         try {
             if (Boolean.parseBoolean(PropertiesLoader.getProperty("hive.auth.kerberos"))) {
                 Utils.loginUserWithKerberos(PropertiesLoader.getProperty("hive.security.user"),
@@ -50,14 +50,14 @@ public class HiveSink implements SinkInterface {
             System.setProperty("javax.net.ssl.trustStorePassword", PropertiesLoader.getProperty("hive.truststore.password"));
 
             java.util.Properties properties = new Properties();
-            properties.put("tez.queue.name", model.getOptions().get(OptionsConverter.Options.HIVE_TEZ_QUEUE_NAME));
+            properties.put("tez.queue.name", model.getOptionsOrDefault(OptionsConverter.Options.HIVE_TEZ_QUEUE_NAME));
 
             hiveConnection = DriverManager.getConnection("jdbc:hive2://" +
                             PropertiesLoader.getProperty("hive.zookeeper.server") + ":" +
                             PropertiesLoader.getProperty("hive.zookeeper.port") + "/" +
                             ";serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" +
                             PropertiesLoader.getProperty("hive.zookeeper.namespace") +
-                            "?tez.queue.name=" + model.getOptions().get(OptionsConverter.Options.HIVE_TEZ_QUEUE_NAME)
+                            "?tez.queue.name=" + model.getOptionsOrDefault(OptionsConverter.Options.HIVE_TEZ_QUEUE_NAME)
                     , properties);
 
             database = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE);

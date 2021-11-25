@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.model;
 
 
+import com.cloudera.frisch.randomdatagen.model.conditions.ConditionalEvaluator;
 import com.cloudera.frisch.randomdatagen.model.type.Field;
 import lombok.Getter;
 import lombok.Setter;
@@ -63,7 +64,7 @@ public class Model<T extends Field> {
         setupFieldHbaseColQualifier((Map<T, String>) this.options.get(OptionsConverter.Options.HBASE_COLUMN_FAMILIES_MAPPING));
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Model created is : " + toString());
+            logger.debug("Model created is : " + this);
         }
     }
 
@@ -129,6 +130,11 @@ public class Model<T extends Field> {
         return rows;
     }
 
+    /**
+     * To convert the options passed in String format to a Java object with list of primary keys
+     * @param pks
+     * @return
+     */
     private Map<OptionsConverter.PrimaryKeys, List<T>> convertPrimaryKeys(Map<String, List<String>> pks) {
         Map<OptionsConverter.PrimaryKeys, List<T>> pksConverted = new HashMap<>();
         pks.forEach((k, v) -> {
@@ -140,6 +146,11 @@ public class Model<T extends Field> {
         return pksConverted;
     }
 
+    /**
+     * To convert options passed in String format to Java object
+     * @param tbs
+     * @return
+     */
     private Map<OptionsConverter.TableNames, String> convertTableNames(Map<String, String> tbs) {
         Map<OptionsConverter.TableNames, String> tbsConverted = new HashMap<>();
         tbs.forEach((k, v) -> {
@@ -175,6 +186,65 @@ public class Model<T extends Field> {
             }
         });
         return optionsFormatted;
+    }
+
+    /**
+     * Calls to get Options values should go through this method instead of getting the map in order to provide default values in case options is not set
+     * Except for hbase column families mapping which is particurlaly handle by a function below
+     * @param option
+     * @return
+     */
+    public Object getOptionsOrDefault(OptionsConverter.Options option) {
+        Object optionResult = this.options.get(option);
+        // Handle default result here
+        if( optionResult == null ) {
+            switch (option) {
+            case SOLR_SHARDS:
+            case SOLR_REPLICAS:
+            case KUDU_REPLICAS:
+            case HIVE_THREAD_NUMBER:
+                optionResult = 1;
+                break;
+            case CSV_HEADER:
+            case PARQUET_DICTIONARY_ENCODING:
+            case HIVE_ON_HDFS:
+            case LOCAL_FILE_ONE_PER_ITERATION:
+                optionResult = true;
+                break;
+            case KAFKA_MESSAGE_TYPE:
+                optionResult = "json";
+                break;
+            case HIVE_TEZ_QUEUE_NAME:
+                optionResult = "root.default";
+                break;
+            case DELETE_PREVIOUS:
+                optionResult = false;
+                break;
+            case PARQUET_PAGE_SIZE:
+            case PARQUET_DICTIONARY_PAGE_SIZE:
+                optionResult = 1048576;
+                break;
+            case PARQUET_ROW_GROUP_SIZE:
+                optionResult = 134217728;
+                break;
+            case KAFKA_RETRIES_CONFIG:
+                optionResult = 3;
+                break;
+            case KUDU_BUCKETS:
+                optionResult= 32;
+                break;
+            case KUDU_BUFFER:
+                optionResult = 100001;
+                break;
+            case KUDU_FLUSH:
+                optionResult = "MANUAL_FLUSH";
+                break;
+
+            default: break;
+            }
+        }
+
+        return optionResult;
     }
 
     /**

@@ -48,18 +48,18 @@ public class HdfsAvroSink implements SinkInterface {
                     PropertiesLoader.getProperty("hdfs.auth.kerberos.keytab"), config);
         }
 
-        logger.debug("Setting up access to HDFSCSV");
+        logger.debug("Setting up access to HDFSAVRO");
         try {
             fileSystem = FileSystem.get(URI.create(PropertiesLoader.getProperty("hdfs.uri")), config);
         } catch (IOException e) {
-            logger.error("Could not access to HDFSCSV !", e);
+            logger.error("Could not access to HDFSAVRO !", e);
         }
 
         schema = model.getAvroSchema();
 
         datumWriter = new GenericDatumWriter<>(schema);
 
-        if (!(Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if (!(Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + ".avro");
 
@@ -77,7 +77,7 @@ public class HdfsAvroSink implements SinkInterface {
             dataFileWriter = new DataFileWriter<>(datumWriter);
             logger.debug("Successfully created hdfs file : " + path);
         } catch (IOException e) {
-            logger.error("Tried to create file : " + path + " with no success :", e);
+            logger.error("Tried to create hdfs file : " + path + " with no success :", e);
         }
     }
 
@@ -94,12 +94,12 @@ public class HdfsAvroSink implements SinkInterface {
             dataFileWriter.close();
             fsDataOutputStream.close();
         } catch (IOException e) {
-            logger.error(" Unable to close HDFSCSV file with error :", e);
+            logger.error(" Unable to close HDFSAVRO file with error :", e);
         }
     }
 
     public void sendOneBatchOfRows(List<Row> rows) {
-        if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             createFileWithOverwrite((String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" + String.format("%010d", counter) + ".avro");
             appendAvscHeader(model);
@@ -110,16 +110,23 @@ public class HdfsAvroSink implements SinkInterface {
             try {
                 dataFileWriter.append(genericRecord);
             } catch (IOException e) {
-                logger.error("Can not write data to the local file due to error: ", e);
+                logger.error("Can not write data to the hdfs file due to error: ", e);
             }
         });
 
-        if ((Boolean) model.getOptions().get(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
+        if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.LOCAL_FILE_ONE_PER_ITERATION)) {
             try {
                 dataFileWriter.close();
                 fsDataOutputStream.close();
             } catch (IOException e) {
-                logger.error(" Unable to close local file with error :", e);
+                logger.error(" Unable to close hdfs file with error :", e);
+            }
+        } else {
+            try {
+                dataFileWriter.flush();
+                fsDataOutputStream.flush();
+            } catch (IOException e) {
+                logger.error(" Unable to flush hdfs file with error :", e);
             }
         }
     }
@@ -128,7 +135,7 @@ public class HdfsAvroSink implements SinkInterface {
         try {
             dataFileWriter.create(schema, fsDataOutputStream.getWrappedStream());
         } catch (IOException e) {
-            logger.error("Can not write header to the local file due to error: ", e);
+            logger.error("Can not write header to the hdfs file due to error: ", e);
         }
     }
 

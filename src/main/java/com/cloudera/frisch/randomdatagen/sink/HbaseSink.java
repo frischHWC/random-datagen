@@ -36,7 +36,7 @@ public class HbaseSink implements SinkInterface {
         Utils.setupHadoopEnv(config);
 
         // Setup Kerberos auth if needed
-        if (Boolean.valueOf(PropertiesLoader.getProperty("hbase.auth.kerberos"))) {
+        if (Boolean.parseBoolean(PropertiesLoader.getProperty("hbase.auth.kerberos"))) {
             Utils.loginUserWithKerberos(PropertiesLoader.getProperty("hbase.security.user"),
                     PropertiesLoader.getProperty("hbase.security.keytab"), config);
             config.set("hbase.security.authentication", "kerberos");

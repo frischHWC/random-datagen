@@ -158,6 +158,17 @@
     {"KAFKA_MESSAGE_TYPE":  "json"},
     {"HIVE_THREAD_NUMBER":  1},
     {"HIVE_ON_HDFS":  true},
-    {"HIVE_TEZ_QUEUE_NAME":  "root.default"}
+    {"HIVE_TEZ_QUEUE_NAME":  "root.default"},
+    {"CSV_HEADER":  true},
+    {"DELETE_PREVIOUS":  false},
+    {"PARQUET_PAGE_SIZE":  1048576},
+    {"PARQUET_ROW_GROUP_SIZE":  134217728},
+    {"PARQUET_DICTIONARY_PAGE_SIZE":  1048576},
+    {"PARQUET_DICTIONARY_ENCODING":  true},
+    {"KAFKA_ACKS_CONFIG":  "all"},
+    {"KAFKA_RETRIES_CONFIG":  3},
+    {"KUDU_BUCKETS":  32},
+    {"KUDU_BUFFER":  100001},
+    {"KUDU_FLUSH":  "MANUAL_FLUSH"},
   ]
 }
