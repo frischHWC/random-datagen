@@ -17,9 +17,9 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/tmp/snam/hdfs/full_model/"},
+    {"HDFS_FILE_PATH": "/tmp/sensor/hdfs/full_model/"},
     {"HDFS_FILE_NAME": "full"},
-    {"HIVE_HDFS_FILE_PATH": "/tmp/snam/hive/full_model/"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/sensor/hive/full_model/"},
     {"HBASE_TABLE_NAME": "snam"},
     {"HBASE_NAMESPACE": "rd"},
     {"KAFKA_TOPIC": "snam"},
@@ -29,7 +29,7 @@
     {"HIVE_TABLE_NAME":  "full_snam"},
     {"HIVE_TEMPORARY_TABLE_NAME":  "full_tmp_test"},
     {"KUDU_TABLE_NAME":  "snam.central"},
-    {"LOCAL_FILE_PATH":  "/root/snam/full/"},
+    {"LOCAL_FILE_PATH":  "/tmp/sensor/full/"},
     {"LOCAL_FILE_NAME":  "snam"},
     {"AVRO_NAME":  "snamdata"}
   ],

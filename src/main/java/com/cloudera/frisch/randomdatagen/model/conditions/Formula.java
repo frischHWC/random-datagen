@@ -45,10 +45,10 @@ public class Formula {
     // Evaluate formula using an evaluator (or built this evaluator)
     String formulaReplaced = formulaToEvaluate;
     for(String colName: listOfColsToEvaluate) {
-      logger.info(formulaReplaced);
+      logger.debug(formulaReplaced);
       formulaReplaced = formulaReplaced.replaceAll("(^| )" + colName + "($| )", row.getValues().get(model.findFieldasFieldWhoseNameIs(colName)).toString());
     }
-    logger.info(formulaReplaced);
+    logger.debug(formulaReplaced);
     return computeFormula(formulaReplaced);
   }
 

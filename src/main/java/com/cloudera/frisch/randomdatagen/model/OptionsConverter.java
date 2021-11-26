@@ -129,7 +129,7 @@ public class OptionsConverter {
                 return Options.SOLR_REPLICAS;
             case "KUDU_REPLICAS":
                 return Options.KUDU_REPLICAS;
-            case "LOCAL_FILE_ONE_PER_ITERATION":
+            case "ONE_FILE_PER_ITERATION":
                 return Options.ONE_FILE_PER_ITERATION;
             case "KAFKA_MESSAGE_TYPE":
                 return Options.KAFKA_MESSAGE_TYPE;

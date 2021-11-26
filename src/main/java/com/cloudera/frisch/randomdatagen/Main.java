@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 
 import java.util.List;
 
-
+@SuppressWarnings("unchecked")
 public class Main {
 
     private static final Logger logger = Logger.getLogger(Main.class);
@@ -58,8 +58,9 @@ public class Main {
         // Recap of what has been generated
         Utils.recap(numberOfBatches, rowsPerBatch, (List<ArgumentsParser.sinks>) ArgumentsParser.getArgsMap().get(ArgumentsParser.args.SINK_TO_FILL), model);
 
+        // Compute and print time taken
         logger.info("Application Finished");
-        logger.info("Application took : " + (System.currentTimeMillis()-start) + " ms to run");
+        logger.info("Application took : " + Utils.formatTimetaken(System.currentTimeMillis()-start) + " to run");
 
     }
 

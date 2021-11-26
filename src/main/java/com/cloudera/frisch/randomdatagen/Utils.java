@@ -281,6 +281,35 @@ public class Utils {
     }
 
     /**
+     * Given a time in milliseconds, format it to a better human comprehensive way
+     * @param timeTaken
+     * @return
+     */
+    public static String formatTimetaken(long timeTaken) {
+        long timeTakenHere = timeTaken;
+        String formattedTime = "";
+
+        if(timeTakenHere > 1000*60*60) {
+            formattedTime = (timeTakenHere/1000*60*60) + "h ";
+            timeTakenHere = timeTakenHere%1000*60*60;
+        }
+
+        if(timeTakenHere > 1000*60) {
+            formattedTime = (timeTakenHere/60*1000) + "m ";
+            timeTakenHere = timeTakenHere%60*1000;
+        }
+
+        if(timeTakenHere > 1000) {
+            formattedTime += (timeTakenHere / 1000) + "s ";
+            timeTakenHere = timeTakenHere%1000;
+        }
+
+        formattedTime += timeTakenHere + "ms ";
+        
+        return formattedTime;
+    }
+
+    /**
      * Test on classpath
      * Run it with /opt/cloudera/parcels/CDH-7.0.3-1.cdh7.0.3.p0.1635019/bin/hadoop is different than /opt/cloudera/parcels/CDH/bin/hadoop
      */
@@ -454,7 +483,6 @@ public class Utils {
             }
 
         });
-
         logger.info("****************************************************************");
     }
 

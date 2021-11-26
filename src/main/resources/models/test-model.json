@@ -51,7 +51,7 @@
     {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/hive/test_model_cond_1/"},
     {"HIVE_DATABASE": "random_datagen"},
     {"HIVE_TABLE_NAME":  "person_balance_test_cond_1"},
-    {"LOCAL_FILE_PATH":  "/tmp/"},
+    {"LOCAL_FILE_PATH":  "/tmp/random_datagen/test/"},
     {"LOCAL_FILE_NAME":  "random-datagen"},
     {"AVRO_NAME":  "randomdata"}
   ]

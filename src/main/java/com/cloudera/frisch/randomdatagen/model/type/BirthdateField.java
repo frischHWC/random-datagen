@@ -19,21 +19,22 @@ import java.util.stream.Collectors;
 public class BirthdateField extends Field<LocalDate> {
 
     BirthdateField(String name, Integer length, List<String> possibleValues, String min, String max) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         this.name = name;
         this.length = length;
         this.possibleValues = possibleValues.stream().map(p -> LocalDate.parse(p, formatter)).collect(Collectors.toList());
-        if(min != null) {
-            String[] minSplit = min.split("/");
-            this.min = LocalDate.of(Integer.parseInt(minSplit[0]), Integer.parseInt(minSplit[1]), Integer.parseInt(minSplit[2])).toEpochDay();
+
+        if(min == null) {
+            this.min = LocalDate.of(1920, 1, 1).toEpochDay();
         } else {
-            this.min = LocalDate.of(1910, 1, 1).toEpochDay();
+            String[] minSplit = min.split("[/]");
+            this.min = LocalDate.of(Integer.parseInt(minSplit[2]), Integer.parseInt(minSplit[1]), Integer.parseInt(minSplit[0])).toEpochDay();
         }
-        if(max != null) {
-            String[] maxSplit = min.split("/");
-            this.max = LocalDate.of(Integer.parseInt(maxSplit[0]), Integer.parseInt(maxSplit[1]), Integer.parseInt(maxSplit[2])).toEpochDay();
-        } else {
+        if(max == null) {
             this.max = LocalDate.of(2020, 1, 1).toEpochDay();
+        } else {
+            String[] maxSplit = max.split("[/]");
+            this.max = LocalDate.of(Integer.parseInt(maxSplit[2]), Integer.parseInt(maxSplit[1]), Integer.parseInt(maxSplit[0])).toEpochDay();
         }
     }
 

@@ -44,7 +44,7 @@
     {"HIVE_TABLE_NAME":  "employee"},
     {"HIVE_TEMPORARY_TABLE_NAME":  "employee_tmp_test"},
     {"KUDU_TABLE_NAME":  "random_datagen.employee"},
-    {"LOCAL_FILE_PATH":  "/root/random_datagen/employee/"},
+    {"LOCAL_FILE_PATH":  "/tmp/random_datagen/employee/"},
     {"LOCAL_FILE_NAME":  "employee"},
     {"AVRO_NAME":  "employee"}
   ],

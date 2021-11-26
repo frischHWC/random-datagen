@@ -54,7 +54,7 @@ public class KuduSink implements SinkInterface {
 
             this.session = client.newSession();
 
-            switch ((String) model.getOptionsOrDefault(OptionsConverter.Options.KUDU_REPLICAS)) {
+            switch ((String) model.getOptionsOrDefault(OptionsConverter.Options.KUDU_FLUSH)) {
                 case "AUTO_FLUSH_SYNC": session.setFlushMode(SessionConfiguration.FlushMode.AUTO_FLUSH_SYNC); break;
                 case "AUTO_FLUSH_BACKGROUND": session.setFlushMode(SessionConfiguration.FlushMode.AUTO_FLUSH_BACKGROUND); break;
                 case "MANUAL_FLUSH": session.setFlushMode(SessionConfiguration.FlushMode.MANUAL_FLUSH); break;

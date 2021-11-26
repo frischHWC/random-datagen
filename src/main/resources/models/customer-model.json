@@ -38,7 +38,7 @@
     {"HIVE_DATABASE": "random_datagen"},
     {"HIVE_TABLE_NAME":  "customer"},
     {"KUDU_TABLE_NAME":  "random_datagen.customer"},
-    {"LOCAL_FILE_PATH":  "/root/random_datagen/customer/"},
+    {"LOCAL_FILE_PATH":  "/tmp/random_datagen/customer/"},
     {"LOCAL_FILE_NAME":  "customer"},
     {"AVRO_NAME":  "customer"}
   ],

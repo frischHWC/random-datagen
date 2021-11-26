@@ -36,7 +36,7 @@
     {"HIVE_DATABASE": "random_datagen"},
     {"HIVE_TABLE_NAME":  "transaction"},
     {"KUDU_TABLE_NAME":  "random_datagen.transaction"},
-    {"LOCAL_FILE_PATH":  "/root/random_datagen/transaction/"},
+    {"LOCAL_FILE_PATH":  "/tmp/random_datagen/transaction/"},
     {"LOCAL_FILE_NAME":  "transaction"},
     {"AVRO_NAME":  "transaction"}
   ],

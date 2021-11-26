@@ -127,7 +127,7 @@ public abstract class Field<T> {
                 field = new StringAZField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
                 break;
             case "INTEGER":
-                field = new IntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()), possible_values_weighted, conditionals, Long.parseLong(min), Long.parseLong(max));
+                field = new IntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()), possible_values_weighted, conditionals, min, max);
                 break;
             case "INCREMENT_INTEGER":
                 field = new IncrementIntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()));
@@ -136,10 +136,10 @@ public abstract class Field<T> {
                 field = new BooleanField(name, length, possibleValues.stream().map(JsonNode::asBoolean).collect(Collectors.toList()), possible_values_weighted);
                 break;
             case "FLOAT":
-                field = new FloatField(name, length, possibleValues.stream().map(j -> (float) j.asDouble()).collect(Collectors.toList()), possible_values_weighted, conditionals, Long.parseLong(min), Long.parseLong(max));
+                field = new FloatField(name, length, possibleValues.stream().map(j -> (float) j.asDouble()).collect(Collectors.toList()), possible_values_weighted, conditionals, min, max);
                 break;
             case "LONG":
-                field = new LongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()), possible_values_weighted, conditionals, Long.parseLong(min), Long.parseLong(max));
+                field = new LongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()), possible_values_weighted, conditionals, min, max);
                 break;
             case "INCREMENT_LONG":
                 field = new IncrementLongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()));

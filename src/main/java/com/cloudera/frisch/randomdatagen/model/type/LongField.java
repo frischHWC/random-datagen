@@ -16,21 +16,21 @@ import java.util.List;
 
 public class LongField extends Field<Long> {
 
-    LongField(String name, Integer length, List<Long> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals, Long min, Long max) {
+    LongField(String name, Integer length, List<Long> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals, String min, String max) {
         if(length==null || length==-1) {
             this.length = Integer.MAX_VALUE;
         } else {
             this.length = length;
         }
-        if(max==null || max==-1) {
+        if(max==null) {
             this.max = Long.MAX_VALUE;
         } else {
-            this.max = max;
+            this.max = Long.parseLong(max);
         }
-        if(min==null || min==-1) {
+        if(min==null) {
             this.min = Long.MIN_VALUE;
         } else {
-            this.min = min;
+            this.min = Long.parseLong(min);
         }
         this.name = name;
         this.possibleValues = possibleValues;

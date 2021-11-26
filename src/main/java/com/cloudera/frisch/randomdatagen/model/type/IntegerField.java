@@ -16,22 +16,22 @@ import java.util.List;
 
 public class IntegerField extends Field<Integer> {
 
-    IntegerField(String name, Integer length, List<Integer> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals, Long min, Long max) {
+    IntegerField(String name, Integer length, List<Integer> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals, String min, String max) {
         this.name = name;
         if(length==null || length==-1) {
             this.length = Integer.MAX_VALUE;
         } else {
             this.length = length;
         }
-        if(max==null || max==-1) {
+        if(max==null) {
             this.max = Integer.MAX_VALUE;
         } else {
-            this.max = max;
+            this.max = Long.parseLong(max);
         }
-        if(min==null || min==-1) {
+        if(min==null) {
             this.min = Integer.MIN_VALUE;
         } else {
-            this.min = min;
+            this.min = Long.parseLong(min);
         }
         this.possibleValues = possibleValues;
         this.possible_values_weighted = possible_values_weighted;
