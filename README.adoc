@@ -85,6 +85,7 @@ This model is divided into 4 sections:
 
 This is an array describing all fields by at least a name and a type, length could be precised but is optional. +
 All available types are:
+
 - STRING which represents an alphaNumeric string (length represents length of string, by default 20 if not set) +
 - STRINGAZ which represents an alpha non-numeric string (length represents length of string, by default 20 if not set) +
 - INTEGER (with length representing maximum value, by default Integer.MAX_VALUE) +
@@ -127,6 +128,7 @@ It is a simple expression evaluated with operators: * , + , - , /
 Output column must be of type STRING, Input columns (used to compute) must be INTEGER or LONG or FLOAT
 
 Example:
+
         "conditionals": {
             "always": "2 * $very_low_int + 56 - $low_int"
         }
@@ -141,6 +143,7 @@ Conditions are evaluated one by one like a "if ... else if ...", first one retur
 Output column must be of type STRING, columns of input must be STRING or LONG or INTEGER or FLOAT
 
 Example:
+
         "conditionals": {
             "$country_of_provenance=FRANCE" : "Paris",
             "$country_of_provenance=GERMANY | $increment_int<40" : "Berlin",
@@ -186,9 +189,35 @@ A definition with minimum and maximum:
       "max": 100
     }
 
+A definition with a formula to evaluate value of the column:
+
+    {
+      "name": "percentage",
+      "type": "INTEGER",
+      "conditionals": {
+            "always": "2 * $very_low_int + 56 - $low_int"
+        }
+    }
+
+A definition with some conditions (equalities and inequalities) to evaluate its value:
+
+    {
+      "name": "percentage",
+      "type": "INTEGER",
+      "conditionals": {
+            "$country_of_provenance=FRANCE" : "Paris",
+            "$country_of_provenance=GERMANY | $increment_int<40" : "Berlin",
+            "$country_of_provenance=GERMANY & $increment_int>40" : "Berlin_40"
+        }
+    }
+
+
+
+
 ==== Table Names:
 
 An array of following properties self-describing: +
+
 - HDFS_FILE_PATH +
 - HDFS_FILE_NAME +
 - HBASE_TABLE_NAME +
@@ -206,6 +235,7 @@ An array of following properties self-describing: +
 
 An array of following properties, each of it associated with a value that is
 corresponding to the name of field (multiple fields could be provided separated by a comma): +
+
 - KAFKA_MSG_KEY +
 - HBASE_PRIMARY_KEY +
 - OZONE_BUCKET +
@@ -217,6 +247,7 @@ corresponding to the name of field (multiple fields could be provided separated 
 ==== Options:
 
 An array of other options that could be required depending with which sinks it is launched: +
+
 - HBASE_COLUMN_FAMILIES_MAPPING +
 This mapping must be in the form : "CF:col1,col2;CF2:col5" +
 - SOLR_SHARDS +
