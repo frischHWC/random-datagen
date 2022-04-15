@@ -35,15 +35,29 @@ public class Model<T extends Field> {
 
     private static final Logger logger = Logger.getLogger(Model.class);
 
-    // LinkedList is enforced to keep order in list of fields (required when generating requests and filling them after)
+    // TODO: Refactor to simplify and optimize generation by holding more information in Model and not in Row
+    /*
+    - Separate Fields that are really random and others computed (formula, increment, dependent on other fields values, conditions etc...)
+    - Always use field name as a reference and get field using a Map between field name and field
+    - Order should not be important if using field name and a map
+    - When generating rows, foreach row:
+        - generate random values
+        - apply conditions for fields that requires some
+    - Implement model checking
+     */
+
+    // TODO: Check and solve this : LinkedList is enforced to keep order in list of fields (required when generating requests and filling them after) ????
     @Getter @Setter
-    private LinkedList<T> fields;
+    private LinkedHashMap<String, T> fieldsRandom;
+    @Getter @Setter
+    private LinkedHashMap<String, T> fieldsComputed;
     @Getter @Setter
     private Map<OptionsConverter.PrimaryKeys, List<T>> primaryKeys;
     @Getter @Setter
     private Map<OptionsConverter.TableNames, String> tableNames;
     @Getter @Setter
     private Map<OptionsConverter.Options, Object> options;
+    // TODO : Make conditional evaluator on the field and not on the entire model
     @Getter @Setter
     private ConditionalEvaluator conditionalEvaluator;
 
@@ -56,8 +70,9 @@ public class Model<T extends Field> {
      * @param tableNames  map of options of Table names to their names
      * @param options     map of other options as String, String
      */
-    public Model(LinkedList<T> fields, Map<String, List<String>> primaryKeys, Map<String, String> tableNames, Map<String, String> options) {
-        this.fields = fields;
+    public Model(LinkedHashMap<String, T> fieldsRandom, LinkedHashMap<String, T> fieldsComputed, Map<String, List<String>> primaryKeys, Map<String, String> tableNames, Map<String, String> options) {
+        this.fieldsRandom = fieldsRandom;
+        this.fieldsComputed = fieldsComputed;
         this.primaryKeys = convertPrimaryKeys(primaryKeys);
         this.tableNames = convertTableNames(tableNames);
         this.options = convertOptions(options);
@@ -74,8 +89,8 @@ public class Model<T extends Field> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        // Field.toString(fields);
-        sb.append(fields.toString());
+        sb.append(fieldsRandom.toString());
+        sb.append(fieldsComputed.toString());
         sb.append("Primary Keys : [");
         primaryKeys.forEach((pk, fl) -> {
             sb.append(pk);
@@ -120,15 +135,16 @@ public class Model<T extends Field> {
 
         for (long i = 0; i < number; i++) {
             Row row = new Row();
-            // A linkedHashMap is required to keep order in fields (which should be the same than fields from Model)
-            LinkedHashMap<T, Object> valuesMap = new LinkedHashMap<>();
-            for(T f: fields) {
-                valuesMap.put(f, f.generateRandomValue());
-            }
-            row.setValues(valuesMap);
-            row.populatePksValues(primaryKeys);
-            rows.add(conditionalEvaluator.evaluateConditions(row, this));
-            if(logger.isDebugEnabled()) {
+            fieldsRandom.forEach((name, f) -> row.getValues()
+                .put(name, f.generateRandomValue()));
+            fieldsComputed.forEach((name, f) -> row.getValues()
+                .put(name, f.generateComputedValue(row)));
+
+            // TODO: Remove this below:
+            // row.populatePksValues(primaryKeys);
+            // rows.add(conditionalEvaluator.evaluateConditions(row, this));
+
+            if (logger.isDebugEnabled()) {
                 logger.debug("Created random row: " + row);
             }
         }

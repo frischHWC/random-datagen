@@ -12,25 +12,18 @@ import java.util.*;
 
 public class ConditionalEvaluator {
 
-  Logger logger = Logger.getLogger(ConditionalEvaluator.class);
+  private final static Logger logger = Logger.getLogger(ConditionalEvaluator.class);
 
   @Getter
   @Setter
-  public Map<String, LinkedList<ConditionsLine>> conditions;
-
-  @Getter
-  @Setter
-  public Map<String, String> mapOfFieldTypes;
+  public LinkedList<ConditionsLine> conditions;
 
   // TODO: Refactor project to be simpler and more efficient by using a Map of key=column_name to value=value on the column
+  // Make one Conditional Evaluator linked to a Field, so we can be able within a field to compute its value based on confitions created
 
 
-  public ConditionalEvaluator(Model model) {
-    conditions = new HashMap<>();
+  public ConditionalEvaluator(Field field) {
 
-    LinkedList<Field> fields =  (LinkedList<Field>) model.getFields();
-
-    for(Field field: fields) {
       if(field.conditionals!= null && !field.conditionals.isEmpty()) {
         logger.debug("Field has been marked as conditional: " + field);
 
@@ -44,7 +37,6 @@ public class ConditionalEvaluator {
         conditions.put(field.name, condLineList);
       }
 
-    }
   }
 
 

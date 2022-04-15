@@ -15,6 +15,14 @@
       "possible_values": ["hr", "consulting", "marketing", "finance"]
     },
     {
+      "name": "country_of_provenance",
+      "type": "STRING",
+      "possible_values_weighted": {
+        "France": 30,
+        "Germany": 70
+      }
+    },
+    {
       "name": "percentage",
       "type": "INTEGER",
       "min": 0,
@@ -120,6 +128,34 @@
         "$category=1 & $longPercent<50" : "third_cond",
         "$country!GERMANY | $longPercent>$onePlusTwo" : "fourth_cond",
         "default" : "default"
+      }
+    },
+    {
+      "name": "city",
+      "type": "CITY",
+      "conditionals": {
+        "city_country": "France,Spain"
+      }
+    },
+    {
+      "name": "city_lat",
+      "type": "CITY",
+      "conditionals": {
+        "city": "$city.lat"
+      }
+    },
+    {
+      "name": "city_long",
+      "type": "CITY",
+      "conditionals": {
+        "city": "$city.long"
+      }
+    },
+    {
+      "name": "city_country",
+      "type": "CITY",
+      "conditionals": {
+        "city": "$city.country"
       }
     },
     {

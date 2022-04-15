@@ -61,7 +61,8 @@ public class JsonParser<T extends Field> implements Parser {
         }
 
         Iterator<JsonNode> fieldsIterator = root.findPath("Fields").elements();
-        LinkedList<T> fields = new LinkedList<>();
+        LinkedHashMap<String, T> fieldsRandom = new LinkedHashMap<>();
+        LinkedHashMap<String, T> fieldsComputed = new LinkedHashMap<>();
 
         Map<String, String> hbaseFamilyColsMap = new HashMap<>();
         try {
@@ -71,13 +72,18 @@ public class JsonParser<T extends Field> implements Parser {
         }
 
         while (fieldsIterator.hasNext()) {
-            T field = getOneField(fieldsIterator.next(), hbaseFamilyColsMap);
+            JsonNode fieldNode = fieldsIterator.next();
+            T field = getOneField(fieldNode, hbaseFamilyColsMap);
             if (field != null) {
-                fields.add(field);
+                if(field.conditionals != null && !field.conditionals.isEmpty()) {
+                    fieldsComputed.put(fieldNode.get("name").asText(), field);
+                } else {
+                    fieldsRandom.put(fieldNode.get("name").asText(), field);
+                }
             }
         }
 
-        return new Model(fields, pks, tbs, opsMap);
+        return new Model(fieldsRandom, fieldsComputed, pks, tbs, opsMap);
     }
 
 

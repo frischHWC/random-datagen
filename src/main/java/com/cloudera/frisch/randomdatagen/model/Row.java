@@ -37,9 +37,15 @@ import java.util.*;
 public class Row<T extends Field> {
     private static final Logger logger = Logger.getLogger(Row.class);
 
+    // TODO: Simplify Row Object:
+    /*
+     - It should be only a map of column value to its value (as an Object)
+     - Multiple functions to render a specific value cast to its type passed (useful for pks)
+     */
+
     // A linkedHashMap is required to keep order in fields (which should be the same than fields from Model)
     @Getter @Setter
-    private LinkedHashMap<T, Object> values;
+    private LinkedHashMap<String, Object> values = new LinkedHashMap<>();
     @Getter @Setter
     private Map<OptionsConverter.PrimaryKeys, Object> pksValues;
 

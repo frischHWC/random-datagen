@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.model.type;
 
 
+import com.cloudera.frisch.randomdatagen.model.Row;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
@@ -44,6 +45,7 @@ public abstract class Field<T> {
     @Setter
     public LinkedHashMap<String, Integer> possible_values_weighted;
 
+    // TODO: Create a conitional Evaluator instead of a list of lines
     // This HashMap represents the condition and then the value associated to this condition
     @Getter
     @Setter
@@ -70,6 +72,7 @@ public abstract class Field<T> {
     public String hbaseColumnQualifier = "cq";
 
     public abstract T generateRandomValue();
+    public abstract T generateComputedValue(Row row);
 
     @Override
     public String toString() {

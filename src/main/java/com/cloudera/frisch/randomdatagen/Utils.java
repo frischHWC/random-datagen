@@ -295,7 +295,7 @@ public class Utils {
         }
 
         if(timeTakenHere > 1000*60) {
-            formattedTime = (timeTakenHere/60*1000) + "m ";
+            formattedTime += (timeTakenHere/60*1000) + "m ";
             timeTakenHere = timeTakenHere%60*1000;
         }
 

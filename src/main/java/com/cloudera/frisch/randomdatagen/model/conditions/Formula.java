@@ -24,8 +24,8 @@ public class Formula {
   @Getter @Setter
   private String formulaToEvaluate;
 
-  private ScriptEngineManager scriptEngineManager;
-  private ScriptEngine scriptEngine;
+  private final ScriptEngineManager scriptEngineManager;
+  private final ScriptEngine scriptEngine;
 
   Formula(String formula, Model model) {
     // fill in the listOfColsToEvaluate + Create formula string with no $

@@ -81,7 +81,7 @@ public class Condition {
         case "IntegerField":
           value2AsInt = Integer.valueOf(value2);
           break;
-        case "Floatfield":
+        case "FloatField":
           value2AsFloat = Float.valueOf(value2);
           break;
         default: break;

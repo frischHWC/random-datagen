@@ -36,6 +36,34 @@
       }
     },
     {
+      "name": "city",
+      "type": "CITY",
+      "conditionals": {
+        "city_country": "France,Spain"
+      }
+    },
+    {
+      "name": "city_lat",
+      "type": "CITY",
+      "conditionals": {
+        "city": "$city.lat"
+      }
+    },
+    {
+      "name": "city_long",
+      "type": "CITY",
+      "conditionals": {
+        "city": "$city.long"
+      }
+    },
+    {
+      "name": "city_country",
+      "type": "CITY",
+      "conditionals": {
+        "city": "$city.country"
+      }
+    },
+    {
       "name": "balance_used",
       "type": "FLOAT"
     },
