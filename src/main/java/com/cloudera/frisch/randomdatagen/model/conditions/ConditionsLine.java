@@ -41,6 +41,13 @@ public class ConditionsLine {
   @Getter @Setter
   private String valueToReturn;
 
+  @Getter @Setter
+  private boolean link = false;
+
+  @Getter @Setter
+  private Link linkToEvaluate;
+
+
 
   public ConditionsLine(String conditionLine, String valueToReturn) {
     this.valueToReturn = valueToReturn;
@@ -57,6 +64,11 @@ public class ConditionsLine {
       logger.debug("Found a formula, that will need to be evaluated");
       this.formula = true;
       this.formulaToEvaluate = new Formula(valueToReturn);
+      return;
+    } else if(conditionSplitted[0].equalsIgnoreCase("link")) {
+      logger.debug("Found a link, that will need to be evaluated");
+      this.link = true;
+      this.linkToEvaluate = new Link(valueToReturn);
       return;
     } else if(conditionSplitted[0].equalsIgnoreCase("default")) {
       logger.debug("Found a default, No evaluation needed");
@@ -123,6 +135,10 @@ public class ConditionsLine {
       } else if(this.formula) {
         // Formula case
         this.valueToReturn = formulaToEvaluate.evaluateFormula(row);
+        return true;
+      } else if(this.link) {
+        // Formula case
+        this.valueToReturn = linkToEvaluate.evaluateLink(row);
         return true;
       } else {
         // Default case

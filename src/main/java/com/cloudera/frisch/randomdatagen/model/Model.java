@@ -16,9 +16,6 @@ import org.apache.orc.TypeDescription;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.cloudera.frisch.randomdatagen.model.OptionsConverter.Options.CSV_HEADER;
-import static com.cloudera.frisch.randomdatagen.model.OptionsConverter.Options.PARQUET_DICTIONARY_ENCODING;
-
 /**
  * This class represents a model, that will be used to describe:
  * - all fields
@@ -73,9 +70,12 @@ public class Model<T extends Field> {
         this.fields.values().forEach(f -> {
             ConditionalEvaluator ce = f.getConditional();
             if(ce!=null) {
-                ce.getConditions().forEach(cl ->
-                    cl.getListOfConditions().forEach(c ->
-                        c.guessColumnType(this)));
+                ce.getConditionLines().forEach(cl -> {
+                    if(cl.isLink()) {
+                        cl.getLinkToEvaluate().setLinkedFieldType(this);
+                    }
+                    cl.getListOfConditions().forEach(c -> c.guessColumnType(this));
+                });
             }
         });
 

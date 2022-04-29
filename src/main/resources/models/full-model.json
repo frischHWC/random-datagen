@@ -133,29 +133,27 @@
     {
       "name": "city",
       "type": "CITY",
-      "conditionals": {
-        "city_country": "France,Spain"
-      }
+      "possible_values": ["France", "Spain"]
     },
     {
       "name": "city_lat",
-      "type": "CITY",
+      "type": "LINK",
       "conditionals": {
-        "city": "$city.lat"
+        "link": "$city.lat"
       }
     },
     {
       "name": "city_long",
-      "type": "CITY",
+      "type": "LINK",
       "conditionals": {
-        "city": "$city.long"
+        "link": "$city.long"
       }
     },
     {
       "name": "city_country",
-      "type": "CITY",
+      "type": "LINK",
       "conditionals": {
-        "city": "$city.country"
+        "link": "$city.country"
       }
     },
     {

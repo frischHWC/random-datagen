@@ -1,7 +1,6 @@
 package com.cloudera.frisch.randomdatagen.model.conditions;
 
 
-import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.Row;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +14,7 @@ public class ConditionalEvaluator {
 
   @Getter
   @Setter
-  public LinkedList<ConditionsLine> conditions = new LinkedList<>();
+  public LinkedList<ConditionsLine> conditionLines = new LinkedList<>();
 
   /*
   A conditionalEvaluator is responsible for preparing conditions evaluations set on a field by parsing the list of conditions to met
@@ -24,13 +23,13 @@ public class ConditionalEvaluator {
         Iterator<Map.Entry<String, String>> condIterator = conditionals.entrySet().iterator();
         while(condIterator.hasNext()) {
           Map.Entry<String, String> condLine = condIterator.next();
-          conditions.add(new ConditionsLine(condLine.getKey(), condLine.getValue()));
+          conditionLines.add(new ConditionsLine(condLine.getKey(), condLine.getValue()));
           logger.debug(" Added condition line: " + condLine.getKey() + " : " + condLine.getValue());
         }
   }
 
   public String evaluateConditions(Row row) {
-    for(ConditionsLine cl: conditions){
+    for(ConditionsLine cl: conditionLines){
       if(cl.isLineSatisfied(row)) {
         return cl.getValueToReturn();
       }

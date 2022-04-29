@@ -19,7 +19,6 @@ import org.apache.solr.common.SolrInputDocument;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -184,11 +183,17 @@ public abstract class Field<T> {
             case "COUNTRY":
                 field = new CountryField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
                 break;
+            case "CITY":
+                field = new CityField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
+                break;
             case "BLOB":
                 field = new BlobField(name, length, possibleValues.stream().map(j -> j.asText().getBytes()).collect(Collectors.toList()));
                 break;
             case "EMAIL":
                 field = new EmailField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
+                break;
+            case "LINK":
+                field = new LinkField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
                 break;
             default:
                 logger.warn("Type : " + type + " has not been recognized and hence will be ignored");

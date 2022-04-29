@@ -63,8 +63,7 @@ public class HiveSink implements SinkInterface {
             properties.put("tez.queue.name", queue);
 
             this.hiveConnection = DriverManager.getConnection("jdbc:hive2://" +
-                            PropertiesLoader.getProperty("hive.zookeeper.server") + ":" +
-                            PropertiesLoader.getProperty("hive.zookeeper.port") + "/" +
+                            PropertiesLoader.getProperty("hive.zookeeper.server") + "/" +
                             ";serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" +
                             PropertiesLoader.getProperty("hive.zookeeper.namespace") +
                             "?tez.queue.name=" + queue
@@ -174,8 +173,7 @@ public class HiveSink implements SinkInterface {
         @Override
         public void run() {
             try (HiveConnection hiveConnectionPerThread = new HiveConnection("jdbc:hive2://" +
-                    PropertiesLoader.getProperty("hive.zookeeper.server") + ":" +
-                    PropertiesLoader.getProperty("hive.zookeeper.port") + "/" +
+                    PropertiesLoader.getProperty("hive.zookeeper.server") + "/" +
                     database +
                     ";serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" +
                     PropertiesLoader.getProperty("hive.zookeeper.namespace")
