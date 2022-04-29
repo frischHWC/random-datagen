@@ -8,7 +8,7 @@ echo "*** Starting to launch program ***"
 
 echo "Launching jar via java command"
 
-    java -Dnashorn.args=--no-deprecation-warning --add-opens java.base/jdk.internal.ref=ALL-UNNAMED -jar random-datagen.jar $@
+    java -Dnashorn.args=--no-deprecation-warning --add-opens java.base/jdk.internal.ref=ALL-UNNAMED -Xmx8G -jar random-datagen.jar $@
 
     sleep 1
 

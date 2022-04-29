@@ -161,6 +161,10 @@
       "type": "INTEGER",
       "min": 1606229803,
       "max": 1637764585
+    },
+    {
+      "name": "ip",
+      "type": "IP"
     }
   ],
   "Table_Names": [

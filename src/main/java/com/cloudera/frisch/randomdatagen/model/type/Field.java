@@ -33,8 +33,6 @@ public abstract class Field<T> {
     static final Logger logger = Logger.getLogger(Field.class);
     Random random = new Random();
 
-    // TODO: Hold the "generic' type (i.e.: String, inte, float, boolean etc..) in an attribute (as an enum ?)
-
     @Getter
     @Setter
     public String name;
@@ -191,6 +189,9 @@ public abstract class Field<T> {
                 break;
             case "EMAIL":
                 field = new EmailField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
+                break;
+            case "IP":
+                field = new IpField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
                 break;
             case "LINK":
                 field = new LinkField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));

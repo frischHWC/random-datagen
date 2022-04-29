@@ -425,6 +425,10 @@ public class Model<T extends Field> {
 
     // TODO: Implement verifications on the model before starting (not two same names of field, primary keys defined)
     // Each field should have a unique name
+    // Each field should have a know type
+    // Some Fields cannot have length or possible values
+    // Some Fields cannot have min/max
+    // Possible values must be of same type than field
     // Depending on on what sink is launched, primary keys must be defined on existing columns
     // Ozone bucket and volume should be string between 3-63 characters (No upper case)
     // Kafka topic should not have special characters or "-"
