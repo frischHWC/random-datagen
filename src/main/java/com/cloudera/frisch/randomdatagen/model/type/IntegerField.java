@@ -16,7 +16,7 @@ import java.util.List;
 
 public class IntegerField extends Field<Integer> {
 
-    IntegerField(String name, Integer length, List<Integer> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals, String min, String max) {
+    IntegerField(String name, Integer length, List<Integer> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, String min, String max) {
         this.name = name;
         if(length==null || length==-1) {
             this.length = Integer.MAX_VALUE;
@@ -24,18 +24,17 @@ public class IntegerField extends Field<Integer> {
             this.length = length;
         }
         if(max==null) {
-            this.max = Integer.MAX_VALUE;
+            this.max = Long.valueOf(Integer.MAX_VALUE);
         } else {
             this.max = Long.parseLong(max);
         }
         if(min==null) {
-            this.min = Integer.MIN_VALUE;
+            this.min = Long.valueOf(Integer.MIN_VALUE);
         } else {
             this.min = Long.parseLong(min);
         }
         this.possibleValues = possibleValues;
         this.possible_values_weighted = possible_values_weighted;
-        this.conditionals = conditionals;
     }
 
     public Integer generateRandomValue() {
@@ -45,15 +44,24 @@ public class IntegerField extends Field<Integer> {
             String result = Utils.getRandomValueWithWeights(random, possible_values_weighted);
             return result.isEmpty() ? 0 :  Integer.parseInt(result);
         } else if(min != Integer.MIN_VALUE) {
-            return random.nextInt((int) max - (int) min + 1 ) + (int) min;
+            return random.nextInt(Math.toIntExact(max - min + 1 )) + Math.toIntExact(min);
         } else {
-            return random.nextInt((int) max);
+            return random.nextInt(Math.toIntExact(max));
         }
     }
 
     /*
     Override if needed Field function to insert into special sinks
     */
+    @Override
+    public String toStringValue(Integer value) {
+        return value.toString();
+    }
+    @Override
+    public Integer toCastValue(String value) {
+        return Integer.valueOf(value);
+    }
+
     @Override
     public Put toHbasePut(Integer value, Put hbasePut) {
         hbasePut.addColumn(Bytes.toBytes(hbaseColumnQualifier), Bytes.toBytes(name), Bytes.toBytes(value));

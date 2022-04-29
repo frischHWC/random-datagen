@@ -67,8 +67,14 @@ public class JsonSink implements SinkInterface {
                 counter++;
             }
 
-            List<String> rowsInString = rows.stream().map(Row::toJSON).collect(Collectors.toList());
-            outputStream.write(String.join(lineSeparator, rowsInString).getBytes());
+            rows.stream().map(Row::toJSON).forEach(r -> {
+                try {
+                    outputStream.write(r.getBytes());
+                    outputStream.write(lineSeparator.getBytes());
+                } catch (IOException e) {
+                    logger.error("Could not write row: " + r + " to file: " + outputStream.getChannel());
+                }
+            });
             outputStream.write(lineSeparator.getBytes());
 
             if (oneFilePerIteration) {

@@ -31,7 +31,7 @@ public class BirthdateField extends Field<LocalDate> {
             this.min = LocalDate.of(Integer.parseInt(minSplit[2]), Integer.parseInt(minSplit[1]), Integer.parseInt(minSplit[0])).toEpochDay();
         }
         if(max == null) {
-            this.max = LocalDate.of(2020, 1, 1).toEpochDay();
+            this.max = LocalDate.of(2022, 1, 1).toEpochDay();
         } else {
             String[] maxSplit = max.split("[/]");
             this.max = LocalDate.of(Integer.parseInt(maxSplit[2]), Integer.parseInt(maxSplit[1]), Integer.parseInt(maxSplit[0])).toEpochDay();
@@ -39,12 +39,12 @@ public class BirthdateField extends Field<LocalDate> {
     }
 
     /**
-     * Generates a random birth date between 1910 & 2020 (unless min & max are specified)
+     * Generates a random birth date between 1910 & 2022 (unless min & max are specified)
      * @return
      */
     public LocalDate generateRandomValue() {
         if(possibleValues.isEmpty()) {
-            long randomDay = min + random.nextInt((int) max - (int) min);
+            Long randomDay = random.longs(1, min, max+1).findFirst().orElse(0L);
             return LocalDate.ofEpochDay(randomDay);
         } else {
             return possibleValues.get(random.nextInt(possibleValues.size()));
@@ -54,6 +54,16 @@ public class BirthdateField extends Field<LocalDate> {
     /*
      Override if needed Field function to insert into special sinks
      */
+
+    @Override
+    public String toStringValue(LocalDate value) {
+        return value.toString();
+    }
+    @Override
+    public LocalDate toCastValue(String value) {
+        String[] dateSplit = value.split("[/]");
+        return LocalDate.of(Integer.parseInt(dateSplit[2]), Integer.parseInt(dateSplit[1]), Integer.parseInt(dateSplit[0]));
+    }
 
     @Override
     public Put toHbasePut(LocalDate value, Put hbasePut) {

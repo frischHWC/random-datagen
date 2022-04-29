@@ -16,7 +16,7 @@ import java.util.List;
 
 public class FloatField extends Field<Float> {
 
-    FloatField(String name, Integer length, List<Float> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals, String min, String max) {
+    FloatField(String name, Integer length, List<Float> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, String min, String max) {
         if(length==null || length==-1) {
             this.length = Integer.MAX_VALUE;
         } else {
@@ -35,7 +35,6 @@ public class FloatField extends Field<Float> {
         this.name = name;
         this.possibleValues = possibleValues;
         this.possible_values_weighted = possible_values_weighted;
-        this.conditionals = conditionals;
     }
 
     public Float generateRandomValue() {
@@ -56,6 +55,15 @@ public class FloatField extends Field<Float> {
     /*
      Override if needed Field function to insert into special sinks
      */
+
+    @Override
+    public String toStringValue(Float value) {
+        return value.toString();
+    }
+    @Override
+    public Float toCastValue(String value) {
+        return Float.valueOf(value);
+    }
 
     @Override
     public Put toHbasePut(Float value, Put hbasePut) {

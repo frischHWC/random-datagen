@@ -32,8 +32,7 @@ public class HashMd5Field extends Field<byte[]> {
 
     public byte[] generateRandomValue() {
         if (possibleValues.isEmpty()) {
-            return
-                    hashAstring(Utils.getAlphaNumericString(this.length, random));
+            return hashAstring(Utils.getAlphaNumericString(this.length, random));
         } else {
             return possibleValues.get(random.nextInt(possibleValues.size()));
         }
@@ -72,6 +71,15 @@ public class HashMd5Field extends Field<byte[]> {
     /*
      Override if needed Field function to insert into special sinks
      */
+
+    @Override
+    public String toStringValue(byte[] value) {
+        return DatatypeConverter.printHexBinary(value);
+    }
+    @Override
+    public byte[] toCastValue(String value) {
+        return hashAstring(value);
+    }
 
     @Override
     public Put toHbasePut(byte[] value, Put hbasePut) {

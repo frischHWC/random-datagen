@@ -16,14 +16,14 @@ import java.util.List;
 
 public class LongField extends Field<Long> {
 
-    LongField(String name, Integer length, List<Long> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals, String min, String max) {
+    LongField(String name, Integer length, List<Long> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, String min, String max) {
         if(length==null || length==-1) {
             this.length = Integer.MAX_VALUE;
         } else {
             this.length = length;
         }
         if(max==null) {
-            this.max = Long.MAX_VALUE;
+            this.max = Long.MAX_VALUE-1;
         } else {
             this.max = Long.parseLong(max);
         }
@@ -35,7 +35,6 @@ public class LongField extends Field<Long> {
         this.name = name;
         this.possibleValues = possibleValues;
         this.possible_values_weighted = possible_values_weighted;
-        this.conditionals = conditionals;
     }
 
     public Long generateRandomValue() {
@@ -45,17 +44,21 @@ public class LongField extends Field<Long> {
             String result = Utils.getRandomValueWithWeights(random, possible_values_weighted);
             return result.isEmpty() ? 0L :  Long.parseLong(result);
         } else {
-            long randomLong = random.nextLong();
-            while(randomLong < min && randomLong > max) {
-                randomLong = random.nextLong();
-            }
-            return randomLong;
+            return random.longs(1, min, max+1).findFirst().orElse(0L);
         }
     }
 
     /*
      Override if needed Field function to insert into special sinks
      */
+    @Override
+    public String toStringValue(Long value) {
+        return value.toString();
+    }
+    @Override
+    public Long toCastValue(String value) {
+        return Long.valueOf(value);
+    }
 
     @Override
     public Put toHbasePut(Long value, Put hbasePut) {

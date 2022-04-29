@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class StringField extends Field<String> {
 
-    StringField(String name, Integer length, List<String> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals) {
+    StringField(String name, Integer length, List<String> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted) {
         this.name = name;
         if(length==null || length<1) {
             this.length = 20;
@@ -26,7 +26,6 @@ public class StringField extends Field<String> {
         }
         this.possibleValues = possibleValues;
         this.possible_values_weighted = possible_values_weighted;
-        this.conditionals = conditionals;
     }
 
     public String generateRandomValue() {

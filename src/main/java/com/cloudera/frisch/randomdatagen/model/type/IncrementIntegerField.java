@@ -34,6 +34,16 @@ public class IncrementIntegerField extends Field<Integer> {
     /*
     Override if needed Field function to insert into special sinks
     */
+
+    @Override
+    public String toStringValue(Integer value) {
+        return value.toString();
+    }
+    @Override
+    public Integer toCastValue(String value) {
+        return Integer.valueOf(value);
+    }
+
     @Override
     public Put toHbasePut(Integer value, Put hbasePut) {
         hbasePut.addColumn(Bytes.toBytes(hbaseColumnQualifier), Bytes.toBytes(name), Bytes.toBytes(value));

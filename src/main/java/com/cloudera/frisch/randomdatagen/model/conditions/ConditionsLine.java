@@ -42,7 +42,7 @@ public class ConditionsLine {
   private String valueToReturn;
 
 
-  public ConditionsLine(String conditionLine, String valueToReturn, Model model) {
+  public ConditionsLine(String conditionLine, String valueToReturn) {
     this.valueToReturn = valueToReturn;
     this.listOfConditionsOperators = new LinkedList<>();
     this.listOfConditions = new LinkedList<>();
@@ -56,7 +56,7 @@ public class ConditionsLine {
     } else if(conditionSplitted[0].equalsIgnoreCase("always")) {
       logger.debug("Found a formula, that will need to be evaluated");
       this.formula = true;
-      this.formulaToEvaluate = new Formula(valueToReturn, model);
+      this.formulaToEvaluate = new Formula(valueToReturn);
       return;
     } else if(conditionSplitted[0].equalsIgnoreCase("default")) {
       logger.debug("Found a default, No evaluation needed");
@@ -68,7 +68,7 @@ public class ConditionsLine {
     for(String s: conditionSplitted){
       if(index%2==0) {
         logger.debug("This is an expression that will create a condition");
-        listOfConditions.add(createConditionFromExpression(s, model));
+        listOfConditions.add(createConditionFromExpression(s));
       } else {
         logger.debug("This is an expression that will create an operator between conditions");
         listOfConditionsOperators.add(createOperatorFromExpression(s));
@@ -86,7 +86,7 @@ public class ConditionsLine {
     }
   }
 
-  private Condition createConditionFromExpression(String conditionExpression, Model model) {
+  private Condition createConditionFromExpression(String conditionExpression) {
     String[] conditionVals = null;
     String operator = "=";
     if (conditionExpression.contains("=")) {
@@ -106,33 +106,23 @@ public class ConditionsLine {
       if (conditionVals[1].matches("[$].*")) {
         logger.debug("2nd option is a column name, not a value");
         return new Condition(conditionVals[0].substring(1),
-            conditionVals[1].substring(1), null, operator, model);
+            conditionVals[1].substring(1), null, operator);
       } else {
         return new Condition(conditionVals[0].substring(1), null,
-            conditionVals[1], operator, model);
+            conditionVals[1], operator);
       }
     }
 
     return null;
   }
 
-  // Evaluate each condition of the line and in case of success return the valueToReturn, else an empty string
-  public String evaluateCondition(Row row, Model model) {
-    if(isLineSatisfied(row, model)) {
-      return valueToReturn;
-    } else {
-      return "";
-    }
-  }
-
-
-  public boolean isLineSatisfied(Row row, Model model) {
+  public boolean isLineSatisfied(Row row) {
     if(!combinedCondition) {
       if(!listOfConditions.isEmpty()) {
-        return listOfConditions.get(0).evaluateCondition(row, model);
+        return listOfConditions.get(0).evaluateCondition(row);
       } else if(this.formula) {
         // Formula case
-        this.valueToReturn = formulaToEvaluate.evaluateFormula(row, model);
+        this.valueToReturn = formulaToEvaluate.evaluateFormula(row);
         return true;
       } else {
         // Default case
@@ -144,21 +134,21 @@ public class ConditionsLine {
       // 1. Isolate groups of AND
       // 2. Evaluate each AND group and return true if one is true, false else
       List<Boolean> conditionsGroupEvaluationResult = new ArrayList<>();
-      Boolean previousResult = listOfConditions.get(0).evaluateCondition(row, model);
+      boolean previousResult = listOfConditions.get(0).evaluateCondition(row);
       for(int i = 1; i<listOfConditions.size(); i++) {
 
         if(listOfConditionsOperators.get(i-1)==ConditionOperators.AND) {
           logger.debug("The operator between previous condition and this one is AND");
           if(previousResult){
             logger.debug("Previous condition was true, need to evaluate this one");
-            previousResult = listOfConditions.get(i).evaluateCondition(row, model);
+            previousResult = listOfConditions.get(i).evaluateCondition(row);
           } else {
             logger.debug("Previous condition was false, no need to evaluate this one");
           }
         } else {
           logger.debug("The operator between previous condition and this one is OR, so keep previous result and start to evaluate new condition");
           conditionsGroupEvaluationResult.add(previousResult);
-          previousResult = listOfConditions.get(i).evaluateCondition(row, model);
+          previousResult = listOfConditions.get(i).evaluateCondition(row);
         }
       }
       return conditionsGroupEvaluationResult.contains(true);

@@ -2,6 +2,7 @@ package com.cloudera.frisch.randomdatagen.model.type;
 
 
 import com.cloudera.frisch.randomdatagen.model.Row;
+import com.cloudera.frisch.randomdatagen.model.conditions.ConditionalEvaluator;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,9 +34,15 @@ public abstract class Field<T> {
     static final Logger logger = Logger.getLogger(Field.class);
     Random random = new Random();
 
+    // TODO: Hold the "generic' type (i.e.: String, inte, float, boolean etc..) in an attribute (as an enum ?)
+
     @Getter
     @Setter
     public String name;
+
+    @Getter
+    @Setter
+    public Boolean computed = false;
 
     @Getter
     @Setter
@@ -45,11 +52,10 @@ public abstract class Field<T> {
     @Setter
     public LinkedHashMap<String, Integer> possible_values_weighted;
 
-    // TODO: Create a conitional Evaluator instead of a list of lines
-    // This HashMap represents the condition and then the value associated to this condition
+    // This is a conditional evaluator holding all complexity (parsing, preparing comparison, evaluating it)
     @Getter
     @Setter
-    public LinkedHashMap<String, String> conditionals;
+    public ConditionalEvaluator conditional;
 
     // Default length is -1, if user does not provide a strict superior to 0 length,
     // each Extended field class should by default override it to a number strictly superior to 0
@@ -60,24 +66,37 @@ public abstract class Field<T> {
     // Minimum possible value for Int/Long
     @Getter
     @Setter
-    public long min;
+    public Long min;
 
     // Maximum possible value Int/Long
     @Getter
     @Setter
-    public long max;
+    public Long max;
 
     @Getter
     @Setter
     public String hbaseColumnQualifier = "cq";
 
-    public abstract T generateRandomValue();
-    public abstract T generateComputedValue(Row row);
-
     @Override
     public String toString() {
-        return "Class Type is " + this.getClass().getSimpleName() + " ; name : " + name + " ; hbase Column Qualifier : " + hbaseColumnQualifier
-                + " ; Length : " + length;
+        StringBuilder sb = new StringBuilder();
+        sb.append("Class Type is " + this.getClass().getSimpleName() + " ; ");
+        sb.append("name : " + name + " ; ");
+        sb.append("hbase Column Qualifier : " + hbaseColumnQualifier + " ; ");
+        sb.append("Length : " + length + " ; ");
+        if(min!=null) {
+            sb.append("Min : " + min + " ; ");
+        }
+        if(max!=null) {
+            sb.append("Max : " + max + " ; ");
+        }
+        return sb.toString();
+    }
+
+    public abstract T generateRandomValue();
+
+    public T generateComputedValue(Row row) {
+        return toCastValue(conditional.evaluateConditions(row));
     }
 
     public static String toString(List<Field> fieldList) {
@@ -124,13 +143,13 @@ public abstract class Field<T> {
 
         switch (type.toUpperCase()) {
             case "STRING":
-                field = new StringField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()), possible_values_weighted, conditionals);
+                field = new StringField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()), possible_values_weighted);
                 break;
             case "STRINGAZ":
                 field = new StringAZField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
                 break;
             case "INTEGER":
-                field = new IntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()), possible_values_weighted, conditionals, min, max);
+                field = new IntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()), possible_values_weighted, min, max);
                 break;
             case "INCREMENT_INTEGER":
                 field = new IncrementIntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()));
@@ -139,10 +158,10 @@ public abstract class Field<T> {
                 field = new BooleanField(name, length, possibleValues.stream().map(JsonNode::asBoolean).collect(Collectors.toList()), possible_values_weighted);
                 break;
             case "FLOAT":
-                field = new FloatField(name, length, possibleValues.stream().map(j -> (float) j.asDouble()).collect(Collectors.toList()), possible_values_weighted, conditionals, min, max);
+                field = new FloatField(name, length, possibleValues.stream().map(j -> (float) j.asDouble()).collect(Collectors.toList()), possible_values_weighted, min, max);
                 break;
             case "LONG":
-                field = new LongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()), possible_values_weighted, conditionals, min, max);
+                field = new LongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()), possible_values_weighted, min, max);
                 break;
             case "INCREMENT_LONG":
                 field = new IncrementLongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()));
@@ -181,6 +200,13 @@ public abstract class Field<T> {
             field.setHbaseColumnQualifier(columnQualifier);
         }
 
+        // If there are some conditions, we consider this field as computed (meaning it requires other fields' values to get its value)
+        if (conditionals != null && !conditionals.isEmpty()) {
+            logger.debug("Field has been marked as conditional: " + field);
+            field.setComputed(true);
+            field.setConditional(new ConditionalEvaluator(conditionals));
+        }
+
         if(logger.isDebugEnabled()) {
             logger.debug("Field has been created: " + field);
         }
@@ -193,6 +219,13 @@ public abstract class Field<T> {
     They provide generic Insertions needed
     Each time a new sink is added, a new function should be created here (or in each field)
      */
+
+    public String toStringValue(T value) {
+        return value.toString();
+    }
+    public T toCastValue(String value) {
+        return (T) value;
+    }
 
     public String toString(T value) {
         return " " + name + " : " + value.toString() + " ;";

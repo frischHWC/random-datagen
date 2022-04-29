@@ -28,6 +28,14 @@ public class TimestampField extends Field<Long> {
     /*
      Override if needed Field function to insert into special sinks
      */
+    @Override
+    public String toStringValue(Long value) {
+        return value.toString();
+    }
+    @Override
+    public Long toCastValue(String value) {
+        return Long.valueOf(value);
+    }
 
     @Override
     public Put toHbasePut(Long value, Put hbasePut) {

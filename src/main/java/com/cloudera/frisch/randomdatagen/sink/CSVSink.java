@@ -69,8 +69,14 @@ public class CSVSink implements SinkInterface {
                 counter++;
             }
 
-            List<String> rowsInString = rows.stream().map(Row::toCSV).collect(Collectors.toList());
-            outputStream.write(String.join(lineSeparator, rowsInString).getBytes());
+            rows.stream().map(Row::toCSV).forEach(r -> {
+                    try {
+                        outputStream.write(r.getBytes());
+                        outputStream.write(lineSeparator.getBytes());
+                    } catch (IOException e) {
+                        logger.error("Could not write row: " + r + " to file: " + outputStream.getChannel());
+                    }
+                });
             outputStream.write(lineSeparator.getBytes());
 
             if (oneFilePerIteration) {
@@ -85,8 +91,7 @@ public class CSVSink implements SinkInterface {
         try {
             if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.CSV_HEADER)) {
                 outputStream.write(model.getCsvHeader().getBytes());
-                outputStream.write(
-                    lineSeparator.getBytes());
+                outputStream.write(lineSeparator.getBytes());
             }
         } catch (IOException e) {
             logger.error("Can not write header to the local file due to error: ", e);
@@ -96,7 +101,7 @@ public class CSVSink implements SinkInterface {
     void createFileWithOverwrite(String path) {
         try {
             File file = new File(path);
-            if(file.createNewFile()) { logger.warn("Could not create file");}
+            file.createNewFile();
             outputStream = new FileOutputStream(path, false);
             logger.debug("Successfully created local file : " + path);
         } catch (IOException e) {

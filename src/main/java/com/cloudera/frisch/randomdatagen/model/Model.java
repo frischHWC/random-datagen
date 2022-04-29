@@ -35,31 +35,22 @@ public class Model<T extends Field> {
 
     private static final Logger logger = Logger.getLogger(Model.class);
 
-    // TODO: Refactor to simplify and optimize generation by holding more information in Model and not in Row
-    /*
-    - Separate Fields that are really random and others computed (formula, increment, dependent on other fields values, conditions etc...)
-    - Always use field name as a reference and get field using a Map between field name and field
-    - Order should not be important if using field name and a map
-    - When generating rows, foreach row:
-        - generate random values
-        - apply conditions for fields that requires some
-    - Implement model checking
-     */
+    // This is to keep right order of fields
+    @Getter @Setter
+    private LinkedHashMap<String, T> fields;
 
-    // TODO: Check and solve this : LinkedList is enforced to keep order in list of fields (required when generating requests and filling them after) ????
+    // This is for convenience when generating data
     @Getter @Setter
-    private LinkedHashMap<String, T> fieldsRandom;
+    private List<String> fieldsRandomName;
     @Getter @Setter
-    private LinkedHashMap<String, T> fieldsComputed;
+    private List<String> fieldsComputedName;
+
     @Getter @Setter
-    private Map<OptionsConverter.PrimaryKeys, List<T>> primaryKeys;
+    private Map<OptionsConverter.PrimaryKeys, LinkedList<String>> primaryKeys;
     @Getter @Setter
     private Map<OptionsConverter.TableNames, String> tableNames;
     @Getter @Setter
     private Map<OptionsConverter.Options, Object> options;
-    // TODO : Make conditional evaluator on the field and not on the entire model
-    @Getter @Setter
-    private ConditionalEvaluator conditionalEvaluator;
 
     /**
      * Constructor that initializes the model and populates it completely
@@ -70,16 +61,29 @@ public class Model<T extends Field> {
      * @param tableNames  map of options of Table names to their names
      * @param options     map of other options as String, String
      */
-    public Model(LinkedHashMap<String, T> fieldsRandom, LinkedHashMap<String, T> fieldsComputed, Map<String, List<String>> primaryKeys, Map<String, String> tableNames, Map<String, String> options) {
-        this.fieldsRandom = fieldsRandom;
-        this.fieldsComputed = fieldsComputed;
+    public Model(LinkedHashMap<String, T> fields, Map<String, List<String>> primaryKeys, Map<String, String> tableNames, Map<String, String> options) {
+        this.fields = fields;
+        this.fieldsRandomName = fields.entrySet().stream().filter(f -> !f.getValue().computed).map(f -> f.getKey()).collect(Collectors.toList());
+        this.fieldsComputedName = fields.entrySet().stream().filter(f -> f.getValue().computed).map(f -> f.getKey()).collect(Collectors.toList());
         this.primaryKeys = convertPrimaryKeys(primaryKeys);
         this.tableNames = convertTableNames(tableNames);
         this.options = convertOptions(options);
-        this.conditionalEvaluator = new ConditionalEvaluator(this);
+
+        // For all conditions passed, we need to check types used to prepare future comparisons
+        this.fields.values().forEach(f -> {
+            ConditionalEvaluator ce = f.getConditional();
+            if(ce!=null) {
+                ce.getConditions().forEach(cl ->
+                    cl.getListOfConditions().forEach(c ->
+                        c.guessColumnType(this)));
+            }
+        });
 
         // Using Options passed, fields should be updated to take into account extra options passed
         setupFieldHbaseColQualifier((Map<T, String>) this.options.get(OptionsConverter.Options.HBASE_COLUMN_FAMILIES_MAPPING));
+
+        // Verify model before going further
+        verifyModel();
 
         if (logger.isDebugEnabled()) {
             logger.debug("Model created is : " + this);
@@ -89,13 +93,11 @@ public class Model<T extends Field> {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(fieldsRandom.toString());
-        sb.append(fieldsComputed.toString());
+        sb.append(fields.toString());
         sb.append("Primary Keys : [");
         primaryKeys.forEach((pk, fl) -> {
             sb.append(pk);
             sb.append(" : { ");
-            // Field.toString(fl)
             sb.append(fl.toString());
             sb.append(" }");
             sb.append(System.getProperty("line.separator"));
@@ -135,21 +137,24 @@ public class Model<T extends Field> {
 
         for (long i = 0; i < number; i++) {
             Row row = new Row();
-            fieldsRandom.forEach((name, f) -> row.getValues()
-                .put(name, f.generateRandomValue()));
-            fieldsComputed.forEach((name, f) -> row.getValues()
-                .put(name, f.generateComputedValue(row)));
-
-            // TODO: Remove this below:
-            // row.populatePksValues(primaryKeys);
-            // rows.add(conditionalEvaluator.evaluateConditions(row, this));
+            row.setModel(this);
+            fieldsRandomName.forEach(f -> row.getValues()
+                .put(f, fields.get(f).generateRandomValue()));
+            fieldsComputedName.forEach(f -> row.getValues()
+                .put(f, fields.get(f).generateComputedValue(row)));
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Created random row: " + row);
             }
+
+            rows.add(row);
         }
 
         return rows;
+    }
+
+    public T getFieldFromName(String name) {
+        return fields.get(name);
     }
 
     /**
@@ -157,12 +162,12 @@ public class Model<T extends Field> {
      * @param pks
      * @return
      */
-    private Map<OptionsConverter.PrimaryKeys, List<T>> convertPrimaryKeys(Map<String, List<String>> pks) {
-        Map<OptionsConverter.PrimaryKeys, List<T>> pksConverted = new HashMap<>();
+    private Map<OptionsConverter.PrimaryKeys, LinkedList<String>> convertPrimaryKeys(Map<String, List<String>> pks) {
+        Map<OptionsConverter.PrimaryKeys, LinkedList<String>> pksConverted = new HashMap<>();
         pks.forEach((k, v) -> {
             OptionsConverter.PrimaryKeys pk = OptionsConverter.convertOptionToPrimaryKey(k);
             if (pk != null) {
-                pksConverted.put(pk, v.stream().map(this::findFieldWhoseNameIs).collect(Collectors.toList()));
+                pksConverted.put(pk, new LinkedList<>(v));
             }
         });
         return pksConverted;
@@ -296,7 +301,7 @@ public class Model<T extends Field> {
         for (String s : ops.split(";")) {
             String cq = s.split(":")[0];
             for (String c : s.split(":")[1].split(",")) {
-                T field = findFieldWhoseNameIs(c);
+                T field = fields.get(c);
                 if (field != null) {
                     hbaseFamilyColsMap.put(field, cq);
                 }
@@ -310,34 +315,6 @@ public class Model<T extends Field> {
         return new HashSet<>(colFamiliesMap.values());
     }
 
-    T findFieldWhoseNameIs(String name) {
-        T fieldToFind = null;
-        for (T f : fields) {
-            if (f.name.equalsIgnoreCase(name)) {
-                fieldToFind = f;
-            }
-        }
-        if (fieldToFind == null) {
-            logger.warn("The field specified in options " + name + " has not been found !!! " +
-                    "=> A review of JSON file should be made to ensure it is consistent");
-        }
-        return fieldToFind;
-    }
-
-    public Field findFieldasFieldWhoseNameIs(String name) {
-        Field fieldToFind = null;
-        for (Field f : fields) {
-            if (f.name.equalsIgnoreCase(name)) {
-                fieldToFind = f;
-            }
-        }
-        if (fieldToFind == null) {
-            logger.warn("The field specified in options " + name + " has not been found !!! " +
-                "=> A review of JSON file should be made to ensure it is consistent");
-        }
-        return fieldToFind;
-    }
-
     private void setupFieldHbaseColQualifier(Map<T, String> fieldHbaseColMap) {
         if(fieldHbaseColMap!=null && !fieldHbaseColMap.isEmpty()) {
             fieldHbaseColMap.forEach(Field::setHbaseColumnQualifier);
@@ -346,17 +323,17 @@ public class Model<T extends Field> {
 
     public Schema getKuduSchema() {
         List<ColumnSchema> columns = new LinkedList<>();
-        fields.forEach(f -> {
+        fields.forEach((name, f) -> {
             boolean isaPK = false;
             for (String k : getKuduPrimaryKeys()) {
-                if (k.equalsIgnoreCase(f.name)) {isaPK = true;}
+                if (k.equalsIgnoreCase(name)) {isaPK = true;}
             }
             if (isaPK) {
-                columns.add(new ColumnSchema.ColumnSchemaBuilder(f.name, f.getKuduType())
+                columns.add(new ColumnSchema.ColumnSchemaBuilder(name, f.getKuduType())
                     .key(true)
                     .build());
             } else {
-                columns.add(new ColumnSchema.ColumnSchemaBuilder(f.name, f.getKuduType())
+                columns.add(new ColumnSchema.ColumnSchemaBuilder(name, f.getKuduType())
                     .build());
             }
         });
@@ -365,31 +342,22 @@ public class Model<T extends Field> {
     }
 
     public List<String> getKuduPrimaryKeys() {
-        List<T> kuduPrimaryKeys = primaryKeys.get(OptionsConverter.PrimaryKeys.KUDU_PRIMARY_KEYS);
-        List<String> hashKeys = new ArrayList<>(kuduPrimaryKeys.size());
-        kuduPrimaryKeys.forEach(f -> hashKeys.add(f.name));
-        return hashKeys;
+        return primaryKeys.get(OptionsConverter.PrimaryKeys.KUDU_PRIMARY_KEYS);
     }
 
     public List<String> getKuduRangeKeys() {
-        List<T> kuduRangeKeys = primaryKeys.get(OptionsConverter.PrimaryKeys.KUDU_RANGE_KEYS);
-        List<String> hashKeys = new ArrayList<>(kuduRangeKeys.size());
-        kuduRangeKeys.forEach(f -> hashKeys.add(f.name));
-        return hashKeys;
+        return primaryKeys.get(OptionsConverter.PrimaryKeys.KUDU_RANGE_KEYS);
     }
 
     public List<String> getKuduHashKeys() {
-        List<T> kuduHashKeys = primaryKeys.get(OptionsConverter.PrimaryKeys.KUDU_HASH_KEYS);
-        List<String> hashKeys = new ArrayList<>(kuduHashKeys.size());
-        kuduHashKeys.forEach(f -> hashKeys.add(f.name));
-        return hashKeys;
+        return primaryKeys.get(OptionsConverter.PrimaryKeys.KUDU_HASH_KEYS);
     }
 
     public String getSQLSchema() {
         StringBuilder sb = new StringBuilder();
         sb.append(" ( ");
-        fields.forEach(f -> {
-            sb.append(f.name);
+        fields.forEach((name, f) -> {
+            sb.append(name);
             sb.append(" ");
             sb.append(f.getHiveType());
             sb.append(", ");
@@ -403,13 +371,13 @@ public class Model<T extends Field> {
     public String getInsertSQLStatement() {
         StringBuilder sb = new StringBuilder();
         sb.append(" ( ");
-        fields.forEach(f -> {
-            sb.append(f.name);
+        fields.forEach((name, f) -> {
+            sb.append(name);
             sb.append(", ");
         });
         sb.deleteCharAt(sb.length() - 2);
         sb.append(") VALUES ( ");
-        fields.forEach(f -> sb.append("?, "));
+        fields.forEach((name, f) -> sb.append("?, "));
         sb.deleteCharAt(sb.length() - 2);
         sb.append(" ) ");
         logger.debug("Insert is : " + sb.toString());
@@ -418,8 +386,8 @@ public class Model<T extends Field> {
 
     public String getCsvHeader() {
         StringBuilder sb = new StringBuilder();
-        fields.forEach(f -> {
-            sb.append(f.name);
+        fields.forEach((name, f) -> {
+            sb.append(name);
             sb.append(",");
         });
         sb.deleteCharAt(sb.length() - 1);
@@ -432,7 +400,7 @@ public class Model<T extends Field> {
                 .namespace("org.apache.avro.ipc")
                 .fields();
 
-        for(T field: fields) {
+        for(T field: fields.values()) {
             schemaBuilder = schemaBuilder.name(field.name).type(field.getGenericRecordType()).noDefault();
         }
 
@@ -441,14 +409,14 @@ public class Model<T extends Field> {
 
     public TypeDescription getOrcSchema() {
         TypeDescription typeDescription = TypeDescription.createStruct();
-        fields.forEach(field -> typeDescription.addField(field.name, field.getTypeDescriptionOrc()));
+        fields.forEach((name, f) -> typeDescription.addField(name, f.getTypeDescriptionOrc()));
         return typeDescription;
     }
 
     public Map<T, ColumnVector> createOrcVectors(VectorizedRowBatch batch) {
         LinkedHashMap<T, ColumnVector> hashMap = new LinkedHashMap<>();
         int cols = 0;
-        for(T field: fields) {
+        for(T field: fields.values()) {
             hashMap.put(field, field.getOrcColumnVector(batch, cols));
             cols++;
         }
@@ -456,8 +424,13 @@ public class Model<T extends Field> {
     }
 
     // TODO: Implement verifications on the model before starting (not two same names of field, primary keys defined)
+    // Each field should have a unique name
+    // Depending on on what sink is launched, primary keys must be defined on existing columns
     // Ozone bucket and volume should be string between 3-63 characters (No upper case)
     // Kafka topic should not have special characters or "-"
+    // Column comparison in conditionals made should be on same column type
+    // Conditionals should be made on existing columns
+    // Conditionals should not have "nested" conditions (meaning relying on a computed column)
     public void verifyModel() { }
 
 }

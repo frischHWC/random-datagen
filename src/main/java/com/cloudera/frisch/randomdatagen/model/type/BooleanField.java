@@ -10,6 +10,7 @@ import org.apache.kudu.Type;
 import org.apache.kudu.client.PartialRow;
 import org.apache.orc.TypeDescription;
 
+import javax.xml.bind.DatatypeConverter;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -37,6 +38,15 @@ public class BooleanField extends Field<Boolean> {
     /*
      Override if needed Field function to insert into special sinks
      */
+
+    @Override
+    public String toStringValue(Boolean value) {
+        return value.toString();
+    }
+    @Override
+    public Boolean toCastValue(String value) {
+        return Boolean.valueOf(value);
+    }
 
     @Override
     public Put toHbasePut(Boolean value, Put hbasePut) {

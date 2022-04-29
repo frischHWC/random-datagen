@@ -1,8 +1,6 @@
 package com.cloudera.frisch.randomdatagen.model.conditions;
 
-import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.Row;
-import com.cloudera.frisch.randomdatagen.model.type.Field;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.log4j.Logger;
@@ -27,26 +25,24 @@ public class Formula {
   private final ScriptEngineManager scriptEngineManager;
   private final ScriptEngine scriptEngine;
 
-  Formula(String formula, Model model) {
+  Formula(String formula) {
     // fill in the listOfColsToEvaluate + Create formula string with no $
-    listOfColsToEvaluate = new LinkedList<String>();
-    for(Field field: (LinkedList<Field>) model.getFields()) {
-      if(formula.contains(field.getName())) {
-        listOfColsToEvaluate.add(field.getName());
-        logger.debug("Add Field : " + field + " to be in the formula");
-      }
+    listOfColsToEvaluate = new LinkedList<>();
+    for(String field: formula.substring(formula.indexOf("$")+1).split("[$]")) {
+        listOfColsToEvaluate.add(field.split("\\s+")[0]);
+        logger.debug("Add Field : " + field.split("\\s+")[0] + " to be in the formula");
     }
     formulaToEvaluate = formula.replaceAll("[$]", "");
     scriptEngineManager = new ScriptEngineManager();
     scriptEngine = scriptEngineManager.getEngineByName("JavaScript");
   }
 
-  public String evaluateFormula(Row row, Model model) {
+  public String evaluateFormula(Row row) {
     // Evaluate formula using an evaluator (or built this evaluator)
     String formulaReplaced = formulaToEvaluate;
     for(String colName: listOfColsToEvaluate) {
       logger.debug(formulaReplaced);
-      formulaReplaced = formulaReplaced.replaceAll("(^| )" + colName + "($| )", row.getValues().get(model.findFieldasFieldWhoseNameIs(colName)).toString());
+      formulaReplaced = formulaReplaced.replaceAll("(^| )" + colName + "($| )", row.getValues().get(colName).toString());
     }
     logger.debug(formulaReplaced);
     return computeFormula(formulaReplaced);

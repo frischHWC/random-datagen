@@ -51,6 +51,14 @@ public class BytesField extends Field<byte[]> {
     /*
      Override if needed Field function to insert into special sinks
      */
+    @Override
+    public String toStringValue(byte[] value) {
+        return DatatypeConverter.printHexBinary(value);
+    }
+    @Override
+    public byte[] toCastValue(String value) {
+        return value.getBytes();
+    }
 
     @Override
     public Put toHbasePut(byte[] value, Put hbasePut) {

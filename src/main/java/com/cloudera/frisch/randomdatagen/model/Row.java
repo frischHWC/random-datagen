@@ -37,56 +37,34 @@ import java.util.*;
 public class Row<T extends Field> {
     private static final Logger logger = Logger.getLogger(Row.class);
 
-    // TODO: Simplify Row Object:
-    /*
-     - It should be only a map of column value to its value (as an Object)
-     - Multiple functions to render a specific value cast to its type passed (useful for pks)
-     */
-
-    // A linkedHashMap is required to keep order in fields (which should be the same than fields from Model)
+    // A linkedHashMap is required to keep order in fields
     @Getter @Setter
     private LinkedHashMap<String, Object> values = new LinkedHashMap<>();
     @Getter @Setter
-    private Map<OptionsConverter.PrimaryKeys, Object> pksValues;
+    private Model model;
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        values.forEach((f,o) -> sb.append(f.toString(o)));
-        sb.append(System.getProperty("line.separator"));
-        sb.append(" Primary Keys values : ");
-        pksValues.forEach((pk, o) -> {
-            sb.append(pk);
-            sb.append(" = ");
-            sb.append(o.toString());
-            sb.append(" ; ");
+        values.forEach((f,o) -> {
+            sb.append(f);
+            sb.append(" : ");
+            sb.append(model.getFieldFromName(f).toStringValue(o));
+            sb.append("  ");
         });
         return sb.toString();
     }
 
-    /**
-     * Population of primary key values is made using Map passed (coming from Model class)
-     * If there is only one field as PK, its type is kept, if there are more than one, a String type is used
-     *
-     * @param primaryKeys map of primary keys with list of fields
-     */
-    void populatePksValues(Map<OptionsConverter.PrimaryKeys, List<T>> primaryKeys) {
-        Map<OptionsConverter.PrimaryKeys, Object> primaryKeysObjectMap = new HashMap<>();
-        primaryKeys.forEach((pk, fields) -> {
-            if (fields.size() == 1) {
-                primaryKeysObjectMap.put(pk, values.get(fields.get(0)));
-            } else {
-                StringBuilder sb = new StringBuilder();
-                fields.forEach(field -> sb.append(values.get(field)));
-                primaryKeysObjectMap.put(pk, sb.toString());
-            }
-        });
-        pksValues = primaryKeysObjectMap;
+    public String getPrimaryKeysValues(OptionsConverter.PrimaryKeys pk) {
+        LinkedList<String> pkNames = (LinkedList<String>) model.getPrimaryKeys().get(pk);
+        StringBuilder sb = new StringBuilder();
+        pkNames.forEach(key -> sb.append(model.getFieldFromName(key).toStringValue(values.get(key))));
+        return sb.toString();
     }
 
     public String toCSV() {
         StringBuilder sb = new StringBuilder();
-        values.forEach((f, o) -> sb.append(f.toCSVString(o)));
+        values.forEach((f, o) -> sb.append(model.getFieldFromName(f).toCSVString(o)));
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
     }
@@ -94,7 +72,7 @@ public class Row<T extends Field> {
     public String toJSON() {
         StringBuilder sb = new StringBuilder();
         sb.append("{ ");
-        values.forEach((f, o) -> sb.append(f.toJSONString(o)));
+        values.forEach((f, o) -> sb.append(model.getFieldFromName(f).toJSONString(o)));
         sb.deleteCharAt(sb.length() - 1);
         sb.append(" }");
         return sb.toString();
@@ -103,39 +81,39 @@ public class Row<T extends Field> {
 
     public Map.Entry<String, GenericRecord> toKafkaMessage(Schema schema) {
         GenericRecord genericRecordRow = new GenericData.Record(schema);
-        values.forEach((f,o) -> genericRecordRow.put(f.name, f.toAvroValue(o)));
-        return new AbstractMap.SimpleEntry<>(pksValues.get(OptionsConverter.PrimaryKeys.KAFKA_MSG_KEY).toString(), genericRecordRow);
+        values.forEach((f,o) -> genericRecordRow.put(f, model.getFieldFromName(f).toAvroValue(o)));
+        return new AbstractMap.SimpleEntry<>(model.getPrimaryKeys().get(OptionsConverter.PrimaryKeys.KAFKA_MSG_KEY).toString(), genericRecordRow);
     }
 
     public Map.Entry<String, String> toKafkaMessageString(KafkaSink.MessageType messageType) {
         StringBuilder sb = new StringBuilder();
         if(messageType == KafkaSink.MessageType.CSV) {
-            values.forEach((f, o) -> sb.append(f.toCSVString(o)));
+            values.forEach((f, o) -> sb.append(model.getFieldFromName(f).toCSVString(o)));
         } else {
-            values.forEach((f, o) -> sb.append(f.toJSONString(o)));
+            values.forEach((f, o) -> sb.append(model.getFieldFromName(f).toJSONString(o)));
         }
-        return new AbstractMap.SimpleEntry<>(pksValues.get(OptionsConverter.PrimaryKeys.KAFKA_MSG_KEY).toString(), sb.toString());
+        return new AbstractMap.SimpleEntry<>(getPrimaryKeysValues(OptionsConverter.PrimaryKeys.KAFKA_MSG_KEY), sb.toString());
     }
 
     public Put toHbasePut() {
-        Put put = new Put(Bytes.toBytes(pksValues.get(OptionsConverter.PrimaryKeys.HBASE_PRIMARY_KEY).toString()));
-        values.forEach((f, o) -> f.toHbasePut(o, put));
+        Put put = new Put(Bytes.toBytes(getPrimaryKeysValues(OptionsConverter.PrimaryKeys.HBASE_PRIMARY_KEY)));
+        values.forEach((f, o) -> model.getFieldFromName(f).toHbasePut(o, put));
         return put;
     }
 
     public SolrInputDocument toSolRDoc() {
         SolrInputDocument doc = new SolrInputDocument();
-        values.forEach((f, o) -> f.toSolrDoc(o, doc));
+        values.forEach((f, o) -> model.getFieldFromName(f).toSolrDoc(o, doc));
         return doc;
     }
 
     public OzoneObject toOzoneObject() {
         StringBuilder sb = new StringBuilder();
-        values.forEach((f, o) -> sb.append(f.toOzone(o)));
+        values.forEach((f, o) -> sb.append(model.getFieldFromName(f).toOzone(o)));
         // Bucket does not support upper case letter, so conversion to lower case is made
         return new OzoneObject(
-                pksValues.get(OptionsConverter.PrimaryKeys.OZONE_BUCKET).toString().toLowerCase(),
-                pksValues.get(OptionsConverter.PrimaryKeys.OZONE_KEY).toString(),
+                getPrimaryKeysValues(OptionsConverter.PrimaryKeys.OZONE_BUCKET).toLowerCase(),
+                getPrimaryKeysValues(OptionsConverter.PrimaryKeys.OZONE_KEY),
                 sb.toString()
         );
     }
@@ -143,14 +121,14 @@ public class Row<T extends Field> {
     public Insert toKuduInsert(KuduTable table) {
         Insert insert = table.newInsert();
         PartialRow partialRow = insert.getRow();
-        values.forEach((field,value) -> field.toKudu(value, partialRow));
+        values.forEach((f,value) -> model.getFieldFromName(f).toKudu(value, partialRow));
         return insert;
     }
 
     public HivePreparedStatement toHiveStatement(HivePreparedStatement hivePreparedStatement){
         int i = 1;
-        for(Map.Entry<? extends Field,Object> entry: values.entrySet()) {
-            entry.getKey().toHive(entry.getValue(),i,hivePreparedStatement);
+        for(Map.Entry<String, Object> entry: values.entrySet()) {
+            model.getFieldFromName(entry.getKey()).toHive(entry.getValue(),i,hivePreparedStatement);
             i++;
         }
         return hivePreparedStatement;
@@ -158,14 +136,14 @@ public class Row<T extends Field> {
 
     public GenericRecord toGenericRecord(Schema schema) {
         GenericRecord genericRecordRow = new GenericData.Record(schema);
-        values.forEach((f,o) -> genericRecordRow.put(f.name, f.toAvroValue(o)));
+        values.forEach((f,o) -> genericRecordRow.put(f, model.getFieldFromName(f).toAvroValue(o)));
         return genericRecordRow;
     }
 
 
-    public void fillinOrcVector(int rowNumber, Map<T, ? extends ColumnVector> vectors) {
+    public void fillinOrcVector(int rowNumber, Map<String, ? extends ColumnVector> vectors) {
         vectors.forEach((field, cv) -> {
-            switch (field.getClass().getSimpleName()) {
+            switch (model.getFieldFromName(field).getClass().getSimpleName()) {
                 case "IncrementLongField":
                 case "LongField":
                 case "TimestampField":
@@ -206,7 +184,7 @@ public class Row<T extends Field> {
                     bytesColumnVectorBytes.setVal(rowNumber, (byte[]) values.get(field));
                     break;
                 default:
-                    logger.warn("Cannot get types of Orc column: " + field.getName() + " as field is " + field.getClass().getSimpleName() );
+                    logger.warn("Cannot get types of Orc column: " + field + " as field is " + model.getFieldFromName(field).getClass().getSimpleName() );
             }
         });
 
