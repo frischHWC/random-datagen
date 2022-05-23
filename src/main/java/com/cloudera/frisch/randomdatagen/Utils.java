@@ -33,6 +33,9 @@ public class Utils {
 
     private static final Logger logger = Logger.getLogger(Utils.class);
 
+    private static final long oneHour = 1000 * 60 *60;
+    private static final long oneMinute = 1000 * 60;
+
     /**
      * Generates a random password between 5 & 35 characters composed of all possible characters
      * @param random
@@ -280,7 +283,6 @@ public class Utils {
         }
     }
 
-    // TODO: Solve error on long time tunning and wrong time seen
     /**
      * Given a time in milliseconds, format it to a better human comprehensive way
      * @param timeTaken
@@ -290,14 +292,14 @@ public class Utils {
         long timeTakenHere = timeTaken;
         String formattedTime = "";
 
-        if(timeTakenHere > 1000*60*60) {
-            formattedTime = (timeTakenHere/1000*60*60) + "h ";
-            timeTakenHere = timeTakenHere%1000*60*60;
+        if(timeTakenHere >= oneHour ) {
+            formattedTime = (timeTakenHere/oneHour) + "h ";
+            timeTakenHere = timeTakenHere%oneHour;
         }
 
-        if(timeTakenHere > 1000*60) {
-            formattedTime += (timeTakenHere/60*1000) + "m ";
-            timeTakenHere = timeTakenHere%60*1000;
+        if(timeTakenHere >= oneMinute) {
+            formattedTime += (timeTakenHere/oneMinute) + "m ";
+            timeTakenHere = timeTakenHere%oneMinute;
         }
 
         if(timeTakenHere > 1000) {
@@ -305,7 +307,7 @@ public class Utils {
             timeTakenHere = timeTakenHere%1000;
         }
 
-        formattedTime += timeTakenHere + "ms ";
+        formattedTime += timeTakenHere + "ms";
         
         return formattedTime;
     }
