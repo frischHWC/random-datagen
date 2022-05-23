@@ -86,20 +86,23 @@ This model is divided into 4 sections:
 This is an array describing all fields by at least a name and a type, length could be precised but is optional. +
 All available types are:
 
-- STRING which represents an alphaNumeric string (length represents length of string, by default 20 if not set) +
-- STRINGAZ which represents an alpha non-numeric string (length represents length of string, by default 20 if not set) +
+- STRING  is an alphaNumeric string (length represents length of string, by default 20 if not set) +
+- STRINGAZ  is an alpha non-numeric string (length represents length of string, by default 20 if not set) +
 - INTEGER (with length representing maximum value, by default Integer.MAX_VALUE) +
 - BOOLEAN +
 - FLOAT +
 - LONG +
-- TIMESTAMP (represents timestamp of data generation) +
+- TIMESTAMP (is timestamp of data generation) +
 - BYTES (length represents length of byte array, by default 20) +
-- HASHMD5 which represent the hash of a random string (length represents size of byte array, by default 32) +
-- BIRTHDATE which represents a date between 1910 & 2020 +
-- NAME which represents a first name taken from a dictionary of over 10,000+ names +
-- COUNTRY which represents a country name taken from a dictionary +
-- BLOB which is a byte array of default 1MB (length represents length of byte array) (Use it carefully) +
-- EMAIL which is a string as in form of (<name>.<name>|<AZ09><name>)@(google|outlook|yahoo|mail).com +
+- HASHMD5   is the hash of a random string (length represents size of byte array, by default 32) +
+- BIRTHDATE  is a date between 1910 & 2020 +
+- NAME  is a first name taken from a dictionary of over 10,000+ names +
+- COUNTRY   is a country name taken from a dictionary +
+- BLOB   is a byte array of default 1MB (length represents length of byte array) (Use it carefully) +
+- EMAIL   is string as in form of (<name>.<name>|<AZ09><name>)@(gaagle.com|yahaa.com|uutlook.com|email.fr) +
+- IP   is a string representing an IP in form of Ipv4: 0-255.0-255.0-255.0-255
+- CITY  is an object representing an existing city (name, lat, long, country) made from a dictionary of over 10,000+ cities, only the name is taken for this field
+- LINK  is a string whose values is derived from another field, currently from a CITY field, it can be lat, long or country
 
 Fields values could be also more "deterministic" by providing manually values, or providing values and give them a weight to choose repartition,
 or even create conditions based on other columns values.
@@ -133,7 +136,7 @@ Example:
             "always": "2 * $very_low_int + 56 - $low_int"
         }
 
-Be careful of letting space in your expression to be parseable and evaluated.
+Be careful of letting space in your expression to be parsable and evaluated.
 
 1. Value depend on other column's value, possible for Integer/Long/Float/String/Boolean (using these types)
 Support for && (= AND) and || (= OR).
@@ -151,6 +154,32 @@ Example:
         }
 
 _N.B.: Multiple conditions are evaluated using precedence of AND over OR, meaning: A & B | C will in fact be evaluated like (A & B) | C_
+
+
+===== Special Case : Cities (CITY & LINK)
+
+It is possible to define CITY for a field as its type, this is what happens under the hood:
+
+- A dictionary of 41,000 cities all around the world is loaded into memory
+- A filter could be applied to take only some cities from one or multiple countries
+- When a row is required, a small city object is constructed, taken randomly from in-memory loaded data, it consists of name, lattitude, longitude and country
+
+It is possible to define a filter based on country for this field, by adding "possible_values": ["France", "Spain"] in the definition of the field. +
+With this, only cities whose country is France or Spain will be loaded.
+
+The field CITY will ONLY have the city name written as a value for the row.
+
+It is possible to define LINK for a field as its type, it will be "linked" to a CITY field by defining conditionals on it.
+
+This field will be a string type and will have its value taken from the previous city object created, by either being latitude, longitude or country.
+
+The relationship between this field and the CITY field is defined like this:
+
+    "conditionals": {
+        "link": "$city.country"
+    }
+
+where city here is the name of another field whose type is CITY.
 
 ===== Examples
 
@@ -212,6 +241,34 @@ A definition with some conditions (equalities and inequalities) to evaluate its 
     }
 
 
+A definition with one field which represent a CITY (filtered on either France or Spain) and other fields for its longitude, latitude and country:
+
+    {
+      "name": "city",
+      "type": "CITY",
+      "possible_values": ["France", "Spain"]
+    },
+    {
+      "name": "city_lat",
+      "type": "LINK",
+      "conditionals": {
+        "link": "$city.lat"
+      }
+    },
+    {
+      "name": "city_long",
+      "type": "LINK",
+      "conditionals": {
+        "link": "$city.long"
+      }
+    },
+    {
+      "name": "city_country",
+      "type": "LINK",
+      "conditionals": {
+        "link": "$city.country"
+      }
+    }
 
 
 ==== Table Names:
@@ -226,10 +283,13 @@ An array of following properties self-describing: +
 - OZONE_VOLUME +
 - SOLR_COLLECTION +
 - HIVE_DATABASE +
+- HIVE_HDFS_FILE_PATH +
 - HIVE_TABLE_NAME +
+- HIVE_TEMPORARY_TABLE_NAME +
 - KUDU_TABLE_NAME +
 - LOCAL_FILE_PATH +
 - LOCAL_FILE_NAME +
+- AVRO_NAME +
 
 ==== Primary Keys:
 
@@ -246,41 +306,41 @@ corresponding to the name of field (multiple fields could be provided separated 
 
 ==== Options:
 
-An array of other options that could be required depending with which sinks it is launched: +
+An array of other options to configure basic settings for some sinks: +
 
 - HBASE_COLUMN_FAMILIES_MAPPING +
 This mapping must be in the form : "CF:col1,col2;CF2:col5" +
 - SOLR_SHARDS +
 - SOLR_REPLICAS +
-- KUDU_REPLICAS
+- KUDU_REPLICAS +
+- ONE_FILE_PER_ITERATION +
+- KAFKA_MESSAGE_TYPE +
+- HIVE_THREAD_NUMBER +
+- HIVE_ON_HDFS +
+- HIVE_TEZ_QUEUE_NAME +
+- CSV_HEADER +
+- DELETE_PREVIOUS +
+- PARQUET_PAGE_SIZE +
+- PARQUET_ROW_GROUP_SIZE +
+- PARQUET_DICTIONARY_PAGE_SIZE +
+- PARQUET_DICTIONARY_ENCODING +
+- KAFKA_ACKS_CONFIG +
+- KAFKA_RETRIES_CONFIG +
+- KUDU_BUCKETS +
+- KUDU_BUFFER +
+- KUDU_FLUSH +
+- OZONE_REPLICATION_FACTOR +
+- HDFS_REPLICATION_FACTOR +
 
 
 Note that all not required settings could be safely removed with no errors.
 
-== Benchmarks
+== Parallel Launch
 
-Inserting 100 batches of 1000 rows on CDP-DC 7.1.1 with 3 workers and 2 masters gave following results: +
-- HDFS : 4s +
-- HBase : 30s +
-- SolR : 28s +
-- Ozone : 100s +
-- Kafka: 5s +
-- Kudu : 11s +
-- Hive : 23s +
+Note that to make it more efficient and faster, this program can be launched in parallel, and especially on yarn thanks to this project: link:yarn-submit[https://github.infra.cloudera.com/frisch/yarnsubmit]. +
+This project has intent to launch java programs on YARN containers, with as many instances as desired by the user, which is perfectly suited for this project. +
 
-Note that to make it more efficient and faster, all previous benchmarks (except HDFS one) could be launched in parallel way using the project link:yarn-submit[https://github.infra.cloudera.com/frisch/yarnsubmit]. +
-This project has intent to launch java programs on YARN containers, with as many instances as dsired by the user, which is perfectly suited for this project. +
-Hence, a benchmark was run with 10 containers, each of it inserting 100 batches of 100 rows, resulting 1 million rows at the end (on the same cluster than before). +
-
-It gave following results (this includes setting up Application Master, submitting applications and setting up containers): +
-- HBase : 60s +
-- SolR : 120s +
-- Ozone : 1200s (20min) +
-- Kafka : 15s +
-- Kudu : 30s +
-- Hive :
-
-The command used to launched the application with yarn-submit project was the following:
+The command used to launch the application with yarn-submit project was the following:
 
 [source,bash]
         ./yarn-submit.sh
