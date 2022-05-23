@@ -30,7 +30,7 @@ public class HdfsOrcSink implements SinkInterface {
     private FileSystem fileSystem;
     private final TypeDescription schema;
     private Writer writer;
-    private final Map<? extends Field, ColumnVector> vectors;
+    private final Map<String, ColumnVector> vectors;
     private final VectorizedRowBatch batch;
     private int counter;
     private final Model model;

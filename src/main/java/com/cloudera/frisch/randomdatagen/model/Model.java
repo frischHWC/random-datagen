@@ -413,11 +413,11 @@ public class Model<T extends Field> {
         return typeDescription;
     }
 
-    public Map<T, ColumnVector> createOrcVectors(VectorizedRowBatch batch) {
-        LinkedHashMap<T, ColumnVector> hashMap = new LinkedHashMap<>();
+    public Map<String, ColumnVector> createOrcVectors(VectorizedRowBatch batch) {
+        LinkedHashMap<String, ColumnVector> hashMap = new LinkedHashMap<>();
         int cols = 0;
         for(T field: fields.values()) {
-            hashMap.put(field, field.getOrcColumnVector(batch, cols));
+            hashMap.put(field.getName(), field.getOrcColumnVector(batch, cols));
             cols++;
         }
         return hashMap;
