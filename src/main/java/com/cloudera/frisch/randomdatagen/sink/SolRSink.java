@@ -42,8 +42,8 @@ public class SolRSink implements SinkInterface {
         }
 
         HttpSolrClient.Builder solrClientBuilder = new HttpSolrClient.Builder(protocol + "://" +
-                PropertiesLoader.getProperty("solr.server.url") + ":" +
-                PropertiesLoader.getProperty("solr.server.port") + "/solr")
+                PropertiesLoader.getProperty("solr.server.url").trim() + ":" +
+                PropertiesLoader.getProperty("solr.server.port").trim() + "/solr")
                 .withConnectionTimeout(10000)
                 .withSocketTimeout(60000);
 
