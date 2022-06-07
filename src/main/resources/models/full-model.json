@@ -133,7 +133,7 @@
     {
       "name": "city",
       "type": "CITY",
-      "possible_values": ["France", "Spain"]
+      "filters": ["France", "Spain"]
     },
     {
       "name": "city_lat",
@@ -165,6 +165,20 @@
     {
       "name": "ip",
       "type": "IP"
+    },
+    {
+      "name": "person",
+      "type": "CSV",
+      "filters": ["country=France"],
+      "file": "/root/cdp-demo/random-datagen/models/person_test.csv",
+      "field": "name"
+    },
+    {
+      "name": "person_department",
+      "type": "LINK",
+      "conditionals": {
+        "link": "$person.department"
+      }
     }
   ],
   "Table_Names": [

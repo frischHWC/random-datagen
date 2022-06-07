@@ -55,14 +55,13 @@ public class CityField extends Field<CityField.City> {
     private List<City> cityDico;
 
 
-    CityField(String name, Integer length, List<String> possibleValues) {
+    CityField(String name, Integer length, List<String> filters) {
         this.name = name;
         this.length = length;
         this.cityDico = loadCityDico();
 
-        // Use possibleValues as a special attribute to hold pre-made filters on country (later lat/long?)
         List<City> possibleCities = new ArrayList<>();
-        possibleValues.forEach(filterOnCountry -> {
+        filters.forEach(filterOnCountry -> {
             possibleCities.addAll(
                 this.cityDico.stream()
                 .filter(c -> c.country.equalsIgnoreCase(filterOnCountry))

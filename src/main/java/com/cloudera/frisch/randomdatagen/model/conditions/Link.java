@@ -5,6 +5,8 @@ import com.cloudera.frisch.randomdatagen.model.Row;
 import com.cloudera.frisch.randomdatagen.model.type.CityField;
 import org.apache.log4j.Logger;
 
+import java.util.Map;
+
 public class Link {
 
   private static final Logger logger = Logger.getLogger(Link.class);
@@ -31,6 +33,8 @@ public class Link {
       switch(linkedFieldType) {
       case "CityField":
         return evaluateLinkedCity((CityField.City) linkedField);
+      case "CsvField":
+        return evaluateLinkedCsv((Map<String, String>) linkedField);
       default:
         logger.warn("Not able to find any link for FieldType: " + linkedFieldType + " for row: " + row );
         break;
@@ -55,6 +59,10 @@ public class Link {
       logger.warn("Cannot find attribute, returning empty value for city: " + city);
       return "";
     }
+  }
+
+  public String evaluateLinkedCsv(Map<String, String> csvRow) {
+    return csvRow.get(linkedFieldAttribute);
   }
 
 
