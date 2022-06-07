@@ -8,8 +8,10 @@ import org.apache.hive.jdbc.HivePreparedStatement;
 import org.apache.kudu.Type;
 import org.apache.kudu.client.PartialRow;
 import org.apache.orc.TypeDescription;
+import org.apache.solr.common.SolrInputDocument;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -38,7 +40,7 @@ public class CsvField extends Field<Map<String, String>> {
     // Load the CSV with filters applied if needed
     private List<Map<String, String>> loadDico(List<String> filters) {
         try {
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream(this.file);
+            InputStream is = new FileInputStream(this.file);
             BufferedReader bf = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
             String header = bf.readLine();
             this.columnNames.addAll(Arrays.asList(header.split(";")));
@@ -70,6 +72,10 @@ public class CsvField extends Field<Map<String, String>> {
 
         } catch (Exception e) {
             logger.error("Could not load CSVs, error : " + e);
+            String stackTrace = Arrays.stream(e.getStackTrace()).
+                map(stackTraceElement -> stackTraceElement.toString())
+                .reduce("", (subtot, element) -> subtot + System.lineSeparator() + element);
+            logger.error("Stacktrace: " + stackTrace);
             return Collections.singletonList(Map.of(this.mainField, ""));
         }
     }
@@ -86,6 +92,11 @@ public class CsvField extends Field<Map<String, String>> {
     @Override
     public String toCSVString(Map<String, String> value) {
         return value.get(this.mainField) + ",";
+    }
+
+    @Override
+    public String toJSONString(Map<String, String> value) {
+        return "\"" + name + "\" : " + "\"" + value.get(this.mainField) + "\", ";
     }
 
     /*
@@ -111,6 +122,17 @@ public class CsvField extends Field<Map<String, String>> {
     public Put toHbasePut(Map<String, String> value, Put hbasePut) {
         hbasePut.addColumn(Bytes.toBytes(hbaseColumnQualifier), Bytes.toBytes(name), Bytes.toBytes(value.get(this.mainField)));
         return hbasePut;
+    }
+
+    @Override
+    public SolrInputDocument toSolrDoc(Map<String, String> value, SolrInputDocument doc) {
+        doc.addField(name, value.get(this.mainField));
+        return doc;
+    }
+
+    @Override
+    public String toOzone(Map<String, String> value) {
+        return value.get(this.mainField);
     }
 
     @Override

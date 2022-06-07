@@ -253,7 +253,7 @@ public abstract class Field<T> {
     }
 
     public String toJSONString(T value) {
-        return "\"" + name + "\" : " + "\"" + value.toString() + "\",";
+        return "\"" + name + "\" : " + "\"" + value.toString() + "\", ";
     }
 
     // This function needs to be overrided in each field

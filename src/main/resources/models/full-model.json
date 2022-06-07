@@ -170,7 +170,7 @@
       "name": "person",
       "type": "CSV",
       "filters": ["country=France"],
-      "file": "/root/cdp-demo/random-datagen/models/person_test.csv",
+      "file": "/root/random-datagen/person_test.csv",
       "field": "name"
     },
     {

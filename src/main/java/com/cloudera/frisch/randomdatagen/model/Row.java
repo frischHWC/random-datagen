@@ -40,17 +40,18 @@ public class Row<T extends Field> {
 
     // A linkedHashMap is required to keep order in fields
     @Getter @Setter
-    private LinkedHashMap<String, Object> values = new LinkedHashMap<>();
+    private HashMap<String, Object> values = new LinkedHashMap<>();
     @Getter @Setter
     private Model model;
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        values.forEach((f,o) -> {
-            sb.append(f);
+        // Use of Model LinkedList of fields to keep order of fields
+        this.model.getFields().forEach((name, fieldtype) -> {
+            sb.append(name);
             sb.append(" : ");
-            sb.append(model.getFieldFromName(f).toStringValue(o));
+            sb.append(model.getFieldFromName(name.toString()).toStringValue(values.get(name.toString())));
             sb.append("  ");
         });
         return sb.toString();
@@ -65,7 +66,12 @@ public class Row<T extends Field> {
 
     public String toCSV() {
         StringBuilder sb = new StringBuilder();
-        values.forEach((f, o) -> sb.append(model.getFieldFromName(f).toCSVString(o)));
+        // Use of Model LinkedList of fields to keep order of fields
+        this.model.getFields().forEach((name, fieldtype) -> sb.append(
+            model.getFieldFromName(
+                name.toString()).toCSVString(values.get(name.toString()))
+            )
+        );
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
     }
@@ -73,7 +79,13 @@ public class Row<T extends Field> {
     public String toJSON() {
         StringBuilder sb = new StringBuilder();
         sb.append("{ ");
-        values.forEach((f, o) -> sb.append(model.getFieldFromName(f).toJSONString(o)));
+        // Use of Model LinkedList of fields to keep order of fields
+        this.model.getFields().forEach((name, fieldtype) -> sb.append(
+                model.getFieldFromName(
+                    name.toString()).toJSONString(values.get(name.toString()))
+            )
+        );
+        sb.deleteCharAt(sb.length() - 2);
         sb.deleteCharAt(sb.length() - 1);
         sb.append(" }");
         return sb.toString();
@@ -82,18 +94,20 @@ public class Row<T extends Field> {
 
     public Map.Entry<String, GenericRecord> toKafkaMessage(Schema schema) {
         GenericRecord genericRecordRow = new GenericData.Record(schema);
-        values.forEach((f,o) -> genericRecordRow.put(f, model.getFieldFromName(f).toAvroValue(o)));
+        this.model.getFields().forEach((name, fieldtype) ->
+            genericRecordRow.put(name.toString(), model.getFieldFromName(name.toString()).toAvroValue(values.get(name.toString())))
+        );
         return new AbstractMap.SimpleEntry<>(model.getPrimaryKeys().get(OptionsConverter.PrimaryKeys.KAFKA_MSG_KEY).toString(), genericRecordRow);
     }
 
     public Map.Entry<String, String> toKafkaMessageString(KafkaSink.MessageType messageType) {
-        StringBuilder sb = new StringBuilder();
+        String value = "";
         if(messageType == KafkaSink.MessageType.CSV) {
-            values.forEach((f, o) -> sb.append(model.getFieldFromName(f).toCSVString(o)));
+            value = this.toCSV();
         } else {
-            values.forEach((f, o) -> sb.append(model.getFieldFromName(f).toJSONString(o)));
+            value = this.toJSON();
         }
-        return new AbstractMap.SimpleEntry<>(getPrimaryKeysValues(OptionsConverter.PrimaryKeys.KAFKA_MSG_KEY), sb.toString());
+        return new AbstractMap.SimpleEntry<>(getPrimaryKeysValues(OptionsConverter.PrimaryKeys.KAFKA_MSG_KEY), value);
     }
 
     public Put toHbasePut() {
@@ -110,7 +124,10 @@ public class Row<T extends Field> {
 
     public OzoneObject toOzoneObject() {
         StringBuilder sb = new StringBuilder();
-        values.forEach((f, o) -> sb.append(model.getFieldFromName(f).toOzone(o)));
+        // Use of Model LinkedList of fields to keep order of fields
+        this.model.getFields().forEach((name, fieldtype) ->
+            sb.append(model.getFieldFromName(name.toString()).toOzone(values.get(name.toString())))
+        );
         // Bucket does not support upper case letter, so conversion to lower case is made
         return new OzoneObject(
                 getPrimaryKeysValues(OptionsConverter.PrimaryKeys.OZONE_BUCKET).toLowerCase(),
@@ -128,8 +145,10 @@ public class Row<T extends Field> {
 
     public HivePreparedStatement toHiveStatement(HivePreparedStatement hivePreparedStatement){
         int i = 1;
-        for(Map.Entry<String, Object> entry: values.entrySet()) {
-            model.getFieldFromName(entry.getKey()).toHive(entry.getValue(),i,hivePreparedStatement);
+        // Use of Model LinkedList of fields to keep order of fields
+        LinkedHashMap<String, T> fieldsFromModel = this.model.getFields();
+        for(Map.Entry<String, T> entry: fieldsFromModel.entrySet()) {
+            model.getFieldFromName(entry.getKey()).toHive(values.get(entry.getKey()), i, hivePreparedStatement);
             i++;
         }
         return hivePreparedStatement;
