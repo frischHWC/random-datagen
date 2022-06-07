@@ -9,6 +9,7 @@ import org.apache.hive.jdbc.HivePreparedStatement;
 import org.apache.kudu.Type;
 import org.apache.kudu.client.PartialRow;
 import org.apache.orc.TypeDescription;
+import org.apache.solr.common.SolrInputDocument;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
@@ -55,14 +56,13 @@ public class CityField extends Field<CityField.City> {
     private List<City> cityDico;
 
 
-    CityField(String name, Integer length, List<String> possibleValues) {
+    CityField(String name, Integer length, List<String> filters) {
         this.name = name;
         this.length = length;
         this.cityDico = loadCityDico();
 
-        // Use possibleValues as a special attribute to hold pre-made filters on country (later lat/long?)
         List<City> possibleCities = new ArrayList<>();
-        possibleValues.forEach(filterOnCountry -> {
+        filters.forEach(filterOnCountry -> {
             possibleCities.addAll(
                 this.cityDico.stream()
                 .filter(c -> c.country.equalsIgnoreCase(filterOnCountry))
@@ -107,6 +107,11 @@ public class CityField extends Field<CityField.City> {
         return value.getName() + ",";
     }
 
+    @Override
+    public String toJSONString(City value) {
+        return "\"" + name + "\" : " + "\"" + value.getName() + "\", ";
+    }
+
     /*
      Override if needed Field function to insert into special sinks
      */
@@ -124,6 +129,17 @@ public class CityField extends Field<CityField.City> {
     public Put toHbasePut(City value, Put hbasePut) {
         hbasePut.addColumn(Bytes.toBytes(hbaseColumnQualifier), Bytes.toBytes(name), Bytes.toBytes(value.name));
         return hbasePut;
+    }
+
+    @Override
+    public SolrInputDocument toSolrDoc(City value, SolrInputDocument doc) {
+        doc.addField(name, value.getName());
+        return doc;
+    }
+
+    @Override
+    public String toOzone(City value) {
+        return value.getName();
     }
 
     @Override

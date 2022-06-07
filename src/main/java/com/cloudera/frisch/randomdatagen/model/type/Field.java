@@ -47,6 +47,14 @@ public abstract class Field<T> {
 
     @Getter
     @Setter
+    public List<T> filters;
+
+    @Getter
+    @Setter
+    public String file;
+
+    @Getter
+    @Setter
     public LinkedHashMap<String, Integer> possible_values_weighted;
 
     // This is a conditional evaluator holding all complexity (parsing, preparing comparison, evaluating it)
@@ -123,7 +131,7 @@ public abstract class Field<T> {
      */
     public static Field instantiateField(String name, String type, Integer length, String columnQualifier, List<JsonNode> possibleValues,
                                          LinkedHashMap<String, Integer> possible_values_weighted, LinkedHashMap<String, String> conditionals,
-                                         String min, String max) {
+                                         String min, String max, List<JsonNode> filters, String file, String mainField) {
         if(name == null || name.isEmpty()) {
             throw new IllegalStateException("Name can not be null or empty for field: " + name);
         }
@@ -182,7 +190,7 @@ public abstract class Field<T> {
                 field = new CountryField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
                 break;
             case "CITY":
-                field = new CityField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
+                field = new CityField(name, length, filters.stream().map(JsonNode::asText).collect(Collectors.toList()));
                 break;
             case "BLOB":
                 field = new BlobField(name, length, possibleValues.stream().map(j -> j.asText().getBytes()).collect(Collectors.toList()));
@@ -195,6 +203,9 @@ public abstract class Field<T> {
                 break;
             case "LINK":
                 field = new LinkField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
+                break;
+            case "CSV":
+                field = new CsvField(name, length, filters.stream().map(JsonNode::asText).collect(Collectors.toList()), file, mainField);
                 break;
             default:
                 logger.warn("Type : " + type + " has not been recognized and hence will be ignored");
@@ -242,7 +253,7 @@ public abstract class Field<T> {
     }
 
     public String toJSONString(T value) {
-        return "\"" + name + "\" : " + "\"" + value.toString() + "\",";
+        return "\"" + name + "\" : " + "\"" + value.toString() + "\", ";
     }
 
     // This function needs to be overrided in each field

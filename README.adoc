@@ -5,7 +5,7 @@ Goal of this project is to generate Random data in order to insert them into dif
 == Glossary
 
 Sink = Output system were data will be written, such as HDFS, HIVE, HBASE etc... +
-model = Representation of data model use to generate random data
+Model = Representation of data model use to generate random data
 
 == Possible sinks
 
@@ -102,7 +102,8 @@ All available types are:
 - EMAIL   is string as in form of (<name>.<name>|<AZ09><name>)@(gaagle.com|yahaa.com|uutlook.com|email.fr) +
 - IP   is a string representing an IP in form of Ipv4: 0-255.0-255.0-255.0-255
 - CITY  is an object representing an existing city (name, lat, long, country) made from a dictionary of over 10,000+ cities, only the name is taken for this field
-- LINK  is a string whose values is derived from another field, currently from a CITY field, it can be lat, long or country
+- LINK  is a string whose values is derived from another field, currently from a CITY or CSV field
+- CSV   is an object taken from a given CSV file
 
 Fields values could be also more "deterministic" by providing manually values, or providing values and give them a weight to choose repartition,
 or even create conditions based on other columns values.
@@ -132,6 +133,7 @@ Output column must be of type STRING, Input columns (used to compute) must be IN
 
 Example:
 
+[source,json]
         "conditionals": {
             "always": "2 * $very_low_int + 56 - $low_int"
         }
@@ -147,6 +149,7 @@ Output column must be of type STRING, columns of input must be STRING or LONG or
 
 Example:
 
+[source,json]
         "conditionals": {
             "$country_of_provenance=FRANCE" : "Paris",
             "$country_of_provenance=GERMANY | $increment_int<40" : "Berlin",
@@ -164,7 +167,7 @@ It is possible to define CITY for a field as its type, this is what happens unde
 - A filter could be applied to take only some cities from one or multiple countries
 - When a row is required, a small city object is constructed, taken randomly from in-memory loaded data, it consists of name, lattitude, longitude and country
 
-It is possible to define a filter based on country for this field, by adding "possible_values": ["France", "Spain"] in the definition of the field. +
+It is possible to define a filter based on country for this field, by adding ``"filters": ["France", "Spain"]`` in the definition of the field. +
 With this, only cities whose country is France or Spain will be loaded.
 
 The field CITY will ONLY have the city name written as a value for the row.
@@ -175,16 +178,32 @@ This field will be a string type and will have its value taken from the previous
 
 The relationship between this field and the CITY field is defined like this:
 
+[source,json]
     "conditionals": {
         "link": "$city.country"
     }
 
 where city here is the name of another field whose type is CITY.
 
+
+===== Special Case : Csv file (CSV & LINK)
+
+It is possible to take data from a CSV file with a header, ";" as a separator and a line separator between each line.
+File path must be specified using: ``"file": "/home/my_csv.csv"``
+
+This file is loaded into memory and filtered (if some filters are specified like this ``"filters": ["country=France"]``).
+
+All fields from teh CSV will be treated as STRING types and a field name must be specified (like this ``"field": "name"`` ) to know which one should be set for this field.
+
+Then, a LINK can be made from other fields to this one and hence get linked values.
+
+
+
 ===== Examples
 
 A simple definition of a field looks like this:
 
+[source,json]
     {
       "name": "name",
       "type": "NAME"
@@ -192,6 +211,7 @@ A simple definition of a field looks like this:
 
 A definition with restricted values:
 
+[source,json]
     {
       "name": "credits_used",
       "type": "INTEGER",
@@ -200,6 +220,7 @@ A definition with restricted values:
 
 A definition with weighted values to not generate even spread data:
 
+[source,json]
     {
       "name": "country_of_provenance",
       "type": "STRING",
@@ -211,6 +232,7 @@ A definition with weighted values to not generate even spread data:
 
 A definition with minimum and maximum:
 
+[source,json]
     {
       "name": "percentage",
       "type": "INTEGER",
@@ -220,6 +242,7 @@ A definition with minimum and maximum:
 
 A definition with a formula to evaluate value of the column:
 
+[source,json]
     {
       "name": "percentage",
       "type": "INTEGER",
@@ -230,6 +253,7 @@ A definition with a formula to evaluate value of the column:
 
 A definition with some conditions (equalities and inequalities) to evaluate its value:
 
+[source,json]
     {
       "name": "percentage",
       "type": "INTEGER",
@@ -243,6 +267,7 @@ A definition with some conditions (equalities and inequalities) to evaluate its 
 
 A definition with one field which represent a CITY (filtered on either France or Spain) and other fields for its longitude, latitude and country:
 
+[source,json]
     {
       "name": "city",
       "type": "CITY",
@@ -269,6 +294,36 @@ A definition with one field which represent a CITY (filtered on either France or
         "link": "$city.country"
       }
     }
+
+
+A definition with two fields taken from a given CSV file, this file is filtered on a column, and another field is taken as a linked to the first one:
+
+[source,json]
+    {
+      "name": "person",
+      "type": "CSV",
+      "filters": ["country=France"],
+      "file": "/root/dictionnaries/person_test.csv",
+      "field": "name"
+    },
+    {
+      "name": "person_department",
+      "type": "LINK",
+      "conditionals": {
+        "link": "$person.department"
+      }
+    }
+
+The CSV file looks like this:
+
+[source,csv]
+name;department;country
+francois;PS;France
+kamel;SE;France
+thomas;RH;Germany
+sebastian;PS;Spain
+
+
 
 
 ==== Table Names:
@@ -393,6 +448,5 @@ needed function in this class
 == TODOs
 
 TODO: Add some tests +
-TODO: Add YAML Parser +
 TODO: Add review of model before launching (implements some checks in it)
 

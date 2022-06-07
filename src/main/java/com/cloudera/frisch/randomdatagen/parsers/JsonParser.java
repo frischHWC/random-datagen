@@ -112,6 +112,32 @@ public class JsonParser<T extends Field> implements Parser {
             max = null;
         }
 
+        String file;
+        try {
+            file = jsonField.get("file").asText();
+        } catch (NullPointerException e) {
+            file = null;
+        }
+
+        String field;
+        try {
+            field = jsonField.get("field").asText();
+        } catch (NullPointerException e) {
+            field = null;
+        }
+
+        JsonNode filtersArray = jsonField.get("filters");
+        List<JsonNode> filters = new ArrayList<>();
+        try {
+            if(filtersArray.isArray()) {
+                for(JsonNode possibleValue: filtersArray) {
+                    filters.add(possibleValue);
+                }
+            }
+        } catch (NullPointerException e) {
+            filters = Collections.emptyList();
+        }
+
         JsonNode possibleValuesArray = jsonField.get("possible_values");
         List<JsonNode> possibleValues = new ArrayList<>();
         try {
@@ -146,7 +172,7 @@ public class JsonParser<T extends Field> implements Parser {
 
         return (T) Field.instantiateField(jsonField.get("name").asText(), jsonField.get("type").asText(), length,
                 opsMap.get(jsonField.get("name").asText()), possibleValues, possible_values_weighted, conditionals,
-                min, max);
+                min, max, filters, file, field);
     }
 
     private Map<String, String> mapColNameToColQual(String mapping) {
