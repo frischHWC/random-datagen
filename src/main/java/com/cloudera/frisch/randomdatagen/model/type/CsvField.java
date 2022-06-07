@@ -1,5 +1,6 @@
 package com.cloudera.frisch.randomdatagen.model.type;
 
+import lombok.Getter;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -24,6 +25,7 @@ public class CsvField extends Field<Map<String, String>> {
 
     // We suppose that each row of the CSV read will fit in a map of string to string (everything is converted to a string)
     private String file;
+    @Getter
     private String mainField;
     private LinkedList<String> columnNames;
 

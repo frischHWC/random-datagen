@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.model;
 
 import com.cloudera.frisch.randomdatagen.model.type.CityField;
+import com.cloudera.frisch.randomdatagen.model.type.CsvField;
 import com.cloudera.frisch.randomdatagen.model.type.Field;
 import com.cloudera.frisch.randomdatagen.sink.KafkaSink;
 import com.cloudera.frisch.randomdatagen.sink.storedobjects.OzoneObject;
@@ -194,6 +195,12 @@ public class Row<T extends Field> {
                     BytesColumnVector bytesColumnVectorCity = (BytesColumnVector) cv;
                     CityField.City valueAsCity = (CityField.City) values.get(field);
                     bytesColumnVectorCity.setVal(rowNumber, valueAsCity.getName().getBytes(StandardCharsets.UTF_8));
+                    break;
+                case "CsvField":
+                    BytesColumnVector bytesColumnVectorCsv = (BytesColumnVector) cv;
+                    Map<String, String> valueAsCsv = (Map<String, String>) values.get(field);
+                    CsvField csvField = (CsvField) model.getFieldFromName(field);
+                    bytesColumnVectorCsv.setVal(rowNumber, valueAsCsv.get(csvField.getMainField()).getBytes(StandardCharsets.UTF_8));
                     break;
                 case "BirthdateField":
                     BytesColumnVector bytesColumnVectorDate = (BytesColumnVector) cv;
