@@ -133,6 +133,7 @@ Output column must be of type STRING, Input columns (used to compute) must be IN
 
 Example:
 
+[source,json]
         "conditionals": {
             "always": "2 * $very_low_int + 56 - $low_int"
         }
@@ -148,6 +149,7 @@ Output column must be of type STRING, columns of input must be STRING or LONG or
 
 Example:
 
+[source,json]
         "conditionals": {
             "$country_of_provenance=FRANCE" : "Paris",
             "$country_of_provenance=GERMANY | $increment_int<40" : "Berlin",
@@ -176,6 +178,7 @@ This field will be a string type and will have its value taken from the previous
 
 The relationship between this field and the CITY field is defined like this:
 
+[source,json]
     "conditionals": {
         "link": "$city.country"
     }
