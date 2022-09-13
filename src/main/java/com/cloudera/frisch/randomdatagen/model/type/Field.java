@@ -184,7 +184,7 @@ public abstract class Field<T> {
                 field = new BirthdateField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()), min, max);
                 break;
             case "NAME":
-                field = new NameField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
+                field = new NameField(name, length, filters.stream().map(JsonNode::asText).collect(Collectors.toList()));
                 break;
             case "COUNTRY":
                 field = new CountryField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
@@ -196,7 +196,7 @@ public abstract class Field<T> {
                 field = new BlobField(name, length, possibleValues.stream().map(j -> j.asText().getBytes()).collect(Collectors.toList()));
                 break;
             case "EMAIL":
-                field = new EmailField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
+                field = new EmailField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()), filters.stream().map(JsonNode::asText).collect(Collectors.toList()));
                 break;
             case "IP":
                 field = new IpField(name, length, possibleValues.stream().map(JsonNode::asText).collect(Collectors.toList()));
@@ -206,6 +206,12 @@ public abstract class Field<T> {
                 break;
             case "CSV":
                 field = new CsvField(name, length, filters.stream().map(JsonNode::asText).collect(Collectors.toList()), file, mainField);
+                break;
+            case "PHONE":
+                field = new PhoneField(name, length, filters.stream().map(JsonNode::asText).collect(Collectors.toList()));
+                break;
+            case "UUID":
+                field = new UuidField(name);
                 break;
             default:
                 logger.warn("Type : " + type + " has not been recognized and hence will be ignored");

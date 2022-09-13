@@ -92,7 +92,8 @@
     },
     {
       "name": "name",
-      "type": "NAME"
+      "type": "NAME",
+      "filters": ["France"]
     },
     {
       "name": "country",
@@ -116,7 +117,7 @@
       "name": "formula_1",
       "type": "STRING",
       "conditionals": {
-        "always": "2 * $longPercent + 42 - $onePlusOne"
+        "formula": "2 * $longPercent + 42 - $onePlusOne"
       }
     },
     {
@@ -178,6 +179,22 @@
       "type": "LINK",
       "conditionals": {
         "link": "$person.department"
+      }
+    },
+    {
+      "name": "phone_number",
+      "type": "PHONE",
+      "filters": ["France"]
+    },
+    {
+      "name": "uuid",
+      "type": "UUID"
+    },
+    {
+      "name": "email_from_name",
+      "type": "STRING",
+      "conditionals": {
+        "injection": "toto_${name}@our_company_name.${country}"
       }
     }
   ],

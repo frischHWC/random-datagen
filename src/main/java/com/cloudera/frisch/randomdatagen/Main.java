@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen;
 
 import com.cloudera.frisch.randomdatagen.config.ArgumentsParser;
+import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.Row;
 import com.cloudera.frisch.randomdatagen.parsers.JsonParser;
@@ -36,10 +37,19 @@ public class Main {
         logger.info("Initialization of all Sinks");
         List<SinkInterface> sinks = SinkSender.sinksInit(model);
 
+        int threads = 1;
+        try {
+            threads =
+                Integer.parseInt(PropertiesLoader.getProperty("threads"));
+        } catch (Exception e){
+            logger.warn("Could nor load property of threads number, default to 1 thread");
+        }
+        logger.info("Will run generation using " + threads + " thread(s)");
+
         for(long i = 0; i < numberOfBatches; i++) {
             logger.info("Start to process batch " + (i+1) + "/" + numberOfBatches + " of " + rowsPerBatch + " rows");
 
-            List<Row> randomDataList = model.generateRandomRows(rowsPerBatch);
+            List<Row> randomDataList = model.generateRandomRows(rowsPerBatch, threads);
 
             // Send Data to sinks in parallel if there are multiple sinks
             sinks.parallelStream().forEach(sink -> sink.sendOneBatchOfRows(randomDataList));

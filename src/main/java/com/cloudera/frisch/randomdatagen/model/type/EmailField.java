@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.model.type;
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import lombok.Getter;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -15,6 +16,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -22,37 +24,86 @@ import java.util.stream.Collectors;
 
 public class EmailField extends Field<String> {
 
-    private List<String> nameDico;
+    public class Name {
+        @Getter
+        String first_name;
+        @Getter
+        String country;
+        @Getter
+        Boolean unisex;
+        @Getter
+        Boolean female;
+        @Getter
+        Boolean male;
 
-    EmailField(String name, Integer length, List<String> possibleValues) {
+        public Name(String name, String country, String male, String female, String unisex ) {
+            this.first_name = name;
+            this.country = country;
+            this.unisex = unisex.equalsIgnoreCase("true");
+            this.male = male.equalsIgnoreCase("true");
+            this.female = female.equalsIgnoreCase("true");
+        }
+
+        @Override
+        public String toString() {
+            return "Name{" +
+                "name='" + first_name + '\'' +
+                ", country='" + country + '\'' +
+                ", unisex='" + unisex.toString() + '\'' +
+                ", male='" + male.toString() + '\'' +
+                ", female='" + female.toString() + '\'' +
+                '}';
+        }
+    }
+
+    private List<String> nameDicoasString;
+    private List<Name> nameDico;
+
+    EmailField(String name, Integer length, List<String> possibleValues, List<String> filters) {
         this.name = name;
         this.length = length;
         this.possibleValues = possibleValues;
+        this.nameDico = loadNameDico();
+
         if(possibleValues.isEmpty()) {
-            nameDico = loadNameDico();
+            this.nameDicoasString = new ArrayList<>();
+
+            if(!filters.isEmpty()) {
+                filters.forEach(filterOnCountry -> {
+                    this.nameDicoasString.addAll(
+                        nameDico.stream().filter(
+                                n -> n.country.equalsIgnoreCase(filterOnCountry))
+                            .map(n -> n.first_name)
+                            .collect(Collectors.toList()));
+                });
+            }
         }
     }
 
     public String generateRandomValue() {
         if(possibleValues.isEmpty()) {
             String prefix = random.nextBoolean() ? Utils.getAlphaNumericString(1, random) :
-                    nameDico.get(random.nextInt(nameDico.size())) + ".";
-            return prefix + nameDico.get(random.nextInt(nameDico.size())) + "@" + emailSupplier();
+                    nameDico.get(random.nextInt(nameDico.size())).first_name + ".";
+            return prefix + nameDico.get(random.nextInt(nameDico.size())).first_name + "@" + emailSupplier();
         } else {
             return possibleValues.get(random.nextInt(possibleValues.size()));
         }
     }
 
-    private List<String> loadNameDico() {
+    private List<Name> loadNameDico() {
         try {
             InputStream is = this.getClass().getClassLoader().getResourceAsStream(
-                "dictionnaries/names-dico.txt");
+                "dictionnaries/names.csv");
             return new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
-                    .lines()
-                    .collect(Collectors.toList());
+                .lines()
+                .map(l -> {
+                    String[] lineSplitted = l.split(";");
+                    return new Name(lineSplitted[0], lineSplitted[1], lineSplitted[2], lineSplitted[3], lineSplitted[4]);
+                })
+                .collect(Collectors.toList());
         } catch (Exception e) {
             logger.warn("Could not load names-dico with error : " + e);
-            return Collections.singletonList("Anonymous");
+            return Collections.singletonList(new Name("anonymous", "", "", "", ""));
         }
     }
 
