@@ -187,6 +187,8 @@ public class Row<T extends Field> {
                 case "EmailField":
                 case "LinkField":
                 case "IpField":
+                case "PhoneField":
+                case "UuidField":
                     BytesColumnVector bytesColumnVector = (BytesColumnVector) cv;
                     String stringValue = (String) values.get(field);
                     bytesColumnVector.setVal(rowNumber, stringValue.getBytes(StandardCharsets.UTF_8));

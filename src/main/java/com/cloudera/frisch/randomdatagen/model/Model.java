@@ -132,23 +132,28 @@ public class Model<T extends Field> {
      * @param number of rows to generate
      * @return list of rows
      */
-    public List<Row> generateRandomRows(long number) {
+    public List<Row> generateRandomRows(long number, int threads) {
         List<Row> rows = new ArrayList<>();
 
-        for (long i = 0; i < number; i++) {
-            Row row = new Row();
-            row.setModel(this);
-            fieldsRandomName.forEach(f -> row.getValues()
-                .put(f, fields.get(f).generateRandomValue()));
-            fieldsComputedName.forEach(f -> row.getValues()
-                .put(f, fields.get(f).generateComputedValue(row)));
+        long numberPerThread = number / threads;
+        LinkedList<RowGeneratorThread> threadsStarted = new LinkedList<>();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Created random row: " + row);
-            }
-
-            rows.add(row);
+        for (int i = 0; i < threads; i++){
+            RowGeneratorThread threadToStart =
+                new RowGeneratorThread<>(numberPerThread, this, fieldsRandomName, fieldsComputedName, fields);
+            threadToStart.start();
+            threadsStarted.add(threadToStart);
+            logger.info("Started 1 thread to generate: " + numberPerThread + " rows ");
         }
+
+        threadsStarted.forEach(t -> {
+            try {
+                t.join();
+                rows.addAll(t.getRows());
+            } catch (InterruptedException e) {
+                logger.warn("A thread was interrupted, its results will not be processed", e);
+            }
+        });
 
         return rows;
     }

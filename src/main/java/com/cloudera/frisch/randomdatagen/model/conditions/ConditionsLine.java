@@ -1,6 +1,6 @@
 package com.cloudera.frisch.randomdatagen.model.conditions;
 
-import com.cloudera.frisch.randomdatagen.model.Model;
+
 import com.cloudera.frisch.randomdatagen.model.Row;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,6 +47,11 @@ public class ConditionsLine {
   @Getter @Setter
   private Link linkToEvaluate;
 
+  @Getter @Setter
+  private boolean injection = false;
+
+  @Getter @Setter
+  private Injection injectionToEvaluate;
 
 
   public ConditionsLine(String conditionLine, String valueToReturn) {
@@ -60,7 +65,7 @@ public class ConditionsLine {
     if(conditionSplitted.length>1){
       logger.debug("Found a combined condition on this line");
       this.combinedCondition=true;
-    } else if(conditionSplitted[0].equalsIgnoreCase("always")) {
+    } else if(conditionSplitted[0].equalsIgnoreCase("formula")) {
       logger.debug("Found a formula, that will need to be evaluated");
       this.formula = true;
       this.formulaToEvaluate = new Formula(valueToReturn);
@@ -69,6 +74,11 @@ public class ConditionsLine {
       logger.debug("Found a link, that will need to be evaluated");
       this.link = true;
       this.linkToEvaluate = new Link(valueToReturn);
+      return;
+    } else if(conditionSplitted[0].equalsIgnoreCase("injection")) {
+      logger.debug("Found an injection, that will need to be evaluated");
+      this.injection = true;
+      this.injectionToEvaluate = new Injection(valueToReturn);
       return;
     } else if(conditionSplitted[0].equalsIgnoreCase("default")) {
       logger.debug("Found a default, No evaluation needed");
@@ -139,6 +149,10 @@ public class ConditionsLine {
       } else if(this.link) {
         // Formula case
         this.valueToReturn = linkToEvaluate.evaluateLink(row);
+        return true;
+      } else if(this.injection) {
+        // Formula case
+        this.valueToReturn = injectionToEvaluate.evaluateInjection(row);
         return true;
       } else {
         // Default case

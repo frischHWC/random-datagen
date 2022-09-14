@@ -20,75 +20,74 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class NameField extends Field<String> {
+public class PhoneField extends Field<String> {
 
-    public class Name {
+    public class Phone {
         @Getter
-        String first_name;
+        String indicator;
         @Getter
         String country;
-        @Getter
-        Boolean unisex;
-        @Getter
-        Boolean female;
-        @Getter
-        Boolean male;
 
-        public Name(String name, String country, String male, String female, String unisex ) {
-            this.first_name = name;
+        public Phone(String indicator, String country) {
+            this.indicator = indicator;
             this.country = country;
-            this.unisex = unisex.equalsIgnoreCase("true");
-            this.male = male.equalsIgnoreCase("true");
-            this.female = female.equalsIgnoreCase("true");
         }
 
         @Override
         public String toString() {
             return "Name{" +
-                "name='" + first_name + '\'' +
+                "indicator='" + indicator + '\'' +
                 ", country='" + country + '\'' +
-                ", unisex='" + unisex.toString() + '\'' +
-                ", male='" + male.toString() + '\'' +
-                ", female='" + female.toString() + '\'' +
                 '}';
         }
     }
 
-    private List<Name> nameDico;
+    private List<Phone> phoneIndicatorDico;
 
-    NameField(String name, Integer length, List<String> filters) {
+    PhoneField(String name, Integer length, List<String> filters) {
         this.name = name;
         this.length = length;
-        this.nameDico = loadNameDico();
+        this.phoneIndicatorDico = loadPhoneDico();
 
         this.possibleValues = new ArrayList<>();
 
         filters.forEach(filterOnCountry -> {
             this.possibleValues.addAll(
-                nameDico.stream().filter(n -> n.country.equalsIgnoreCase(filterOnCountry))
-                    .map(n -> n.first_name)
+                phoneIndicatorDico.stream().filter(n -> n.country.equalsIgnoreCase(filterOnCountry))
+                    .map(n -> n.indicator)
                     .collect(Collectors.toList()));
         });
     }
 
     public String generateRandomValue() {
-        return possibleValues.get(random.nextInt(possibleValues.size()));
+        String indicator = possibleValues.get(random.nextInt(possibleValues.size()));
+        StringBuffer sb = new StringBuffer();
+        sb.append("+");
+        sb.append(indicator);
+        sb.append(" ");
+        int counter = 1;
+        while (counter <= (11-indicator.length())) {
+            sb.append(random.nextInt(10));
+            counter++;
+        }
+
+        return sb.toString();
     }
 
-    private List<Name> loadNameDico() {
+    private List<Phone> loadPhoneDico() {
         try {
             InputStream is = this.getClass().getClassLoader().getResourceAsStream(
-                "dictionnaries/names.csv");
+                "dictionnaries/phone-country-codes.csv");
             return new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
                     .lines()
                     .map(l -> {
                         String[] lineSplitted = l.split(";");
-                        return new NameField.Name(lineSplitted[0], lineSplitted[1], lineSplitted[2], lineSplitted[3], lineSplitted[4]);
+                        return new PhoneField.Phone(lineSplitted[0], lineSplitted[1]);
                     })
                     .collect(Collectors.toList());
         } catch (Exception e) {
             logger.warn("Could not load names-dico with error : " + e);
-            return Collections.singletonList(new NameField.Name("Anonymous", "", "", "", ""));
+            return Collections.singletonList(new PhoneField.Phone("00", ""));
         }
     }
 
