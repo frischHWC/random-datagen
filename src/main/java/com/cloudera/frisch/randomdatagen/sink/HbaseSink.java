@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 
 /**
  * This is an HBase Sink using HBase API 2.3
- * It requires in config.properties to define zookeeper quorum, port, znode and type of authentication (simple or kerberos)
- * Each instance is only able to manage one connection to one specific table defined by property hbase.table.name in config.properties
+ * It requires in application.properties to define zookeeper quorum, port, znode and type of authentication (simple or kerberos)
+ * Each instance is only able to manage one connection to one specific table defined by property hbase.table.name in application.properties
  */
 public class HbaseSink implements SinkInterface {
 

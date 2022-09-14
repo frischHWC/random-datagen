@@ -18,12 +18,21 @@ public class PropertiesLoader {
         java.util.Properties properties = new java.util.Properties();
 
         try {
-            FileInputStream fileInputStream = new FileInputStream("config.properties");
+            FileInputStream fileInputStream = new FileInputStream(
+                "src/main/resources/application.properties");
             properties.load(fileInputStream);
         } catch (IOException e) {
             logger.error("Property file not found !", e);
         }
         return properties;
+    }
+
+    public static void setProperty(String key, String value){
+        try {
+            properties.setProperty(key, value);
+        } catch (Exception e) {
+            logger.error("Cannot set property: " + key + " to value: " + value);
+        }
     }
 
     public static String getProperty(String key) {

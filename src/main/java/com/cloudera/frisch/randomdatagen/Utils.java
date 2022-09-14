@@ -1,12 +1,10 @@
 package com.cloudera.frisch.randomdatagen;
 
 
-import com.cloudera.frisch.randomdatagen.config.ArgumentsParser;
+import com.cloudera.frisch.randomdatagen.config.SinkParser;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
-import com.cloudera.frisch.randomdatagen.sink.*;
-import org.apache.avro.reflect.MapEntry;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
@@ -15,7 +13,6 @@ import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.log4j.Logger;
 
-import javax.security.auth.Subject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -335,7 +332,7 @@ public class Utils {
     /**
      * Log in the recap of what's been generated
      */
-    public static void recap(long numberOfBatches, long rowPerBatch, List<ArgumentsParser.sinks> sinks, Model model) {
+    public static void recap(long numberOfBatches, long rowPerBatch, List<SinkParser.sinks> sinks, Model model) {
         logger.info(" ************************* Recap of data generation ****************** ");
         logger.info("Generated " + rowPerBatch*numberOfBatches + " rows into : ");
 

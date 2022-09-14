@@ -419,7 +419,7 @@ This main reads the command-line arguments to know which model to use, how much 
 It parses the model file and create a model object based on it, this model contains a list of fields with their definition,
 also table names definitions, primary keys and other options passed through model.
 
-It then uses the config file link:src/main/resources/config.properties[src/main/resources/config.properties] to get
+It then uses the config file link:src/main/resources/application.properties[src/main/resources/config.properties] to get
 configuration of output systems (that are called sink). It initiates sinks by creating needed files or tables for all required sinks.
 
 Finally, it launches batches of generation of data, that are then send to all sinks in parallel.

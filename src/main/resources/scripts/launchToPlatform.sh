@@ -15,16 +15,20 @@ ssh ${SSH_KEY} ${USER}@${HOST} "mkdir -p ${DEST_DIR}/resources/"
 scp ${SSH_KEY} src/main/resources/models/*.json ${USER}@${HOST}:${DEST_DIR}/
 scp ${SSH_KEY} src/main/resources/dictionnaries/* ${USER}@${HOST}:${DEST_DIR}/
 scp ${SSH_KEY} src/main/resources/*.properties ${USER}@${HOST}:${DEST_DIR}/
-scp ${SSH_KEY} src/main/resources/launch.sh ${USER}@${HOST}:${DEST_DIR}/
+scp ${SSH_KEY} src/main/resources/scripts/launch.sh ${USER}@${HOST}:${DEST_DIR}/
 
 ssh ${SSH_KEY} ${USER}@${HOST} "chmod +x ${DEST_DIR}/launch.sh"
 
-scp ${SSH_KEY} target/random-datagen-*.jar ${USER}@${HOST}:${DEST_DIR}/random-datagen.jar
+cd target/
+tar -cvzf random-datagen.tar.gz random-datagen-*.jar
+cd ../
+scp ${SSH_KEY} target/random-datagen.tar.gz ${USER}@${HOST}:${DEST_DIR}/random-datagen.tar.gz
+ssh ${SSH_KEY} ${USER}@${HOST} "tar -xvzf ${DEST_DIR}/random-datagen.tar.gz ${DEST_DIR}/"
 
 echo "Finished to send required files"
 
 echo "Launch script on platform to launch program properly"
-ssh ${SSH_KEY} ${USER}@${HOST} 'bash -s' < src/main/resources/launch.sh $@
+ssh ${SSH_KEY} ${USER}@${HOST} 'bash -s' < src/main/resources/scripts/launch.sh $@
 echo "Program finished"
 
 

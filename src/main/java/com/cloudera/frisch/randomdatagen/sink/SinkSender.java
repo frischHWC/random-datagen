@@ -1,6 +1,6 @@
 package com.cloudera.frisch.randomdatagen.sink;
 
-import com.cloudera.frisch.randomdatagen.config.ArgumentsParser;
+import com.cloudera.frisch.randomdatagen.config.SinkParser;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import org.apache.log4j.Logger;
 
@@ -22,15 +22,10 @@ public class SinkSender {
      * @return list of sinks initialized
      */
     @SuppressWarnings("unchecked")
-    public static List<SinkInterface> sinksInit(Model model) {
+    public static List<SinkInterface> sinksInit(Model model, List<SinkParser.sinks> sinks) {
         List<SinkInterface> sinkList = new ArrayList<>();
-        List<ArgumentsParser.sinks> argsSinkList = Collections.emptyList();
-        try {
-            argsSinkList = (List<ArgumentsParser.sinks>) ArgumentsParser.getArgsMap().get(ArgumentsParser.args.SINK_TO_FILL);
-        } catch (Exception e) {
-            logger.warn("Could not cast sink list => Check parameters passed to the program ", e);
-        }
-        argsSinkList.forEach(sink -> {
+
+        sinks.forEach(sink -> {
             SinkInterface sinkToInitAndStart = null;
             switch (sink) {
                 case HDFSCSV:

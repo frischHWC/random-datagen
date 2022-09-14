@@ -24,7 +24,7 @@ import java.util.concurrent.CountDownLatch;
  * An inner class @see{com.cloudera.frisch.randomdatagen.sink.HiveSinkParallel} below, allows multi threaded inserts,
  * It is recommended to not insert too many rows as Hive is very slow on insertion and use the batch function,
  * with a high number of rows per batch and few batches (to avoid recreating connection to Hive each time)
- * and with a maximum of 20 threads (configurable in config.properties)
+ * and with a maximum of 20 threads (configurable in application.properties)
  */
 @SuppressWarnings("unchecked")
 public class HiveSink implements SinkInterface {

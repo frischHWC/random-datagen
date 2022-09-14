@@ -7,7 +7,7 @@ target/
 *.log
 src/main/resources/overall_launch.sh
 src/main/resources/create_release.sh
-src/main/resources/config.properties
+src/main/resources/application.properties
 .factorypath
 .classpath
 .settings

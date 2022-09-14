@@ -59,7 +59,7 @@ public class KafkaSink implements SinkInterface {
                 System.setProperty("javax.net.ssl.keyStore",
                     PropertiesLoader.getProperty("kafka.keystore.location"));
                 System.setProperty("javax.net.ssl.keyStorePassword",
-                    PropertiesLoader.getProperty("kafka.keystore.pasword"));
+                    PropertiesLoader.getProperty("kafka.keystore.password"));
                 schemaRegistryProtocol = "https";
             }
 
