@@ -11,7 +11,6 @@ import org.apache.kudu.client.PartialRow;
 import org.apache.orc.TypeDescription;
 import org.apache.solr.common.SolrInputDocument;
 
-import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -75,7 +74,7 @@ public class CityField extends Field<CityField.City> {
     private List<City> loadCityDico() {
         try {
             InputStream is = this.getClass().getClassLoader().getResourceAsStream(
-                "dictionnaries/worldcities.csv");
+                "dictionaries/worldcities.csv");
             return new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
                     .lines()
                     .map(l -> {

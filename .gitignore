@@ -5,8 +5,10 @@
 target/*
 target/
 *.log
-src/main/resources/overall_launch.sh
-src/main/resources/create_release.sh
+src/main/resources/scripts/overall_launch.sh
+src/main/resources/scripts/create_release.sh
+src/main/resources/parcel_creation/install_parcel.sh
+src/main/resources/parcel_creation/overall_launch.sh
 src/main/resources/application.properties
 .factorypath
 .classpath

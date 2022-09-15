@@ -77,7 +77,7 @@ public class PhoneField extends Field<String> {
     private List<Phone> loadPhoneDico() {
         try {
             InputStream is = this.getClass().getClassLoader().getResourceAsStream(
-                "dictionnaries/phone-country-codes.csv");
+                "dictionaries/phone-country-codes.csv");
             return new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
                     .lines()
                     .map(l -> {

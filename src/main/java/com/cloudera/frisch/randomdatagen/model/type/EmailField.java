@@ -93,7 +93,7 @@ public class EmailField extends Field<String> {
     private List<Name> loadNameDico() {
         try {
             InputStream is = this.getClass().getClassLoader().getResourceAsStream(
-                "dictionnaries/names.csv");
+                "dictionaries/names.csv");
             return new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))
                 .lines()
                 .map(l -> {
