@@ -1,0 +1,191 @@
+{
+  "name" : "DATAGEN",
+  "label" : "DATAGEN",
+  "description" : "The service to generate Data into various services of CDP platform",
+  "version" : "1.0",
+  "parcel" : {
+      "requiredTags" : [ "datagen" ],
+      "optionalTags" : []
+  },
+  "runAs" : { 
+    "user" : "datagen",
+    "group" : "datagen"
+   },
+   "maxInstances" : 1,
+   "compatibility" : {
+    "generation" : 2,
+    "cdhVersion" : {
+      "min" : "7.1.7",
+      "max" : "7.1.8"
+    }
+  },
+  "rolesWithExternalLinks" : ["DATAGEN_SERVER"],
+   "hdfsDirs" : [
+       {
+         "name" : "CreateUserHdfsHomeDirCommand",
+         "label" : "Create Datagen User Home Dir",
+         "description" : "Creates the Datagen user directory in HDFS",
+         "directoryDescription" : "Datagen HDFS user directory",
+         "path" : "/user/${user}",
+         "permissions" : "0755"
+       }
+   ],
+  "serviceInit" : {
+      "preStartSteps" : [
+        {
+          "commandName" : "CreateUserHdfsHomeDirCommand"
+        }
+      ]
+   },
+  "commands" : [
+    {
+     "name" : "gen_json_local",
+     "label" : "Generates local JSON",
+     "description" : "Generates JSON Data locally",
+     "roleCommand" : "gen_json_local",
+     "roleName" : "DATAGEN_SERVER",
+     "runMode" : "single"
+    }
+   ],
+  "serviceDependencies" : [
+    {
+     "name" : "HDFS"
+    }, 
+    {
+      "name" : "HBASE" 
+    }, 
+    {
+      "name" : "HIVE" 
+    }, 
+    {
+      "name" : "KAFKA" 
+    }, 
+    {
+      "name" : "KUDU" 
+    }, 
+    {
+      "name" : "OZONE" 
+    }, 
+    {
+      "name" : "SOLR" 
+    }
+  ],
+ "roles" : [
+   {
+    "name" : "DATAGEN_SERVER",
+    "label" : "Datagen Web Server",
+    "pluralLabel" : "Web Servers",
+    "startRunner" : {
+      "program" : "scripts/control.sh",
+      "args" : [ "start" ],
+      "environmentVariables" : {
+        "WEBSERVER_PORT" : "4242"
+       }
+     },
+     "externalLink" : {
+       "name" : "datagen_swagger",
+       "label" : "Datagen Swagger Web UI",
+       "url" : "http://${host}:8080/swagger-ui.html"
+     },
+     "topology" : {
+       "minInstances" : "0",
+       "maxInstances" : "100",
+       "softMinInstances" : "1",
+       "softMaxInstances" : "1",
+       "requiresOddNumberOfInstances" : "false"
+     },
+     "logging" : {
+       "dir" : "/var/log/datagen",
+       "filename" : "datagen.log",
+       "modifiable" : true,
+       "configName" : "log.dir",
+       "loggingType" : "log4j"
+     },
+     "commands" : [
+       {
+        "name" : "gen_json_local",
+        "label" : "Gen JSON locally",
+        "description" : "Generates JSON Data locally",
+        "expectedExitCodes" : [0],
+        "requiredRoleState" : "running",
+        "commandRunner" : {
+          "program" : "scripts/control.sh",
+          "args" : ["local_json"]
+        }
+       }
+      ],
+    "parameters" : [
+    {
+        "name" : "number_of_batches",
+        "label" : "Number of Batches",
+        "description" : "The number of batch to run when launching a data generation",
+        "required" : true,
+        "configurableInWizard" : true,
+        "default" : 20,
+        "min": 0,
+        "type" : "long"
+    },
+    {
+        "name" : "number_of_rows",
+        "label" : "Number of Rows",
+        "description" : "The number of row to run when launching a data generation",
+        "required" : true,
+        "configurableInWizard" : true,
+        "default" : 20,
+        "min": 0,
+        "type" : "long"
+    },
+    {
+        "name" : "kerberos_principal",
+        "label" : "Kerberos Principal",
+        "description" : "The kerberos principal used when launching a data generation",
+        "required" : true,
+        "configurableInWizard" : true,
+        "default" : "",
+        "type" : "string"
+    },
+    {
+        "name" : "kerberos_keytab",
+        "label" : "Kerberos Keytab",
+        "description" : "The kerberos keytab used when launching a data generation",
+        "required" : true,
+        "configurableInWizard" : true,
+        "default" : "",
+        "type" : "string"
+    },
+    {
+        "name" : "data_model",
+        "label" : "Data Model",
+        "description" : "The Model of data to use to generate data",
+        "required" : true,
+        "configurableInWizard" : true,
+        "default" : "test_model.json",
+        "type" : "string_enum",
+        "validValues": ["test_model.json", "full_model.json"]
+    },
+
+    {
+        "name" : "custom_model_path",
+        "label" : "Custom Model Path",
+        "description" : "The custom Model Path to use instead of the furnished data model. This file must exists on the machine where the gateway is installed",
+        "required" : true,
+        "default" : "",
+        "type" : "path",
+        "pathType": "serviceSpecific",
+        "mode": "0755"
+    },
+    {
+        "name" : "thread_number",
+        "label" : "Thread Number",
+        "description" : "The number of parallel thread to launch data generation",
+        "required" : true,
+        "configurableInWizard" : true,
+        "default" : 1,
+        "min": 1,
+        "type" : "long"
+    }
+  ]
+  }
+ ]
+   
+}

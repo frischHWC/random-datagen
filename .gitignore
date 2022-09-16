@@ -9,7 +9,7 @@ src/main/resources/scripts/overall_launch.sh
 src/main/resources/scripts/create_release.sh
 src/main/resources/parcel_creation/install_parcel.sh
 src/main/resources/parcel_creation/overall_launch.sh
-src/main/resources/application.properties
+src/main/resources/csd/install_csd.sh
 .factorypath
 .classpath
 .settings
