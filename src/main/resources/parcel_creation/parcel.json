@@ -4,6 +4,10 @@
   "version": "${PARCEL_VERSION}",
   "setActiveSymlink": true,
 
+  "depends": "",
+  "replaces": "",
+  "conflicts": "",
+
   "provides": [
     "datagen"
   ],
@@ -17,9 +21,7 @@
   "components": [
     {
       "name"       : "datagen",
-      "version"    : "${PARCEL_VERSION}",
-      "pkg_version": "${PARCEL_VERSION}",
-      "pkg_release": "${PARCEL_VERSION}"
+      "version"    : "${PARCEL_VERSION}"
     }
   ],
 
