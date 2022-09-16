@@ -1,6 +1,6 @@
 {
   "name" : "DATAGEN",
-  "label" : "Datagen",
+  "label" : "DATAGEN",
   "description" : "The service to generate Data into various services of CDP platform",
   "version" : "1.0",
   "parcel" : {
