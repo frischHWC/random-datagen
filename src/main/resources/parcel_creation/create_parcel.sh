@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 CDP_VERSION="7.1.7.1000"
-RD_VERSION="0.1.2"
+RD_VERSION="0.1.3"
 TEMP_DIR="/tmp/datagen_parcel_files"
 TEMP_PARCEL_DIR="/tmp/datagen_parcel"
 DISTRO_SUFFIX="el7"
