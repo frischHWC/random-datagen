@@ -29,7 +29,8 @@
     "datagen": {
       "longname"    : "Data Generator",
       "home"        : "/home/datagen",
-      "shell"       : "/bin/bash"
+      "shell"       : "/bin/bash",
+      "extra_groups": []
     }
   },
 
