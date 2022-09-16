@@ -63,12 +63,21 @@ public class NameField extends Field<String> {
 
         this.possibleValues = new ArrayList<>();
 
-        filters.forEach(filterOnCountry -> {
+        if(!filters.isEmpty()) {
+            filters.forEach(filterOnCountry -> {
+                this.possibleValues.addAll(
+                    nameDico.stream().filter(
+                            n -> n.country.equalsIgnoreCase(filterOnCountry))
+                        .map(n -> n.first_name)
+                        .collect(Collectors.toList()));
+            });
+        } else {
             this.possibleValues.addAll(
-                nameDico.stream().filter(n -> n.country.equalsIgnoreCase(filterOnCountry))
+                nameDico.stream()
                     .map(n -> n.first_name)
-                    .collect(Collectors.toList()));
-        });
+                    .collect(Collectors.toList())
+            );
+        }
     }
 
     public String generateRandomValue() {

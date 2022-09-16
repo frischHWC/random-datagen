@@ -21,14 +21,14 @@ public class DataGenerationController {
   @Autowired
   private DataGenerationService dataGenerationService;
 
-  @PostMapping(value = "/json")
-  public void generateIntoJson(
+  @PostMapping(value = "/csv")
+  public void generateIntoCSV(
       @RequestParam String modelFilePath,
       @RequestParam Long numberOfBatches,
       @RequestParam Long rowsPerBatch
   ) {
     dataGenerationService.generateDate(modelFilePath, numberOfBatches,rowsPerBatch,
-        Collections.singletonList("JSON"));
+        Collections.singletonList("CSV"));
   }
 
 

@@ -12,6 +12,7 @@ import com.cloudera.frisch.randomdatagen.sink.SinkSender;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class DataGenerationService {
     Parser parser = new JsonParser(modelFilePath);
     Model model = parser.renderModelFromFile();
 
-    List<SinkParser.sinks> sinksList = Collections.emptyList();
+    List<SinkParser.sinks> sinksList = new ArrayList<>();
     try {
       for(String s: sinksListAsString) {
         sinksList.add(SinkParser.stringToSink(s));

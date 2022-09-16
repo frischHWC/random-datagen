@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 CDP_VERSION="7.1.7.1000"
-RD_VERSION="0.1.3"
+RD_VERSION="0.1.4"
 
 TEMP_CSD_DIR="/tmp/datagen_csd"
 
