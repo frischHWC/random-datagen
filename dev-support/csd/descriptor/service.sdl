@@ -99,7 +99,7 @@
        "filename" : "datagen.log",
        "modifiable" : true,
        "configName" : "log.dir",
-       "loggingType" : "log4j"
+       "loggingType" : "logback"
      },
      "commands" : [
        {

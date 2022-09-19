@@ -1,0 +1,29 @@
+---
+# TODO: Replace this:
+# Create Manifest.json
+yum install jq
+cd /tmp/cm_ext/make_manifest
+python make_manifest.py ${TEMP_PARCEL_DIR}/
+PARCEL_NAME=$(ls /tmp/datagen_parcel/ | grep parcel)
+echo "PARCEL NAME: $PARCEL_NAME "
+PARCEL_HASH=$(cat ${TEMP_PARCEL_DIR}/manifest.json | jq -r '.parcels[0].hash')
+echo "PARCEL HASH: $PARCEL_HASH "
+rm -rf "${TEMP_PARCEL_DIR}/${PARCEL_NAME}.sha"
+echo "${PARCEL_HASH}" >> "${TEMP_PARCEL_DIR}/${PARCEL_NAME}.sha"
+
+# Create HTTP server remotely and push parcel file in it
+yum install httpd
+systemctl start httpd
+rm -rf /var/www/html/datagen-repo/
+mkdir -p /var/www/html/datagen-repo/
+cp ${TEMP_PARCEL_DIR}/* /var/www/html/datagen-repo/
+chmod -R ugo+rX /var/www/html/datagen-repo/
+
+# API call to CM add the repo with the parcel
+curl -k -u admin:admin https://localhost:7183/api/v49/cm/config > /tmp/cm_config.json
+export REPOS_URLS=$(cat /tmp/cm_config.json | jq -r '.items[] | select(.name | contains("REMOTE_PARCEL_REPO_URLS")).value')
+echo $REPOS_URLS
+rm -f /tmp/repos_url.json
+cp /tmp/random-datagen/src/main/resources/parcel_creation/repos_url.json /tmp/repos_url.json
+envsubst < /tmp/repos_url.json > /tmp/repos_url.json.tmp && mv /tmp/repos_url.json.tmp /tmp/repos_url.json
+curl -X PUT -H "Content-Type: application/json" -k -u admin:admin https://localhost:7183/api/v49/cm/config -d "@/tmp/repos_url.json"

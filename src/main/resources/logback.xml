@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <property name="LOGS" value="./logs" />
+    <property name="LOGS" value="/tmp/" />
 
     <appender name="Console"
               class="ch.qos.logback.core.ConsoleAppender">

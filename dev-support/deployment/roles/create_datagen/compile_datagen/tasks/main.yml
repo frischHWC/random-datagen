@@ -1,0 +1,11 @@
+---
+- name: Clone Repository
+  git:
+    repo: "{{ data_gen_git_url }}"
+    dest: "{{ target_dir }}/git-repo/"
+    version: "{{ data_gen_git_branch }}"
+
+- name: Clean & Package Project
+  command:
+    cmd: mvn clean package
+    chdir: "{{ target_dir }}/git-repo/"

@@ -1,0 +1,69 @@
+---
+# Check which services are deployed and available to setup the gen_<Service> vars
+
+- set_fact:
+    gen_kafka: "{{ true if (cloudera_manager_all_services.json | community.general.json_query(query)) == 'STARTED' else false }}"
+  vars:
+    query: "items[?type == 'KAFKA'].serviceState | [0]"
+  when: gen_kafka is not defined
+
+- name: DEBUG - gen_kafka
+  debug:
+    msg: "{{ gen_kafka }}"
+  when: debug | default(false)
+
+- set_fact:
+    sr_service_exists: "{{ cloudera_manager_all_services.json | community.general.json_query(query) | length > 0 }}"
+  vars:
+    query: "items[?type == 'SCHEMAREGISTRY'].name"
+
+- name: DEBUG - Schema Registry exists
+  debug:
+    msg: "{{ sr_service_exists }}"
+  when: debug | default(false)
+
+
+- set_fact:
+    config_kafka: "{{ true if gen_kafka and (kafka_url is not defined or kafka_protocol is not defined) else false }}"  
+
+- name: DEBUG - config_kafka
+  debug:
+    msg: "{{ config_kafka }}"
+  when: debug | default(false)
+
+- set_fact:
+    config_schema_registry: "{{ true if gen_kafka and sr_service_exists and sr_url is not defined else false }}"  
+
+- name: DEBUG - config_schema_registry
+  debug:
+    msg: "{{ config_schema_registry }}"
+  when: debug | default(false)
+
+
+# Version
+
+- set_fact:
+    dg_full_version: "{{ datagen_version }}.{{ cdp_version }}"
+
+- name: DEBUG - dg_full_version
+  debug:
+    msg: "{{ dg_full_version }}"
+  when: debug | default(false)
+
+- set_fact:
+    dg_name: "DATAGEN-{{ datagen_version }}.{{ cdp_version }}"
+
+- name: DEBUG - dg_name
+  debug:
+    msg: "{{ dg_name }}"
+  when: debug | default(false)
+
+- set_fact:
+    distro_suffix: "el7"
+  when: distro_suffix is not defined
+
+- name: DEBUG - distro_suffix
+  debug:
+    msg: "{{ distro_suffix }}"
+  when: debug | default(false)
+

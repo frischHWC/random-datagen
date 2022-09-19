@@ -1,0 +1,6 @@
+---
+# TODO: replace this:
+scp ${SSH_KEY} ${TEMP_CSD_DIR}/DATAGEN-${RD_VERSION}.${CDP_VERSION}.jar ${USER}@${HOST}:/opt/cloudera/csd/
+
+# Restart CM
+ssh ${SSH_KEY} ${USER}@${HOST} "systemctl restart cloudera-scm-server"

@@ -1,0 +1,12 @@
+---
+##############################################
+############# Install Datagen #############
+
+- name: Auto-Configure
+  hosts: cloudera_manager
+  gather_facts: false
+  roles: 
+    - auto_configure/cm-config
+    - auto_configure/all-config
+  tags: 
+    - auto_configure 

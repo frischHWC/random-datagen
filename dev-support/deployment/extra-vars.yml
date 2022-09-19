@@ -1,0 +1,28 @@
+---
+# Minimum settings 
+cluster_name: ${CLUSTER_NAME}
+
+# CM info required
+cloudera_manager_host: ${CM_HOST} 
+cloudera_manager_user: ${CM_USER} 
+cloudera_manager_password: ${CM_PASSWORD}
+
+# Edge Node for data gen
+cdp_version: ${CDP_VERSION}
+datagen_version: ${DATAGEN_VERSION}
+
+# Edge Node for data gen
+edge_host: ${EDGE_HOST}
+
+# Not required as they have default settings but can be overrided
+debug: ${DEBUG}
+
+# Directory where Datagen will be cloned and compiled
+target_dir: ${TARGET_DIR}
+
+# Data Gen Settings
+data_gen_git_url: ${DATA_GEN_GIT_URL}
+data_gen_git_branch: ${DATA_GEN_GIT_BRANCH}
+
+
+

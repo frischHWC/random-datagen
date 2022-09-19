@@ -1,0 +1,21 @@
+---
+- name: Clean Directory for this project
+  file:
+    path: "{{ target_dir }}/"
+    state: absent
+
+- name: Create Directory for Project
+  file:
+    path: "{{ target_dir }}/"
+    state: directory
+    mode: '0755'
+
+- name: Install Maven
+  package:
+    name: maven
+    state: present
+
+- name: Install Git
+  package:
+    name: git
+    state: present    

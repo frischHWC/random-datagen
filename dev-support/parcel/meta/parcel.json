@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "name": "DATAGEN",
-  "version": "${PARCEL_VERSION}",
+  "version": "DATAGEN_FULL_VERSION",
   "setActiveSymlink": true,
 
   "depends": "",
@@ -21,7 +21,7 @@
   "components": [
     {
       "name"       : "datagen",
-      "version"    : "${PARCEL_VERSION}"
+      "version"    : "DATAGEN_FULL_VERSION"
     }
   ],
 

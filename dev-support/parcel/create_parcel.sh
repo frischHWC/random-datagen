@@ -20,13 +20,13 @@ mkdir -p "${PARCEL_DIR}/models/"
 mkdir -p "${PARCEL_DIR}/dictionaries/"
 
 # Place all needed files in a temp_dir with right structure
-cp parcel.json "${PARCEL_DIR}/meta/"
-cp release-notes.txt "${PARCEL_DIR}/meta/"
-cp datagen_env.sh "${PARCEL_DIR}/meta/"
-cp ../dictionaries/* "${PARCEL_DIR}/dictionaries/"
-cp ../models/* "${PARCEL_DIR}/models/"
-cp ../logback.xml "${PARCEL_DIR}/"
-cp ../application.properties "${PARCEL_DIR}/"
+cp meta/parcel.json "${PARCEL_DIR}/meta/"
+cp meta/release-notes.txt "${PARCEL_DIR}/meta/"
+cp meta/datagen_env.sh "${PARCEL_DIR}/meta/"
+cp ../src/main/resources/dictionaries/* "${PARCEL_DIR}/dictionaries/"
+cp ../src/main/resources/models/* "${PARCEL_DIR}/models/"
+cp ../src/main/resources/logback.xml "${PARCEL_DIR}/"
+cp ../src/main/resources/application.properties "${PARCEL_DIR}/"
 cp ../../../../target/random-datagen*.jar "${PARCEL_DIR}/${PARCEL_NAME}.jar"
 
 envsubst < "${PARCEL_DIR}/meta/parcel.json" > "${PARCEL_DIR}/meta/parcel.json.tmp" \
