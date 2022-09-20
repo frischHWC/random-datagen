@@ -7,7 +7,7 @@
 
 - name: Remove CSD jar file
   file:
-    path: "/opt/cloudera/csd/{{ item }}"
+    path: "{{ item }}"
     state: absent
   with_items: "{{ jars_compiled.files | map(attribute='path') | list }}"
 
