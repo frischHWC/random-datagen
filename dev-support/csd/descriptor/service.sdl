@@ -78,15 +78,6 @@
       "name" : "SCHEMAREGISTRY"
     }
   ],
-   "configWriter" : {
-        "generators" : [
-          {
-            "filename" : "service.properties",
-            "configFormat" : "jinja",
-            "template" : "aux/templates/properties.j2"
-          }
-        ]
-    },
   "roles" : [
    {
     "name" : "DATAGEN_SERVER",
@@ -100,6 +91,15 @@
         "WEBSERVER_PORT" : "4242"
        }
      },
+     "configWriter" : {
+             "generators" : [
+               {
+                 "filename" : "service.properties",
+                 "configFormat" : "jinja",
+                 "template" : "aux/templates/properties.j2"
+               }
+             ]
+         },
      "kerberosPrincipals" : [
              {
                "name" : "datagen_principal",
