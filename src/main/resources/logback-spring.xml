@@ -3,12 +3,6 @@
 
     <springProfile name="dev">
 
-        <!-- LOG everything at INFO level -->
-        <root level="info">
-            <appender-ref ref="RollingFile" />
-            <appender-ref ref="Console" />
-        </root>
-
         <appender name="Console"
                   class="ch.qos.logback.core.ConsoleAppender">
             <layout class="ch.qos.logback.classic.PatternLayout">
@@ -18,16 +12,15 @@
             </layout>
         </appender>
 
+        <!-- LOG everything at INFO level -->
+        <root level="info">
+            <appender-ref ref="Console" />
+        </root>
+
     </springProfile>
 
 
     <springProfile name="cdp">
-
-        <!-- LOG everything at INFO level -->
-        <root level="info">
-            <appender-ref ref="RollingFile" />
-            <appender-ref ref="Console" />
-        </root>
 
         <appender name="RollingFile"
                   class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -48,6 +41,11 @@
                 </timeBasedFileNamingAndTriggeringPolicy>
             </rollingPolicy>
         </appender>
+
+        <!-- LOG everything at INFO level -->
+        <root level="info">
+            <appender-ref ref="RollingFile" />
+        </root>
 
     </springProfile>
 
