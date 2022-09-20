@@ -9,7 +9,7 @@ app.name="Data Generator"
 hadoop.user=datagen
 hadoop.home=/user/datagen
 kerberos.user=datagen
-kerberos.keytab=datagen.keytab
+kerberos.keytab=${CONF_DIR}/datagen.keytab
 
 {% for key, value in globals | dictsort() -%}
 {{ key | replace('_', '.') }} = {{ value }}
