@@ -64,15 +64,6 @@
       "configurableInWizard": true,
       "default": true,
       "type": "boolean"
-    },
-    {
-      "name": "tls_enabled",
-      "label": "TLS Enabled",
-      "description": "Set to true if TLS is enabled for services where data will be generated. Used to connect to HIVE, KAFKA, SOLR, KUDU.",
-      "required": true,
-      "configurableInWizard": true,
-      "default": true,
-      "type": "boolean"
     }
   ],
   "serviceDependencies": [
@@ -116,7 +107,7 @@
           "start"
         ],
         "environmentVariables": {
-          "WEBSERVER_PORT": "4242"
+          "MAX_HEAP_SIZE": "${max_heap_size}"
         }
       },
       "configWriter": {
@@ -154,7 +145,7 @@
         "autoTlsMode": "auto"
       },
       "logging": {
-        "dir": "/var/log/datagen/",
+        "dir": "/var/log/datagen",
         "filename": "datagen.log",
         "modifiable": true,
         "configName": "log.dir",
@@ -190,6 +181,17 @@
         }
       ],
       "parameters": [
+        {
+          "name": "max_heap_size",
+          "label": "Maximum Heap size",
+          "description": "Maximum heap size specified as a JVM parameter to the application",
+          "required": true,
+          "configurableInWizard": true,
+          "default": 4,
+          "min": 1,
+          "unit": "gigabytes",
+          "type": "memory"
+        },
         {
           "name": "number_of_batches",
           "label": "Number of Batches",
@@ -306,6 +308,13 @@
           "type": "port"
         },
         {
+          "name": "solr_tls_enabled",
+          "label": "Solr TLS",
+          "description": "If SolR TLS is enabled",
+          "default": "true",
+          "type": "boolean"
+        },
+        {
           "name": "kafka_url",
           "label": "Kafka URL",
           "description": "Kafka URL as: <KAFKA_SERVER_1>:<KAFKA_PORT>,<KAFKA_SERVER_2>:<KAFKA_PORT>",
@@ -318,6 +327,13 @@
           "description": "Schema Registry URL as: <SR_SERVER>:<SR_PORT>",
           "default": "",
           "type": "string"
+        },
+        {
+          "name": "schema_registry_tls_enabled",
+          "label": "Schema Registry TLS",
+          "description": "If Schema Registry TLS is enabled",
+          "default": "true",
+          "type": "boolean"
         },
         {
           "name": "kafka_protocol",

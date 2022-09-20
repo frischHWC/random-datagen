@@ -28,6 +28,7 @@ public class PropertiesLoader {
         }
 
         try {
+            logger.info("Reading properties from file : " + pathToApplicationProperties);
             FileInputStream fileInputStream = new FileInputStream(pathToApplicationProperties);
             properties.load(fileInputStream);
         } catch (IOException e) {
