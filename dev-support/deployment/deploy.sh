@@ -22,6 +22,7 @@ export CM_PASSWORD="admin"
 # Version of RD to create (to inject datagen-env.sh)
 export CDP_VERSION="7.1.7.1000"
 export DATAGEN_VERSION="0.1.5"
+export DISTRO_SUFFIX="el7"
 
 
 # DEBUG
@@ -57,6 +58,7 @@ function usage()
     echo ""
     echo "  --cdp-version=$CDP_VERSION : Version of CDP on which Datagen is deployed (Default) $CDP_VERSION "
     echo "  --datagen-version=$DATAGEN_VERSION : Version of Datagen that will be set for this deployment  (Default) $DATAGEN_VERSION"
+    echo "  --distro-suffix=$DISTRO_SUFFIX : Version of OS to deploy datagen  (Default) $DISTRO_SUFFIX"
     echo ""
     echo "  --debug=$DEBUG : To set DEBUG log-level (Default) $DEBUG "
     echo "  --log-dir=$LOG_DIR : Log directory (Default) $LOG_DIR "
@@ -104,6 +106,9 @@ while [ "$1" != "" ]; do
             ;;
         --datagen-version)
             DATAGEN_VERSION=$VALUE
+            ;;
+        --distro-suffix)
+            DISTRO_SUFFIX=$VALUE
             ;;
         --debug)
             DEBUG=$VALUE
@@ -211,7 +216,7 @@ then
     echo " Follow advancement at: ${LOG_DIR}/install_datagen.log "
 fi
 ansible-playbook -i ${HOSTS_TEMP} -e @${EXTRA_VARS_TEMP} playbooks/install_datagen.yml 2>&1 > ${LOG_DIR}/install_datagen.log
-OUTPUT=$(tail -20 ${LOG_DIR}/install_datagenlog | grep -A20 RECAP | grep -v "failed=0" | wc -l | xargs)
+OUTPUT=$(tail -20 ${LOG_DIR}/install_datagen.log | grep -A20 RECAP | grep -v "failed=0" | wc -l | xargs)
 if [ "${OUTPUT}" == "2" ]
 then
   echo " SUCCESS: Datagen Installation made "

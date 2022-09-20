@@ -7,9 +7,13 @@ cloudera_manager_host: ${CM_HOST}
 cloudera_manager_user: ${CM_USER} 
 cloudera_manager_password: ${CM_PASSWORD}
 
-# Edge Node for data gen
+# Versioning
 cdp_version: ${CDP_VERSION}
 datagen_version: ${DATAGEN_VERSION}
+dg_full_version: ${DATAGEN_VERSION}.${CDP_VERSION}
+dg_name: DATAGEN-${DATAGEN_VERSION}.${CDP_VERSION}
+distro_suffix: ${DISTRO_SUFFIX}
+parcel_name: DATAGEN-${DATAGEN_VERSION}.${CDP_VERSION}-${DISTRO_SUFFIX}
 
 # Edge Node for data gen
 edge_host: ${EDGE_HOST}

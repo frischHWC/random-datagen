@@ -1,1 +1,51 @@
 ---
+- name: Get All Hosts
+  uri:
+    url: "{{ cloudera_manager_api_url }}/hosts"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+  register: all_hosts
+
+- name: Set hostId
+  set_fact:
+    edge_host_id: "{{ all_hosts.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?hostname == '{{ edge_host }}' ].hostId | [0]"
+
+- name: DEBUG - edge_host_id
+  debug:
+    msg: "{{ edge_host_id }}"
+  when: debug | default(false)
+
+- name: Add Datagen service to CM
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: POST
+    body_format: json
+    body:  "{{ lookup('template', 'datagen_service.json' ) }}"
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+
+- name: Wait to acknowledge service to be added
+  pause:
+    seconds: 30
+
+- name: Start Datagen Service
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/datagen/commands/start"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: POST
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no

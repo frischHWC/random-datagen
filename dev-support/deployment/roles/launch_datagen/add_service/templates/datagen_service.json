@@ -1,0 +1,40 @@
+{
+    "items": 
+    [
+            {
+                "tags" : [ ],
+                "name" : "datagen",
+                "type" : "DATAGEN",
+                "serviceVersion" : "CDH 7.1.7",
+                "displayName" : "Datagen",
+                "roles": [
+                    {
+                        "name" : "DATAGEN_SERVER",
+                        "type" : "DATAGEN_SERVER",
+                        "hostRef" : {
+                          "hostId" : "{{ edge_host_id }}",
+                          "hostname" : "{{ edge_host }}"
+                        }
+                    }
+                ],
+                "roleConfigGroups" : [ {
+                    "name" : "DATAGEN_SERVER",
+                    "roleType" : "DATAGEN_SERVER",
+                    "config" : {
+                        "items" : 
+                        [ 
+                            {
+                              "name" : "kerberos_principal",
+                              "value" : "francois@FRISCH.COM"
+                            },
+                            {
+                                "name" : "kerberos_keytab",
+                                "value" : "/home/francois/francois.keytab"
+                            }
+                        ]
+                      }
+                  }
+                ]
+            }
+    ]
+}

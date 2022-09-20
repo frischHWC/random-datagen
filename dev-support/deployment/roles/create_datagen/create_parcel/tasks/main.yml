@@ -34,6 +34,17 @@
     state: directory
     mode: '0755'
 
+- name: Find jar compiled
+  find:
+    paths: "{{ target_dir }}/git-repo/target/"
+    patterns: 'random-datagen*.jar'
+  register: jar_compiled
+
+- name: Get Jar from Compilation
+  copy:
+    src: "{{ jar_compiled.files[0].path }}"
+    dest: "{{ target_dir }}/parcel/{{ dg_name }}/{{ dg_name }}.jar"
+    remote_src: yes
 
 
 - name: Copy Meta's file
@@ -79,7 +90,7 @@
     remote_src: true
 
 
-#Inject version in datagen_env.sh and parcel.json
+# Inject version in datagen_env.sh and parcel.json
 - name: Inject DG full Name
   replace:
     path: "{{ target_dir }}/parcel/{{ dg_name }}/meta/datagen_env.sh"
@@ -92,9 +103,9 @@
     regexp: 'DATAGEN_FULL_VERSION'
     replace: "{{ dg_full_version }}"
 
-    
+
 
 - name: Create Parcel tar
   command:
-    cmd: "tar -czvf {{ dg_name }}.parcel {{ dg_name }}/"
+    cmd: "tar -czvf {{ parcel_name }}.parcel {{ dg_name }}/"
     chdir: "{{ target_dir }}/parcel/"

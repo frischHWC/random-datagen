@@ -2,11 +2,34 @@
 ##############################################
 ############# Install Datagen #############
 
-- name: Auto-Configure
+- name: Remove Service & Parcel
+  hosts: edge
+  gather_facts: true
+  roles: 
+    - auto_configure/cm-config
+    - install_datagen/remove_service
+    - install_datagen/remove_parcel
+
+- name: Remove CSD
+  hosts: cloudera_manager
+  gather_facts: false
+  roles:   
+    - install_datagen/remove_csd
+
+- name: Get CSD
+  hosts: edge
+  gather_facts: false
+  roles: 
+    - install_datagen/get_csd
+
+- name: Install CSD 
   hosts: cloudera_manager
   gather_facts: false
   roles: 
-    - auto_configure/cm-config
-    - auto_configure/all-config
-  tags: 
-    - auto_configure 
+    - install_datagen/install_csd
+
+- name: Install Parcel 
+  hosts: edge
+  gather_facts: false
+  roles: 
+    - install_datagen/install_parcel

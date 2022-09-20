@@ -10,12 +10,18 @@
     state: directory
     mode: '0755'
 
-- name: Install Maven
-  package:
-    name: maven
-    state: present
-
 - name: Install Git
   package:
     name: git
     state: present    
+
+- name: Install Maven 3.8.6
+  command: 
+    cmd: wget --no-check-certificate  https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz
+    chdir: /opt/
+
+- name: Untar Maven 3.8.6
+  command: 
+    cmd: tar -xvzf apache-maven-3.8.6-bin.tar.gz
+    chdir: /opt/
+    

@@ -39,31 +39,3 @@
     msg: "{{ config_schema_registry }}"
   when: debug | default(false)
 
-
-# Version
-
-- set_fact:
-    dg_full_version: "{{ datagen_version }}.{{ cdp_version }}"
-
-- name: DEBUG - dg_full_version
-  debug:
-    msg: "{{ dg_full_version }}"
-  when: debug | default(false)
-
-- set_fact:
-    dg_name: "DATAGEN-{{ datagen_version }}.{{ cdp_version }}"
-
-- name: DEBUG - dg_name
-  debug:
-    msg: "{{ dg_name }}"
-  when: debug | default(false)
-
-- set_fact:
-    distro_suffix: "el7"
-  when: distro_suffix is not defined
-
-- name: DEBUG - distro_suffix
-  debug:
-    msg: "{{ distro_suffix }}"
-  when: debug | default(false)
-

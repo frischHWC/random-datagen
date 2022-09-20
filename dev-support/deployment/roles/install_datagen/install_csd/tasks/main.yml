@@ -1,6 +1,15 @@
 ---
-# TODO: replace this:
-scp ${SSH_KEY} ${TEMP_CSD_DIR}/DATAGEN-${RD_VERSION}.${CDP_VERSION}.jar ${USER}@${HOST}:/opt/cloudera/csd/
+- name: Copy CSD to CM
+  copy:
+    src: "/tmp/{{ dg_name }}.jar"
+    dest: "/opt/cloudera/csd/{{ dg_name }}.jar"
 
-# Restart CM
-ssh ${SSH_KEY} ${USER}@${HOST} "systemctl restart cloudera-scm-server"
+- name: Restart CM 
+  systemd:
+    state: restarted
+    name: cloudera-scm-server
+
+# TODO: make sure CM is restarted
+- name: Wait 1 minute to make sure CM is restarted
+  pause:
+    seconds: 60

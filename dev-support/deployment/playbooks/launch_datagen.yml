@@ -2,11 +2,10 @@
 ##############################################
 ############# Launch DATAGEN #############
 
-- name: Auto-Configure
-  hosts: cloudera_manager
+- name: Launch Datagen
+  hosts: edge
   gather_facts: false
   roles: 
     - auto_configure/cm-config
-    - auto_configure/all-config
-  tags: 
-    - auto_configure 
+    - launch_datagen/add_service
+    - launch_datagen/launch_command

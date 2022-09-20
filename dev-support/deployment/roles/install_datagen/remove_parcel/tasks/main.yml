@@ -1,1 +1,77 @@
 ---
+# List Parcels and check if it exists
+- name: Get All Parcels
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/parcels/"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: cloudera_manager_all_parcels
+
+
+- set_fact:
+    datagen_parcel_exists: "{{ cloudera_manager_all_parcels.json | community.general.json_query(query) | length > 0 }}"
+  vars:
+    query: "items[?product == 'DATAGEN'].version | [0]"
+
+- name: DEBUG - datagen_parcel_exists
+  debug:
+    msg: "{{ datagen_parcel_exists }}"
+  when: debug | default(false)
+
+- set_fact:
+    datagen_parcel_version: "{{ cloudera_manager_all_parcels.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?product == 'DATAGEN'].version | [0]"
+  when: datagen_parcel_exists
+
+- name: DEBUG - datagen_parcel_version
+  debug:
+    msg: "{{ datagen_parcel_version }}"
+  when: datagen_parcel_exists and debug | default(false)
+
+
+- name: Deactivate Parcel 
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/parcels/products/DATAGEN/versions/{{ datagen_parcel_version }}/commands/deactivate"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: POST
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  when: datagen_parcel_exists
+
+- name: Wait 1 minute to make sure parcel is deactivated
+  pause:
+    seconds: 60
+  when: datagen_parcel_exists
+
+- name: Remove completely Parcel 
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/parcels/products/DATAGEN/versions/{{ datagen_parcel_version }}/commands/startRemovalOfDistribution"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: POST
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  when: datagen_parcel_exists
+
+- name: Wait 1 minute to make sure parcel is deactivated
+  pause:
+    seconds: 60
+  when: datagen_parcel_exists
+
+# TODO: Make sure parcel does not exists anymore with a GET
+
+

@@ -8,5 +8,3 @@
   roles: 
     - auto_configure/cm-config
     - auto_configure/all-config
-  tags: 
-    - auto_configure 

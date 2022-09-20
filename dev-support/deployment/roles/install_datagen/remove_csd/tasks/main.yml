@@ -1,2 +1,21 @@
 ---
-# TODO: Remove /opt/cloudera/csd/DATAGEN*.jar and restart CM
+- name: Find CSD Jar name
+  find:
+    paths: "/opt/cloudera/csd/"
+    patterns: 'DATAGEN*.jar'
+  register: jar_compiled
+
+- name: Remove CSD jar file
+  file:
+    path: "/opt/cloudera/csd/{{ jar_compiled }}"
+    state: absent
+
+- name: Restart CM 
+  systemd:
+    state: restarted
+    name: cloudera-scm-server
+
+# TODO: make sure CM is restarted
+- name: Wait 1 minute to make sure CM is restarted
+  pause:
+    seconds: 60

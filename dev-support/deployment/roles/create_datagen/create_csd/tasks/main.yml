@@ -37,6 +37,6 @@
     remote_src: true
 
 - name: Create CSD jar
-  command:
+  shell:
     cmd: "jar -cvf {{ dg_name }}.jar *"
     chdir: "{{ target_dir }}/csd/"
