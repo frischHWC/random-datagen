@@ -3,12 +3,13 @@
   find:
     paths: "/opt/cloudera/csd/"
     patterns: 'DATAGEN*.jar'
-  register: jar_compiled
+  register: jars_compiled
 
 - name: Remove CSD jar file
   file:
-    path: "/opt/cloudera/csd/{{ jar_compiled }}"
+    path: "/opt/cloudera/csd/{{ item }}"
     state: absent
+  with_items: "{{ jars_compiled.files | map(attribute='path') | list }}"
 
 - name: Restart CM 
   systemd:

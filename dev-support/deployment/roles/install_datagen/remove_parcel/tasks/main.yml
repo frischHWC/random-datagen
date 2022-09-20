@@ -72,6 +72,19 @@
     seconds: 60
   when: datagen_parcel_exists
 
+- name: Remove Downloadable Parcel
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/parcels/products/DATAGEN/versions/{{ datagen_parcel_version }}/commands/removeDownload"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: POST
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  when: datagen_parcel_exists
+
 # TODO: Make sure parcel does not exists anymore with a GET
 
 

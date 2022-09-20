@@ -77,8 +77,7 @@
       "name" : "SCHEMAREGISTRY"
     }
   ],
-  {
-    "configWriter" : {
+   "configWriter" : {
         "generators" : [
           {
             "filename" : "service.properties",
@@ -86,13 +85,13 @@
             "template" : "aux/templates/properties.j2"
           }
         ]
-    }
-  }
- "roles" : [
+    },
+  "roles" : [
    {
     "name" : "DATAGEN_SERVER",
     "label" : "Datagen Web Server",
     "pluralLabel" : "Web Servers",
+    "jvmBased" : "true",
     "startRunner" : {
       "program" : "scripts/control.sh",
       "args" : [ "start" ],
@@ -216,7 +215,7 @@
         "description" : "Password of related truststore. Used to connect to HIVE, KAFKA, SOLR, KUDU.",
         "default" : "{{CM_AUTO_TLS}}",
         "type" : "password",
-        "configurableInWizard" : true,
+        "configurableInWizard" : true
     },
     {
         "name" : "keystore_location",
@@ -234,7 +233,7 @@
         "description" : "Password of related keystore. Used to connect to KAFKA.",
         "default" : "{{CM_AUTO_TLS}}",
         "type" : "password",
-        "configurableInWizard" : true,
+        "configurableInWizard" : true
     },
 
 
