@@ -48,6 +48,7 @@
      "runMode" : "single"
     }
    ],
+  "kerberos" : "${kerberos_enabled}",
   "serviceDependencies" : [
     {
      "name" : "HDFS"
