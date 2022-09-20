@@ -82,10 +82,10 @@
     mode: '0755'
     remote_src: true
 
-- name: Copy logback.xml
+- name: Copy logback-spring.xml
   copy:
-    src: "{{ target_dir }}/git-repo/src/main/resources/logback.xml"
-    dest: "{{ target_dir }}/parcel/{{ dg_name }}/logback.xml"
+    src: "{{ target_dir }}/git-repo/src/main/resources/logback-spring.xml"
+    dest: "{{ target_dir }}/parcel/{{ dg_name }}/logback-spring.xml"
     mode: '0755'
     remote_src: true
 
