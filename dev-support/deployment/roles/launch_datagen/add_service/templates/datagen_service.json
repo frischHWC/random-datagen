@@ -24,12 +24,8 @@
                         "items" : 
                         [ 
                             {
-                              "name" : "kerberos_principal",
-                              "value" : "francois@FRISCH.COM"
-                            },
-                            {
-                                "name" : "kerberos_keytab",
-                                "value" : "/home/francois/francois.keytab"
+                              "name" : "threads",
+                              "value" : 4
                             }
                         ]
                       }

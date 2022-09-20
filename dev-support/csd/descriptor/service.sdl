@@ -9,7 +9,8 @@
   },
   "runAs" : { 
     "user" : "datagen",
-    "group" : "datagen"
+    "group" : "datagen",
+    "principal" : "datagen"
    },
    "maxInstances" : 1,
    "compatibility" : {
@@ -99,6 +100,13 @@
         "WEBSERVER_PORT" : "4242"
        }
      },
+     "kerberosPrincipals" : [
+             {
+               "name" : "datagen_principal",
+               "primary" : "${principal}",
+               "instance" : "${host}"
+             }
+           ],
      "externalLink" : {
        "name" : "datagen_swagger",
        "label" : "Datagen Swagger Web UI",
