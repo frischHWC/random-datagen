@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.model.type;
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -18,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.List;
 
+@Slf4j
 public class HashMd5Field extends Field<byte[]> {
 
     HashMd5Field(String name, Integer length, List<byte[]> possibleValues) {
@@ -61,7 +63,7 @@ public class HashMd5Field extends Field<byte[]> {
             md.update(toHash.getBytes(StandardCharsets.UTF_8));
             return md.digest();
         } catch (NoSuchAlgorithmException e) {
-            logger.warn("Could not load algorithm md5");
+            log.warn("Could not load algorithm md5");
             byte[] bytesArray = new byte[32];
             random.nextBytes(bytesArray);
             return bytesArray;
@@ -103,7 +105,7 @@ public class HashMd5Field extends Field<byte[]> {
         try {
             hivePreparedStatement.setString(index, DatatypeConverter.printHexBinary(value).toUpperCase());
         } catch (SQLException e) {
-            logger.warn("Could not set value : " + DatatypeConverter.printHexBinary(value).toUpperCase() + " into hive statement due to error :", e);
+            log.warn("Could not set value : " + DatatypeConverter.printHexBinary(value).toUpperCase() + " into hive statement due to error :", e);
         }
         return hivePreparedStatement;
     }

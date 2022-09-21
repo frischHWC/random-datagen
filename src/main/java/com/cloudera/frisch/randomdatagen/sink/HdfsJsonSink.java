@@ -7,6 +7,7 @@ import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
  * This is an HDFSJSON sink using Hadoop 3.1 API
  * Each instance manages one connection to a file system and one specific file
  */
+@Slf4j
 public class HdfsJsonSink implements SinkInterface {
 
     private FileSystem fileSystem;
@@ -56,11 +58,11 @@ public class HdfsJsonSink implements SinkInterface {
                 properties.get(ApplicationConfigs.HDFS_AUTH_KERBEROS_KEYTAB),config);
         }
 
-        logger.debug("Setting up access to HDFSJSON");
+        log.debug("Setting up access to HDFSJSON");
         try {
             fileSystem = FileSystem.get(URI.create(hdfsUri), config);
         } catch (IOException e) {
-            logger.error("Could not access to HDFSJSON !", e);
+            log.error("Could not access to HDFSJSON !", e);
         }
 
         Utils.createHdfsDirectory(fileSystem, directoryName);
@@ -80,7 +82,7 @@ public class HdfsJsonSink implements SinkInterface {
         try {
         fsDataOutputStream.close();
         } catch (IOException e) {
-            logger.error(" Unable to close HDFSJSON file with error :", e);
+            log.error(" Unable to close HDFSJSON file with error :", e);
         }
     }
 
@@ -100,7 +102,7 @@ public class HdfsJsonSink implements SinkInterface {
                 fsDataOutputStream.close();
             }
         } catch (IOException e) {
-            logger.error("Can not write data to the HDFSJSON file due to error: ", e);
+            log.error("Can not write data to the HDFSJSON file due to error: ", e);
         }
     }
 
@@ -108,9 +110,9 @@ public class HdfsJsonSink implements SinkInterface {
         try {
             Utils.deleteHdfsFile(fileSystem, path);
             fsDataOutputStream = fileSystem.create(new Path(path), replicationFactor);
-            logger.debug("Successfully created hdfs file : " + path);
+            log.debug("Successfully created hdfs file : " + path);
         } catch (IOException e) {
-            logger.error("Tried to create file : " + path + " with no success :", e);
+            log.error("Tried to create file : " + path + " with no success :", e);
         }
     }
 

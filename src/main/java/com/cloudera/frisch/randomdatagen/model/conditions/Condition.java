@@ -5,12 +5,12 @@ import com.cloudera.frisch.randomdatagen.model.Row;
 import com.cloudera.frisch.randomdatagen.model.type.Field;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.log4j.Logger;
 
+@Slf4j
 public class Condition {
-
-  private static final Logger logger = Logger.getLogger(Condition.class);
-
+  
   @Getter @Setter
   String columnName1;
 
@@ -52,10 +52,10 @@ public class Condition {
                 break;
     }
 
-    logger.debug("Comparison will be made between two columns: " + columnName1 + " and " + columnName2);
+    log.debug("Comparison will be made between two columns: " + columnName1 + " and " + columnName2);
 
     if(value2 != null) {
-      logger.debug("Comparison will be made between column: " + columnName1 + " and value: " + value2 );
+      log.debug("Comparison will be made between column: " + columnName1 + " and value: " + value2 );
     }
 
   }
@@ -64,7 +64,7 @@ public class Condition {
   public void guessColumnType(Model model) {
     Field field = (Field) model.getFields().get(columnName1);
     if (field==null){
-      logger.error("Could not find column: " + columnName1 + " in list of fields");
+      log.error("Could not find column: " + columnName1 + " in list of fields");
     }
 
     switch(field.getClass().getSimpleName()) {
@@ -117,7 +117,7 @@ public class Condition {
 
     default:
       result = false;
-      logger.warn("Could not get any operator to evaluate condition");
+      log.warn("Could not get any operator to evaluate condition");
       break;
     }
 

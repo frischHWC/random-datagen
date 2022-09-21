@@ -4,14 +4,14 @@ package com.cloudera.frisch.randomdatagen.model.conditions;
 import com.cloudera.frisch.randomdatagen.model.Row;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.log4j.Logger;
 
 import java.util.*;
 
+@Slf4j
 public class ConditionalEvaluator {
-
-  private final static Logger logger = Logger.getLogger(ConditionalEvaluator.class);
-
+  
   @Getter
   @Setter
   public LinkedList<ConditionsLine> conditionLines = new LinkedList<>();
@@ -24,7 +24,7 @@ public class ConditionalEvaluator {
         while(condIterator.hasNext()) {
           Map.Entry<String, String> condLine = condIterator.next();
           conditionLines.add(new ConditionsLine(condLine.getKey(), condLine.getValue()));
-          logger.debug(" Added condition line: " + condLine.getKey() + " : " + condLine.getValue());
+          log.debug(" Added condition line: " + condLine.getKey() + " : " + condLine.getValue());
         }
   }
 

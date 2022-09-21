@@ -6,6 +6,7 @@ import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericRecord;
@@ -20,7 +21,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-
+@Slf4j
 public class ParquetSink implements SinkInterface {
 
 
@@ -64,7 +65,7 @@ public class ParquetSink implements SinkInterface {
                 writer.close();
             }
         } catch (IOException e) {
-            logger.error(" Unable to close local file with error :", e);
+            log.error(" Unable to close local file with error :", e);
         }
     }
 
@@ -78,14 +79,14 @@ public class ParquetSink implements SinkInterface {
             try {
                 writer.write(genericRecord);
             } catch (IOException e) {
-                logger.error("Can not write data to the local file due to error: ", e);
+                log.error("Can not write data to the local file due to error: ", e);
             }
         });
         if (oneFilePerIteration) {
             try {
                 writer.close();
             } catch (IOException e) {
-                logger.error(" Unable to close local file with error :", e);
+                log.error(" Unable to close local file with error :", e);
             }
         }
     }
@@ -103,10 +104,10 @@ public class ParquetSink implements SinkInterface {
                     .withDictionaryPageSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_DICTIONARY_PAGE_SIZE))
                     .withRowGroupSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_ROW_GROUP_SIZE))
                     .build();
-            logger.debug("Successfully created local Parquet file : " + path);
+            log.debug("Successfully created local Parquet file : " + path);
 
         } catch (IOException e) {
-            logger.error("Tried to create Parquet local file : " + path + " with no success :", e);
+            log.error("Tried to create Parquet local file : " + path + " with no success :", e);
         }
     }
 

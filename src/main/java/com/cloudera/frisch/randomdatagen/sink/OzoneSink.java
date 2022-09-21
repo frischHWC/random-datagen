@@ -8,6 +8,7 @@ import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
 import com.cloudera.frisch.randomdatagen.sink.storedobjects.OzoneObject;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hdds.client.ReplicationFactor;
 import org.apache.hadoop.hdds.client.ReplicationType;
 import org.apache.hadoop.hdds.conf.OzoneConfiguration;
@@ -25,6 +26,7 @@ import java.util.Map;
  * This is an Ozone Sink base on 0.4 API
  * Note that it could produce some Timeout on heavy workload but it still inserts correctly
  */
+@Slf4j
 public class OzoneSink implements SinkInterface {
 
     private OzoneClient ozClient;
@@ -57,7 +59,7 @@ public class OzoneSink implements SinkInterface {
             this.volume = objectStore.getVolume(volumeName);
 
         } catch (IOException e) {
-            logger.error("Could not connect and create Volume into Ozone, due to error: ", e);
+            log.error("Could not connect and create Volume into Ozone, due to error: ", e);
         }
 
     }
@@ -67,7 +69,7 @@ public class OzoneSink implements SinkInterface {
         try {
             ozClient.close();
         } catch (IOException e) {
-            logger.warn("Could not close properly Ozone connection, due to error: ", e);
+            log.warn("Could not close properly Ozone connection, due to error: ", e);
         }
     }
 
@@ -83,7 +85,7 @@ public class OzoneSink implements SinkInterface {
                 os.getOutputStream().flush();
                 os.close();
             } catch (IOException e) {
-                logger.error("Could not write row to Ozone volume: " + volume.getName() +
+                log.error("Could not write row to Ozone volume: " + volume.getName() +
                         " and bucket : " + ob.getBucket() +
                         " and key: " + ob.getKey() + " due to error: ", e);
             }
@@ -100,16 +102,16 @@ public class OzoneSink implements SinkInterface {
     private void createBucketIfNotExist(String bucketName) {
         try {
             volume.createBucket(bucketName);
-            logger.debug("Created successfully bucket : " + bucketName + " under volume : " + volume);
+            log.debug("Created successfully bucket : " + bucketName + " under volume : " + volume);
         } catch (OMException e) {
             if (e.getResult() == OMException.ResultCodes.BUCKET_ALREADY_EXISTS) {
-                logger.info("Bucket: " + bucketName + " under volume : " + volume.getName() + " already exists ");
+                log.info("Bucket: " + bucketName + " under volume : " + volume.getName() + " already exists ");
             } else {
-                logger.error("An error occurred while creating volume " +
+                log.error("An error occurred while creating volume " +
                         this.volumeName + " : ", e);
             }
         } catch (IOException e) {
-            logger.error("Could not create bucket to Ozone volume: " +
+            log.error("Could not create bucket to Ozone volume: " +
                     this.volumeName + " and bucket : " + bucketName + " due to error: ", e);
         }
 
@@ -128,12 +130,12 @@ public class OzoneSink implements SinkInterface {
             objectStore.createVolume(volumeName);
         } catch (OMException e) {
             if (e.getResult() == OMException.ResultCodes.VOLUME_ALREADY_EXISTS) {
-                logger.info("Volume: " + volumeName + " already exists ");
+                log.info("Volume: " + volumeName + " already exists ");
             } else {
-                logger.error("An error occurred while creating volume " + volumeName + " : ", e);
+                log.error("An error occurred while creating volume " + volumeName + " : ", e);
             }
         } catch (IOException e) {
-            logger.error("An unexpected exception occurred while creating volume " + volumeName + ": ", e);
+            log.error("An unexpected exception occurred while creating volume " + volumeName + ": ", e);
         }
     }
 
@@ -148,16 +150,16 @@ public class OzoneSink implements SinkInterface {
             OzoneVolume volume = objectStore.getVolume(volumeName);
 
             volume.listBuckets("bucket").forEachRemaining(bucket -> {
-                logger.debug("Deleting everything in bucket: " + bucket.getName() + " in volume: " + volumeName);
+                log.debug("Deleting everything in bucket: " + bucket.getName() + " in volume: " + volumeName);
                 try {
                     bucket.listKeys(null).forEachRemaining(key -> {
                         try {
-                            logger.debug("Deleting key: " + key.getName() +
+                            log.debug("Deleting key: " + key.getName() +
                                 " in bucket: " + bucket.getName() +
                                 " in volume: " + volumeName);
                             bucket.deleteKey(key.getName());
                         } catch (IOException e) {
-                            logger.error(
+                            log.error(
                                 "cannot delete key : " + key.getName() +
                                     " in bucket: " + bucket.getName() +
                                     " in volume: " + volumeName +
@@ -165,18 +167,18 @@ public class OzoneSink implements SinkInterface {
                         }
                     });
                 } catch (IOException e) {
-                    logger.error("Could not list keys in bucket " + bucket.getName() + " in volume: " + volumeName);
+                    log.error("Could not list keys in bucket " + bucket.getName() + " in volume: " + volumeName);
                 }
                 try {
                     volume.deleteBucket(bucket.getName());
                 } catch (IOException e) {
-                    logger.error("cannot delete bucket : " + bucket.getName() + " in volume: " + volumeName + " due to error: ", e);
+                    log.error("cannot delete bucket : " + bucket.getName() + " in volume: " + volumeName + " due to error: ", e);
                 }
             });
 
             objectStore.deleteVolume(volumeName);
         } catch (IOException e) {
-            logger.error("Could not delete volume: " + volumeName + " due to error: ", e);
+            log.error("Could not delete volume: " + volumeName + " due to error: ", e);
         }
     }
 

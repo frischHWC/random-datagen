@@ -1,5 +1,6 @@
 package com.cloudera.frisch.randomdatagen.model.type;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -12,7 +13,7 @@ import org.apache.orc.TypeDescription;
 import java.sql.SQLException;
 import java.util.UUID;
 
-
+@Slf4j
 public class UuidField extends Field<String> {
 
     UuidField(String name) {
@@ -50,7 +51,7 @@ public class UuidField extends Field<String> {
         try {
             hivePreparedStatement.setString(index, value);
         } catch (SQLException e) {
-            logger.warn("Could not set value : " + value + " into hive statement due to error :", e);
+            log.warn("Could not set value : " + value + " into hive statement due to error :", e);
         }
         return hivePreparedStatement;
     }

@@ -6,6 +6,7 @@ import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hive.jdbc.HiveConnection;
 import org.apache.hive.jdbc.HivePreparedStatement;
@@ -29,6 +30,7 @@ import java.util.concurrent.CountDownLatch;
  * and with a maximum of 20 threads (configurable in application.properties)
  */
 @SuppressWarnings("unchecked")
+@Slf4j
 public class HiveSink implements SinkInterface {
 
     private final int threads_number;
@@ -78,7 +80,7 @@ public class HiveSink implements SinkInterface {
                 prepareAndExecuteStatement("DROP TABLE IF EXISTS " + tableName);
             }
 
-            logger.info("SQL schema for hive: " + model.getSQLSchema());
+            log.info("SQL schema for hive: " + model.getSQLSchema());
             prepareAndExecuteStatement("CREATE TABLE IF NOT EXISTS " + tableName + model.getSQLSchema());
 
             if (hiveOnHDFS) {
@@ -87,7 +89,7 @@ public class HiveSink implements SinkInterface {
                     model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH));
                 this.hdfsSink = new HdfsParquetSink(model, properties);
 
-                logger.info("Creating temporary table: " + tableNameTemporary);
+                log.info("Creating temporary table: " + tableNameTemporary);
                 prepareAndExecuteStatement(
                         "CREATE EXTERNAL TABLE IF NOT EXISTS " + tableNameTemporary + model.getSQLSchema() +
                                 " STORED AS PARQUET " +
@@ -95,11 +97,11 @@ public class HiveSink implements SinkInterface {
                 );
             }
 
-            logger.info("SQL Insert schema for hive: " + model.getInsertSQLStatement());
+            log.info("SQL Insert schema for hive: " + model.getInsertSQLStatement());
             insertStatement = "INSERT INTO " + tableName + model.getInsertSQLStatement();
 
         } catch (SQLException e) {
-            logger.error("Could not connect to HS2 and create table due to error: ", e);
+            log.error("Could not connect to HS2 and create table due to error: ", e);
         }
     }
 
@@ -107,7 +109,7 @@ public class HiveSink implements SinkInterface {
     public void terminate() {
         try {
             if (hiveOnHDFS) {
-                logger.info("Starting to load data to final table");
+                log.info("Starting to load data to final table");
                 prepareAndExecuteStatement("INSERT INTO " + tableName +
                         " SELECT * FROM " + tableNameTemporary);
             }
@@ -115,7 +117,7 @@ public class HiveSink implements SinkInterface {
             hiveConnection.close();
 
         } catch (SQLException e) {
-            logger.error("Could not close the Hive connection due to error: ", e);
+            log.error("Could not close the Hive connection due to error: ", e);
         }
     }
 
@@ -153,7 +155,7 @@ public class HiveSink implements SinkInterface {
         try {
             latch.await();
         } catch (InterruptedException e) {
-            logger.error("Thread interrupted in the middle of a treatment : ", e);
+            log.error("Thread interrupted in the middle of a treatment : ", e);
             Thread.currentThread().interrupt();
         }
     }
@@ -181,23 +183,23 @@ public class HiveSink implements SinkInterface {
 
                 rows.forEach(row -> {
                     try {
-                        logger.debug("Inserting one row " + row.toString() + " from thread : " + getName());
+                        log.debug("Inserting one row " + row.toString() + " from thread : " + getName());
 
                         hivePreparedStatementByThread.clearParameters();
                         row.toHiveStatement(hivePreparedStatementByThread);
                         hivePreparedStatementByThread.execute();
 
-                        logger.debug("Finished to insert one row " + row.toString() + " from thread : " + getName());
+                        log.debug("Finished to insert one row " + row.toString() + " from thread : " + getName());
                     } catch (SQLException e) {
-                        logger.error("Could not execute the request on row: " + row.toString() + " due to error: ", e);
+                        log.error("Could not execute the request on row: " + row.toString() + " due to error: ", e);
                     } catch (StringIndexOutOfBoundsException e) {
-                        logger.warn("This row has not been inserted due to a Hive API row bugs : " + row.toString());
+                        log.warn("This row has not been inserted due to a Hive API row bugs : " + row.toString());
                     }
                 });
 
                 hivePreparedStatementByThread.close();
             } catch (SQLException e) {
-                logger.error("Could not prepare statement for Hive");
+                log.error("Could not prepare statement for Hive");
             }
 
             latch.countDown();
@@ -208,7 +210,7 @@ public class HiveSink implements SinkInterface {
         try (PreparedStatement preparedStatement = hiveConnection.prepareStatement(sqlQuery)) {
             preparedStatement.execute();
         } catch (SQLException e) {
-            logger.error("Could not execute request due to error: ", e);
+            log.error("Could not execute request due to error: ", e);
         }
     }
 

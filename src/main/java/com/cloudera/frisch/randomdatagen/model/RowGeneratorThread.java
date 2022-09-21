@@ -2,16 +2,15 @@ package com.cloudera.frisch.randomdatagen.model;
 
 import com.cloudera.frisch.randomdatagen.model.type.Field;
 import lombok.Getter;
-import org.apache.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 
+@Slf4j
 public class RowGeneratorThread<T extends Field> extends Thread {
-
-  private static final Logger logger = Logger.getLogger(RowGeneratorThread.class);
 
   @Getter
   private volatile List<Row> rows;
@@ -29,7 +28,7 @@ public class RowGeneratorThread<T extends Field> extends Thread {
     this.fieldsRandomName = fieldsRandomName;
     this.fieldsComputedName = fieldsComputedName;
     this.fields = fields;
-    logger.debug("Prepared a new Thread to run generation of data");
+    log.debug("Prepared a new Thread to run generation of data");
   }
 
   @Override
@@ -42,8 +41,8 @@ public class RowGeneratorThread<T extends Field> extends Thread {
       fieldsComputedName.forEach(f -> row.getValues()
           .put(f, fields.get(f).generateComputedValue(row)));
 
-      if (logger.isDebugEnabled()) {
-        logger.debug("Created random row: " + row);
+      if (log.isDebugEnabled()) {
+        log.debug("Created random row: " + row);
       }
       rows.add(row);
     }

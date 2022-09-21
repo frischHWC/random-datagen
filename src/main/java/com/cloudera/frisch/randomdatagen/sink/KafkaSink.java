@@ -7,6 +7,7 @@ import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
 import com.hortonworks.registries.schemaregistry.client.SchemaRegistryClient;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
@@ -25,6 +26,7 @@ import static com.hortonworks.registries.schemaregistry.serdes.avro.SerDesProtoc
 /**
  * This is a Kafka Sink
  */
+@Slf4j
 public class KafkaSink implements SinkInterface {
 
     private Producer<String, GenericRecord> producer;

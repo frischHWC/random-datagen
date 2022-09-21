@@ -6,6 +6,7 @@ import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.kudu.client.*;
@@ -18,6 +19,7 @@ import java.util.Map;
  * This is a kudu sink based on Kudu 1.11.0 API
  */
 @SuppressWarnings("unchecked")
+@Slf4j
 public class KuduSink implements SinkInterface {
 
     private KuduTable table;
@@ -70,7 +72,7 @@ public class KuduSink implements SinkInterface {
             this.table = client.openTable(tableName);
 
         } catch (Exception e) {
-            logger.error("Could not connect to Kudu due to error: ", e);
+            log.error("Could not connect to Kudu due to error: ", e);
         }
     }
 
@@ -80,7 +82,7 @@ public class KuduSink implements SinkInterface {
             session.close();
             client.shutdown();
         } catch (Exception e) {
-            logger.error("Could not close connection to Kudu due to error: ", e);
+            log.error("Could not close connection to Kudu due to error: ", e);
         }
     }
 
@@ -91,12 +93,12 @@ public class KuduSink implements SinkInterface {
                 try {
                     session.apply(insert);
                 } catch (KuduException e) {
-                    logger.error("Could not insert row for kudu in table : " + table + " due to error:", e );
+                    log.error("Could not insert row for kudu in table : " + table + " due to error:", e );
                 }
             });
             session.flush();
         } catch (Exception e) {
-            logger.error("Could not send rows to kudu due to error: ", e);
+            log.error("Could not send rows to kudu due to error: ", e);
         }
 
     }
@@ -116,9 +118,9 @@ public class KuduSink implements SinkInterface {
             client.createTable(tableName, model.getKuduSchema(), cto);
         } catch (KuduException e) {
             if(e.getMessage().contains("already exists")){
-                logger.info("Table Kudu : "  + tableName + " already exists, hence it will not be created");
+                log.info("Table Kudu : "  + tableName + " already exists, hence it will not be created");
             } else {
-                logger.error("Could not create table due to error", e);
+                log.error("Could not create table due to error", e);
             }
         }
 

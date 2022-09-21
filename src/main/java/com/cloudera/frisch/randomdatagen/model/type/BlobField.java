@@ -1,5 +1,6 @@
 package com.cloudera.frisch.randomdatagen.model.type;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -15,7 +16,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-
+@Slf4j
 public class BlobField extends Field<byte[]> {
 
     BlobField(String name, Integer length, List<byte[]> possibleValues) {
@@ -83,7 +84,7 @@ public class BlobField extends Field<byte[]> {
         try {
             hivePreparedStatement.setBytes(index, value);
         } catch (SQLException e) {
-            logger.warn("Could not set value : " + Arrays.toString(value) + " into hive statement due to error :", e);
+            log.warn("Could not set value : " + Arrays.toString(value) + " into hive statement due to error :", e);
         }
         return hivePreparedStatement;
     }

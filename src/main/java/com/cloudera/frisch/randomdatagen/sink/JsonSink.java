@@ -6,6 +6,7 @@ import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
  * This is a JSON sink
  * Its goal is to write into ONE single json file data randomly generated
  */
+@Slf4j
 public class JsonSink implements SinkInterface {
 
     private FileOutputStream outputStream;
@@ -57,7 +59,7 @@ public class JsonSink implements SinkInterface {
                 outputStream.close();
             }
         } catch (IOException e) {
-            logger.error(" Unable to close local file with error :", e);
+            log.error(" Unable to close local file with error :", e);
         }
     }
 
@@ -74,7 +76,7 @@ public class JsonSink implements SinkInterface {
                     outputStream.write(r.getBytes());
                     outputStream.write(lineSeparator.getBytes());
                 } catch (IOException e) {
-                    logger.error("Could not write row: " + r + " to file: " + outputStream.getChannel());
+                    log.error("Could not write row: " + r + " to file: " + outputStream.getChannel());
                 }
             });
             outputStream.write(lineSeparator.getBytes());
@@ -83,18 +85,18 @@ public class JsonSink implements SinkInterface {
                 outputStream.close();
             }
         } catch (IOException e) {
-            logger.error("Can not write data to the local file due to error: ", e);
+            log.error("Can not write data to the local file due to error: ", e);
         }
     }
 
     void createFileWithOverwrite(String path) {
         try {
             File file = new File(path);
-            if(file.createNewFile()) { logger.warn("Could not create file");}
+            if(file.createNewFile()) { log.warn("Could not create file");}
             outputStream = new FileOutputStream(path, false);
-            logger.debug("Successfully created local file : " + path);
+            log.debug("Successfully created local file : " + path);
         } catch (IOException e) {
-            logger.error("Tried to create file : " + path + " with no success :", e);
+            log.error("Tried to create file : " + path + " with no success :", e);
         }
     }
 

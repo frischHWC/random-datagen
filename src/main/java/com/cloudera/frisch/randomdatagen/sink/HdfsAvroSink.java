@@ -7,6 +7,7 @@ import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericDatumWriter;
@@ -25,6 +26,7 @@ import java.util.Map;
  * This is an HDFS Avro sink using Hadoop 3.2 API
  * Each instance manages one connection to a file system
  */
+@Slf4j
 public class HdfsAvroSink implements SinkInterface {
 
     private final Schema schema;
@@ -65,7 +67,7 @@ public class HdfsAvroSink implements SinkInterface {
         try {
             this.fileSystem = FileSystem.get(URI.create(hdfsUri), config);
         } catch (IOException e) {
-            logger.error("Could not access to HDFSAVRO !", e);
+            log.error("Could not access to HDFSAVRO !", e);
         }
 
         this.schema = model.getAvroSchema();
@@ -90,7 +92,7 @@ public class HdfsAvroSink implements SinkInterface {
             dataFileWriter.close();
             fsDataOutputStream.close();
         } catch (IOException e) {
-            logger.error(" Unable to close HDFSAVRO file with error :", e);
+            log.error(" Unable to close HDFSAVRO file with error :", e);
         }
     }
 
@@ -106,7 +108,7 @@ public class HdfsAvroSink implements SinkInterface {
             try {
                 dataFileWriter.append(genericRecord);
             } catch (IOException e) {
-                logger.error("Can not write data to the hdfs file due to error: ", e);
+                log.error("Can not write data to the hdfs file due to error: ", e);
             }
         });
 
@@ -115,14 +117,14 @@ public class HdfsAvroSink implements SinkInterface {
                 dataFileWriter.close();
                 fsDataOutputStream.close();
             } catch (IOException e) {
-                logger.error(" Unable to close hdfs file with error :", e);
+                log.error(" Unable to close hdfs file with error :", e);
             }
         } else {
             try {
                 dataFileWriter.flush();
                 fsDataOutputStream.flush();
             } catch (IOException e) {
-                logger.error(" Unable to flush hdfs file with error :", e);
+                log.error(" Unable to flush hdfs file with error :", e);
             }
         }
     }
@@ -132,9 +134,9 @@ public class HdfsAvroSink implements SinkInterface {
             Utils.deleteHdfsFile(fileSystem, path);
             fsDataOutputStream = fileSystem.create(new Path(path), replicationFactor);
             dataFileWriter = new DataFileWriter<>(datumWriter);
-            logger.debug("Successfully created hdfs file : " + path);
+            log.debug("Successfully created hdfs file : " + path);
         } catch (IOException e) {
-            logger.error("Tried to create hdfs file : " + path + " with no success :", e);
+            log.error("Tried to create hdfs file : " + path + " with no success :", e);
         }
     }
 
@@ -142,7 +144,7 @@ public class HdfsAvroSink implements SinkInterface {
         try {
             dataFileWriter.create(schema, fsDataOutputStream.getWrappedStream());
         } catch (IOException e) {
-            logger.error("Can not write header to the hdfs file due to error: ", e);
+            log.error("Can not write header to the hdfs file due to error: ", e);
         }
     }
 

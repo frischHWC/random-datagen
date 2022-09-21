@@ -3,6 +3,7 @@ package com.cloudera.frisch.randomdatagen.sink;
 import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.SinkParser;
 import com.cloudera.frisch.randomdatagen.model.Model;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -10,12 +11,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-
+@Slf4j
 public class SinkSender {
 
     private SinkSender() { throw new IllegalStateException("Could not initialize this class");}
-
-    private static final Logger logger = Logger.getLogger(SinkSender.class);
+    
 
     /**
      * Check what are the all sinks passed and initiates them one by one
@@ -79,12 +79,12 @@ public class SinkSender {
                     sinkToInitAndStart = new ORCSink(model, properties);
                     break;
                  default:
-                     logger.warn("The sink " + sink + " provided has not been recognized as an expected sink");
+                     log.warn("The sink " + sink + " provided has not been recognized as an expected sink");
                      break;
             }
 
             if(sinkToInitAndStart != null) {
-                logger.info(sinkToInitAndStart.getClass().getSimpleName() + " is added to the list of sink");
+                log.info(sinkToInitAndStart.getClass().getSimpleName() + " is added to the list of sink");
                 sinkList.add(sinkToInitAndStart);
             }
 

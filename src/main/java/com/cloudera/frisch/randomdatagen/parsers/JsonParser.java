@@ -5,6 +5,7 @@ import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.type.Field;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.util.*;
  * Goal of this class is to be able to parse a codified file JSON and render a model based on it
  */
 @SuppressWarnings("unchecked")
+@Slf4j
 public class JsonParser<T extends Field> implements Parser {
 
     private JsonNode root;
@@ -21,13 +23,13 @@ public class JsonParser<T extends Field> implements Parser {
     public JsonParser(String jsonFilePath) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            logger.info("Model used is from Json file : " + jsonFilePath);
+            log.info("Model used is from Json file : " + jsonFilePath);
             root = mapper.readTree(new File(jsonFilePath));
-            logger.debug("JSON file content is :" + root.toPrettyString());
+            log.debug("JSON file content is :" + root.toPrettyString());
         } catch (IOException e) {
-            logger.error("Could not read JSON file: " + jsonFilePath + ", please verify its structure, error is : ", e);
+            log.error("Could not read JSON file: " + jsonFilePath + ", please verify its structure, error is : ", e);
         } catch (NullPointerException e) {
-            logger.error("Model file has not been found at : " + jsonFilePath + " , please verify it exists, error is: ", e);
+            log.error("Model file has not been found at : " + jsonFilePath + " , please verify it exists, error is: ", e);
             System.exit(1);
         }
     }
@@ -67,7 +69,7 @@ public class JsonParser<T extends Field> implements Parser {
         try {
             hbaseFamilyColsMap = mapColNameToColQual(opsMap.get("HBASE_COLUMN_FAMILIES_MAPPING"));
         } catch (Exception e) {
-            logger.warn("Could not get any column qualifier, defaulting to 'cq', check you are not using HBase ");
+            log.warn("Could not get any column qualifier, defaulting to 'cq', check you are not using HBase ");
         }
 
         while (fieldsIterator.hasNext()) {

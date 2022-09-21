@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.model.type;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -20,7 +21,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 public class CsvField extends Field<Map<String, String>> {
 
     // We suppose that each row of the CSV read will fit in a map of string to string (everything is converted to a string)
@@ -73,11 +74,11 @@ public class CsvField extends Field<Map<String, String>> {
                 .collect(Collectors.toList());
 
         } catch (Exception e) {
-            logger.error("Could not load CSVs, error : " + e);
+            log.error("Could not load CSVs, error : " + e);
             String stackTrace = Arrays.stream(e.getStackTrace()).
                 map(stackTraceElement -> stackTraceElement.toString())
                 .reduce("", (subtot, element) -> subtot + System.lineSeparator() + element);
-            logger.error("Stacktrace: " + stackTrace);
+            log.error("Stacktrace: " + stackTrace);
             return Collections.singletonList(Map.of(this.mainField, ""));
         }
     }
@@ -153,7 +154,7 @@ public class CsvField extends Field<Map<String, String>> {
         try {
             hivePreparedStatement.setString(index, value.get(this.mainField));
         } catch (SQLException e) {
-            logger.warn("Could not set value : " + value + " into hive statement due to error :", e);
+            log.warn("Could not set value : " + value + " into hive statement due to error :", e);
         }
         return hivePreparedStatement;
     }

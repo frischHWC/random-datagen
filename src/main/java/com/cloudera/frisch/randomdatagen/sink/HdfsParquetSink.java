@@ -7,6 +7,7 @@ import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.hadoop.conf.Configuration;
@@ -24,6 +25,7 @@ import java.util.Map;
 /**
  * This is an HDFS PARQUET sink using Hadoop 3.2 API
  */
+@Slf4j
 public class HdfsParquetSink implements SinkInterface {
 
     private FileSystem fileSystem;
@@ -65,7 +67,7 @@ public class HdfsParquetSink implements SinkInterface {
         try {
             this.fileSystem = FileSystem.get(URI.create(hdfsUri), config);
         } catch (IOException e) {
-            logger.error("Could not access to HDFS PARQUET !", e);
+            log.error("Could not access to HDFS PARQUET !", e);
         }
 
         this.schema = model.getAvroSchema();
@@ -88,7 +90,7 @@ public class HdfsParquetSink implements SinkInterface {
         try {
         writer.close();
         } catch (IOException e) {
-            logger.error(" Unable to close HDFS PARQUET file with error :", e);
+            log.error(" Unable to close HDFS PARQUET file with error :", e);
         }
     }
 
@@ -104,7 +106,7 @@ public class HdfsParquetSink implements SinkInterface {
                 try {
                     writer.write(genericRecord);
                 } catch (IOException e) {
-                    logger.error("Can not write data to the HDFS PARQUET file due to error: ", e);
+                    log.error("Can not write data to the HDFS PARQUET file due to error: ", e);
                 }
             });
 
@@ -112,7 +114,7 @@ public class HdfsParquetSink implements SinkInterface {
                 writer.close();
             }
         } catch (IOException e) {
-            logger.error("Can not write data to the HDFS PARQUET file due to error: ", e);
+            log.error("Can not write data to the HDFS PARQUET file due to error: ", e);
         }
     }
 
@@ -129,10 +131,10 @@ public class HdfsParquetSink implements SinkInterface {
                 .withDictionaryPageSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_DICTIONARY_PAGE_SIZE))
                 .withRowGroupSize((int) model.getOptionsOrDefault(OptionsConverter.Options.PARQUET_ROW_GROUP_SIZE))
                 .build();
-            logger.debug("Successfully created local Parquet file : " + path);
+            log.debug("Successfully created local Parquet file : " + path);
 
         } catch (IOException e) {
-            logger.error("Tried to create Parquet local file : " + path + " with no success :", e);
+            log.error("Tried to create Parquet local file : " + path + " with no success :", e);
         }
     }
 

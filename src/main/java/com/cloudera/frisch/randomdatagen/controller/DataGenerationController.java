@@ -2,6 +2,7 @@ package com.cloudera.frisch.randomdatagen.controller;
 
 
 import com.cloudera.frisch.randomdatagen.service.DataGenerationService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,11 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Collections;
 
 
+@Slf4j
 @RestController
 @RequestMapping("/datagen")
 public class DataGenerationController {
-
-  private static final Logger logger = Logger.getLogger(DataGenerationController.class);
 
   @Autowired
   private DataGenerationService dataGenerationService;

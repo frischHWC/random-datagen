@@ -6,6 +6,7 @@ import com.cloudera.frisch.randomdatagen.config.SinkParser;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
@@ -24,12 +25,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-
+@Slf4j
 public class Utils {
 
     private Utils() { throw new IllegalStateException("Could not initialize this class"); }
-
-    private static final Logger logger = Logger.getLogger(Utils.class);
 
     private static final long oneHour = 1000 * 60 *60;
     private static final long oneMinute = 1000 * 60;
@@ -131,7 +130,7 @@ public class Utils {
             try {
                 UserGroupInformation.loginUserFromKeytab(kerberosUser, pathToKeytab);
             } catch (IOException e) {
-                logger.error("Could not load keytab file",e);
+                log.error("Could not load keytab file",e);
             }
 
     }
@@ -160,8 +159,8 @@ public class Utils {
         File folder = new File(directory);
         File[] files = folder.listFiles((dir,f) -> f.matches(name + ".*[.]" + extension));
         for(File f: files){
-            logger.debug("Will delete local file: " + f);
-            if(!f.delete()) { logger.warn("Could not delete file: " + f);}
+            log.debug("Will delete local file: " + f);
+            if(!f.delete()) { log.warn("Could not delete file: " + f);}
         }
     }
 
@@ -176,12 +175,12 @@ public class Utils {
             while(fileiterator.hasNext()) {
                 LocatedFileStatus file = fileiterator.next();
                 if(file.getPath().getName().matches(name + ".*[.]" + extension)) {
-                    logger.debug("Will delete HDFS file: " + file.getPath());
+                    log.debug("Will delete HDFS file: " + file.getPath());
                     fileSystem.delete(file.getPath(), false);
                 }
             }
         } catch (Exception e) {
-            logger.warn("Could not delete files under " + directory + " due to error: ", e);
+            log.warn("Could not delete files under " + directory + " due to error: ", e);
         }
     }
 
@@ -194,7 +193,7 @@ public class Utils {
         try {
             fileSystem.mkdirs(new Path(path));
         } catch (IOException e) {
-            logger.error("Unable to create hdfs directory of : " + path + " due to error: ", e);
+            log.error("Unable to create hdfs directory of : " + path + " due to error: ", e);
         }
     }
 
@@ -206,7 +205,7 @@ public class Utils {
         try {
             new File(path).mkdirs();
         } catch (Exception e) {
-            logger.error("Unable to create directory of : " + path + " due to error: ", e);
+            log.error("Unable to create directory of : " + path + " due to error: ", e);
         }
     }
 
@@ -217,9 +216,9 @@ public class Utils {
     public static void deleteLocalFile(String path) {
         try {
             new File(path).delete();
-            logger.debug("Successfully delete local file : " + path);
+            log.debug("Successfully delete local file : " + path);
         } catch (Exception e) {
-            logger.error("Tried to delete file : " + path + " with no success :", e);
+            log.error("Tried to delete file : " + path + " with no success :", e);
         }
     }
 
@@ -231,9 +230,9 @@ public class Utils {
     public static void deleteHdfsFile(FileSystem fileSystem, String path) {
         try {
             fileSystem.delete(new Path(path), true);
-            logger.debug("Successfully deleted hdfs file : " + path);
+            log.debug("Successfully deleted hdfs file : " + path);
         } catch (IOException e) {
-            logger.error("Tried to delete hdfs file : " + path + " with no success :", e);
+            log.error("Tried to delete hdfs file : " + path + " with no success :", e);
         }
     }
 
@@ -277,7 +276,7 @@ public class Utils {
             fileWriter.append("};");
             fileWriter.flush();
         } catch (IOException e) {
-            logger.error("Could not write proper JAAS config file : " + fileName + " due to error : ", e);
+            log.error("Could not write proper JAAS config file : " + fileName + " due to error : ", e);
         }
     }
 
@@ -317,16 +316,16 @@ public class Utils {
     public static void testClasspath() {
         String classpath = System.getProperty("java.class.path");
         String[] paths = classpath.split(System.getProperty("path.separator"));
-        logger.info("Home is : " + System.getProperty("java.home"));
+        log.info("Home is : " + System.getProperty("java.home"));
 
         try(FileWriter myWriter = new FileWriter("/home/frisch/classpath.txt")) {
             for(String p: paths) {
                 myWriter.write(p + System.getProperty("line.separator"));
-                logger.info("This file is in path : " + p);
+                log.info("This file is in path : " + p);
             }
             myWriter.flush();
         } catch (IOException e) {
-            logger.error("Could not write to file", e);
+            log.error("Could not write to file", e);
         }
     }
 
@@ -334,157 +333,157 @@ public class Utils {
      * Log in the recap of what's been generated
      */
     public static void recap(long numberOfBatches, long rowPerBatch, List<SinkParser.sinks> sinks, Model model) {
-        logger.info(" ************************* Recap of data generation ****************** ");
-        logger.info("Generated " + rowPerBatch*numberOfBatches + " rows into : ");
+        log.info(" ************************* Recap of data generation ****************** ");
+        log.info("Generated " + rowPerBatch*numberOfBatches + " rows into : ");
 
         sinks.forEach(sink -> {
             switch (sink) {
             case HDFSCSV:
-                logger.info("   - HDFS as CSV files of " + rowPerBatch + " rows, from : ");
-                logger.info("       " +
+                log.info("   - HDFS as CSV files of " + rowPerBatch + " rows, from : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-0000000000.csv");
-                logger.info("       to : ");
-                logger.info("       " +
+                log.info("       to : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" +
                     String.format("%010d", numberOfBatches-1) + ".csv");
                 break;
             case HDFSJSON:
-                logger.info("   - HDFS as JSON files of " + rowPerBatch + " rows, from : ");
-                logger.info("       " +
+                log.info("   - HDFS as JSON files of " + rowPerBatch + " rows, from : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-0000000000.json");
-                logger.info("       to : ");
-                logger.info("       " +
+                log.info("       to : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" +
                     String.format("%010d", numberOfBatches-1) + ".json");
                 break;
             case HDFSAVRO:
-                logger.info("   - HDFS as Avro files of " + rowPerBatch + " rows, from : ");
-                logger.info("       " +
+                log.info("   - HDFS as Avro files of " + rowPerBatch + " rows, from : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-0000000000.avro");
-                logger.info("       to : ");
-                logger.info("       " +
+                log.info("       to : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" +
                     String.format("%010d", numberOfBatches-1) + ".avro");
                 break;
             case HDFSORC:
-                logger.info("   - HDFS as ORC files of " + rowPerBatch + " rows, from : ");
-                logger.info("       " +
+                log.info("   - HDFS as ORC files of " + rowPerBatch + " rows, from : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-0000000000.orc");
-                logger.info("       to : ");
-                logger.info("       " +
+                log.info("       to : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" +
                     String.format("%010d", numberOfBatches-1) + ".orc");
                 break;
             case HDFSPARQUET:
-                logger.info("   - HDFS as Parquet files of " + rowPerBatch + " rows, from : ");
-                logger.info("       " +
+                log.info("   - HDFS as Parquet files of " + rowPerBatch + " rows, from : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-0000000000.parquet");
-                logger.info("        to : ");
-                logger.info("       " +
+                log.info("        to : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" +
                     String.format("%010d", numberOfBatches-1) + ".parquet");
                 break;
             case HBASE:
-                logger.info("   - HBase in namespace " + model.getTableNames().get(OptionsConverter.TableNames.HBASE_NAMESPACE) +
+                log.info("   - HBase in namespace " + model.getTableNames().get(OptionsConverter.TableNames.HBASE_NAMESPACE) +
                     " in table : " + model.getTableNames().get(OptionsConverter.TableNames.HBASE_TABLE_NAME));
                 break;
             case HIVE:
-                logger.info("   - Hive in database: " + model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE) +
+                log.info("   - Hive in database: " + model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE) +
                     " in table : " + model.getTableNames().get(OptionsConverter.TableNames.HIVE_TABLE_NAME));
                 if((Boolean) model.getOptions().get(OptionsConverter.Options.HIVE_ON_HDFS)) {
                     String tableNameTemporary = model.getTableNames().get(OptionsConverter.TableNames.HIVE_TEMPORARY_TABLE_NAME)==null ?
                         (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TABLE_NAME) + "_tmp" :
                         (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TEMPORARY_TABLE_NAME);
-                    logger.info("   - Hive in database: " + model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE) +
+                    log.info("   - Hive in database: " + model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE) +
                         " in external table : " + tableNameTemporary + " located in HDFS at: " +
                         model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH));
                 }
                 break;
             case OZONE:
-                logger.info("   - Ozone in volume " + model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME));
+                log.info("   - Ozone in volume " + model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME));
                 break;
             case SOLR:
-                logger.info("   - SolR in collection " + model.getTableNames().get(OptionsConverter.TableNames.SOLR_COLLECTION));
+                log.info("   - SolR in collection " + model.getTableNames().get(OptionsConverter.TableNames.SOLR_COLLECTION));
                 break;
             case KAFKA:
-                logger.info("   - Kafka in topic " + model.getTableNames().get(OptionsConverter.TableNames.KAFKA_TOPIC));
+                log.info("   - Kafka in topic " + model.getTableNames().get(OptionsConverter.TableNames.KAFKA_TOPIC));
                 break;
             case KUDU:
-                logger.info("   - Kudu in table " + model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME));
+                log.info("   - Kudu in table " + model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME));
                 break;
             case CSV:
-                logger.info("   - CSV files of " + rowPerBatch + " rows, from : " );
-                logger.info("       " +
+                log.info("   - CSV files of " + rowPerBatch + " rows, from : " );
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-0000000000.csv");
-                logger.info("       to : ");
-                logger.info("       " +
+                log.info("       to : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" +
                     String.format("%010d", numberOfBatches-1) + ".csv");
                 break;
             case JSON:
-                logger.info("   - JSON files of " + rowPerBatch + " rows, from : " );
-                logger.info("       " +
+                log.info("   - JSON files of " + rowPerBatch + " rows, from : " );
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-0000000000.json");
-                logger.info("       to : ");
-                logger.info("       " +
+                log.info("       to : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" +
                     String.format("%010d", numberOfBatches-1) + ".json");
                 break;
             case AVRO:
-                logger.info("   - Avro files of " + rowPerBatch + " rows, from : ");
-                logger.info("       " +
+                log.info("   - Avro files of " + rowPerBatch + " rows, from : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-0000000000.avro");
-                logger.info("       to : ");
-                logger.info("       " +
+                log.info("       to : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" +
                     String.format("%010d", numberOfBatches-1) + ".avro");
                 break;
             case PARQUET:
-                logger.info("   - Parquet files of " + rowPerBatch + " rows, from : " );
-                logger.info("       " +
+                log.info("   - Parquet files of " + rowPerBatch + " rows, from : " );
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-0000000000.parquet");
-                logger.info("       to : ");
-                logger.info("       " +
+                log.info("       to : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" +
                     String.format("%010d", numberOfBatches-1) + ".parquet");
                 break;
             case ORC:
-                logger.info("   - ORC files of " + rowPerBatch + " rows, from : " );
-                logger.info("       " +
+                log.info("   - ORC files of " + rowPerBatch + " rows, from : " );
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-0000000000.orc");
-                logger.info("       to : ");
-                logger.info("       " +
+                log.info("       to : ");
+                log.info("       " +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH) +
                     model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_NAME) + "-" +
                     String.format("%010d", numberOfBatches-1) + ".orc");
                 break;
             default:
-                logger.info("The sink " + sink.toString() +
+                log.info("The sink " + sink.toString() +
                     " provided has not been recognized as an expected sink");
                 break;
             }
 
         });
-        logger.info("****************************************************************");
+        log.info("****************************************************************");
     }
 
 

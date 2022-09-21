@@ -4,6 +4,7 @@ package com.cloudera.frisch.randomdatagen.model.conditions;
 import com.cloudera.frisch.randomdatagen.model.Row;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
@@ -14,9 +15,8 @@ import java.util.List;
 /**
  * A Conditions line is a line of 1 or multiple conditions evaluated in order
  */
+@Slf4j
 public class ConditionsLine {
-
-  Logger logger = Logger.getLogger(ConditionsLine.class);
 
   @Getter @Setter
   private LinkedList<Condition> listOfConditions;
@@ -63,25 +63,25 @@ public class ConditionsLine {
     String[] conditionSplitted = conditionLine.trim().split(" ");
 
     if(conditionSplitted.length>1){
-      logger.debug("Found a combined condition on this line");
+      log.debug("Found a combined condition on this line");
       this.combinedCondition=true;
     } else if(conditionSplitted[0].equalsIgnoreCase("formula")) {
-      logger.debug("Found a formula, that will need to be evaluated");
+      log.debug("Found a formula, that will need to be evaluated");
       this.formula = true;
       this.formulaToEvaluate = new Formula(valueToReturn);
       return;
     } else if(conditionSplitted[0].equalsIgnoreCase("link")) {
-      logger.debug("Found a link, that will need to be evaluated");
+      log.debug("Found a link, that will need to be evaluated");
       this.link = true;
       this.linkToEvaluate = new Link(valueToReturn);
       return;
     } else if(conditionSplitted[0].equalsIgnoreCase("injection")) {
-      logger.debug("Found an injection, that will need to be evaluated");
+      log.debug("Found an injection, that will need to be evaluated");
       this.injection = true;
       this.injectionToEvaluate = new Injection(valueToReturn);
       return;
     } else if(conditionSplitted[0].equalsIgnoreCase("default")) {
-      logger.debug("Found a default, No evaluation needed");
+      log.debug("Found a default, No evaluation needed");
       this.defaultValue = true;
       return;
     }
@@ -89,10 +89,10 @@ public class ConditionsLine {
     int index = 0;
     for(String s: conditionSplitted){
       if(index%2==0) {
-        logger.debug("This is an expression that will create a condition");
+        log.debug("This is an expression that will create a condition");
         listOfConditions.add(createConditionFromExpression(s));
       } else {
-        logger.debug("This is an expression that will create an operator between conditions");
+        log.debug("This is an expression that will create an operator between conditions");
         listOfConditionsOperators.add(createOperatorFromExpression(s));
       }
       index++;
@@ -126,7 +126,7 @@ public class ConditionsLine {
 
     if (conditionVals != null) {
       if (conditionVals[1].matches("[$].*")) {
-        logger.debug("2nd option is a column name, not a value");
+        log.debug("2nd option is a column name, not a value");
         return new Condition(conditionVals[0].substring(1),
             conditionVals[1].substring(1), null, operator);
       } else {
@@ -168,15 +168,15 @@ public class ConditionsLine {
       for(int i = 1; i<listOfConditions.size(); i++) {
 
         if(listOfConditionsOperators.get(i-1)==ConditionOperators.AND) {
-          logger.debug("The operator between previous condition and this one is AND");
+          log.debug("The operator between previous condition and this one is AND");
           if(previousResult){
-            logger.debug("Previous condition was true, need to evaluate this one");
+            log.debug("Previous condition was true, need to evaluate this one");
             previousResult = listOfConditions.get(i).evaluateCondition(row);
           } else {
-            logger.debug("Previous condition was false, no need to evaluate this one");
+            log.debug("Previous condition was false, no need to evaluate this one");
           }
         } else {
-          logger.debug("The operator between previous condition and this one is OR, so keep previous result and start to evaluate new condition");
+          log.debug("The operator between previous condition and this one is OR, so keep previous result and start to evaluate new condition");
           conditionsGroupEvaluationResult.add(previousResult);
           previousResult = listOfConditions.get(i).evaluateCondition(row);
         }

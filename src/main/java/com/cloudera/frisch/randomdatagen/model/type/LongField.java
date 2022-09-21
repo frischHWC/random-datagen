@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.model.type;
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -14,6 +15,7 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+@Slf4j
 public class LongField extends Field<Long> {
 
     LongField(String name, Integer length, List<Long> possibleValues, LinkedHashMap<String, Integer> possible_values_weighted, String min, String max) {
@@ -82,7 +84,7 @@ public class LongField extends Field<Long> {
         try {
             hivePreparedStatement.setLong(index, value);
         } catch (SQLException e) {
-            logger.warn("Could not set value : " +value.toString() + " into hive statement due to error :", e);
+            log.warn("Could not set value : " +value.toString() + " into hive statement due to error :", e);
         }
         return hivePreparedStatement;
     }

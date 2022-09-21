@@ -3,6 +3,7 @@ package com.cloudera.frisch.randomdatagen.model.conditions;
 import com.cloudera.frisch.randomdatagen.model.Row;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.log4j.Logger;
 
 import javax.script.ScriptEngine;
@@ -10,10 +11,9 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.LinkedList;
 
-
+@Slf4j
 public class Formula {
-
-  private static final Logger logger = Logger.getLogger(Formula.class);
+  
 
   // for all cols name existing in model, try to find which one are involved in the formula and put them in a list
   @Getter @Setter
@@ -30,7 +30,7 @@ public class Formula {
     listOfColsToEvaluate = new LinkedList<>();
     for(String field: formula.substring(formula.indexOf("$")+1).split("[$]")) {
         listOfColsToEvaluate.add(field.split("\\s+")[0]);
-        logger.debug("Add Field : " + field.split("\\s+")[0] + " to be in the formula");
+        log.debug("Add Field : " + field.split("\\s+")[0] + " to be in the formula");
     }
     formulaToEvaluate = formula.replaceAll("[$]", "");
     scriptEngineManager = new ScriptEngineManager();
@@ -41,10 +41,10 @@ public class Formula {
     // Evaluate formula using an evaluator (or built this evaluator)
     String formulaReplaced = formulaToEvaluate;
     for(String colName: listOfColsToEvaluate) {
-      logger.debug(formulaReplaced);
+      log.debug(formulaReplaced);
       formulaReplaced = formulaReplaced.replaceAll("(^| )" + colName + "($| )", row.getValues().get(colName).toString());
     }
-    logger.debug(formulaReplaced);
+    log.debug(formulaReplaced);
     return computeFormula(formulaReplaced);
   }
 
@@ -52,9 +52,9 @@ public class Formula {
     Object value = 0f;
     try {
        value = scriptEngine.eval(formula);
-       logger.debug("Evaluating formula: " + formula + " to: " + value);
+       log.debug("Evaluating formula: " + formula + " to: " + value);
     } catch (ScriptException e) {
-      logger.warn("Could not evaluate expression: " + formula + " due to error: ", e);
+      log.warn("Could not evaluate expression: " + formula + " due to error: ", e);
     }
     return value.toString();
   }

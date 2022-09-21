@@ -8,6 +8,7 @@ import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
 import com.cloudera.frisch.randomdatagen.model.type.Field;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -26,6 +27,7 @@ import java.util.Map;
  * This is an ORC HDFS sink using Hadoop 3.2 API
  */
 @SuppressWarnings("unchecked")
+@Slf4j
 public class HdfsOrcSink implements SinkInterface {
 
     private FileSystem fileSystem;
@@ -70,7 +72,7 @@ public class HdfsOrcSink implements SinkInterface {
         try {
             fileSystem = FileSystem.get(URI.create(hdfsUri), config);
         } catch (IOException e) {
-            logger.error("Could not access to ORC HDFS !", e);
+            log.error("Could not access to ORC HDFS !", e);
         }
 
         this.schema = model.getOrcSchema();
@@ -96,7 +98,7 @@ public class HdfsOrcSink implements SinkInterface {
                 writer.close();
             }
         } catch (IOException e) {
-            logger.error(" Unable to close ORC HDFS file with error :", e);
+            log.error(" Unable to close ORC HDFS file with error :", e);
         }
     }
 
@@ -116,7 +118,7 @@ public class HdfsOrcSink implements SinkInterface {
                     batch.reset();
                 }
             } catch (IOException e) {
-                logger.error("Can not write data to the ORC HDFS file due to error: ", e);
+                log.error("Can not write data to the ORC HDFS file due to error: ", e);
             }
         }
 
@@ -126,14 +128,14 @@ public class HdfsOrcSink implements SinkInterface {
                 batch.reset();
             }
         } catch (IOException e) {
-            logger.error("Can not write data to the ORC HDFS file due to error: ", e);
+            log.error("Can not write data to the ORC HDFS file due to error: ", e);
         }
 
         if (oneFilePerIteration) {
             try {
                 writer.close();
             } catch (IOException e) {
-                logger.error(" Unable to close ORC HDFS file with error :", e);
+                log.error(" Unable to close ORC HDFS file with error :", e);
             }
         }
 
@@ -146,7 +148,7 @@ public class HdfsOrcSink implements SinkInterface {
                 OrcFile.writerOptions(conf)
                     .setSchema(schema));
         } catch (IOException e) {
-            logger.warn("Could not create writer to ORC HDFS file due to error:", e);
+            log.warn("Could not create writer to ORC HDFS file due to error:", e);
         }
     }
 }

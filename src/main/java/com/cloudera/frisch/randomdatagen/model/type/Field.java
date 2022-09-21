@@ -6,13 +6,13 @@ import com.cloudera.frisch.randomdatagen.model.conditions.ConditionalEvaluator;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
 import org.apache.hive.jdbc.HivePreparedStatement;
 import org.apache.kudu.Type;
 import org.apache.kudu.client.PartialRow;
-import org.apache.log4j.Logger;
 import org.apache.orc.TypeDescription;
 import org.apache.solr.common.SolrInputDocument;
 
@@ -28,9 +28,9 @@ import java.util.stream.Collectors;
  * Goal is also to describe how a field is rendered according to its type
  * Every new type added should extends this abstract class in a new Java Class (and override generateRandomValue())
  */
+@Slf4j
 public abstract class Field<T> {
-
-    static final Logger logger = Logger.getLogger(Field.class);
+    
     Random random = new Random();
 
     @Getter
@@ -214,7 +214,7 @@ public abstract class Field<T> {
                 field = new UuidField(name);
                 break;
             default:
-                logger.warn("Type : " + type + " has not been recognized and hence will be ignored");
+                log.warn("Type : " + type + " has not been recognized and hence will be ignored");
                 return null;
         }
 
@@ -225,13 +225,13 @@ public abstract class Field<T> {
 
         // If there are some conditions, we consider this field as computed (meaning it requires other fields' values to get its value)
         if (conditionals != null && !conditionals.isEmpty()) {
-            logger.debug("Field has been marked as conditional: " + field);
+            log.debug("Field has been marked as conditional: " + field);
             field.setComputed(true);
             field.setConditional(new ConditionalEvaluator(conditionals));
         }
 
-        if(logger.isDebugEnabled()) {
-            logger.debug("Field has been created: " + field);
+        if(log.isDebugEnabled()) {
+            log.debug("Field has been created: " + field);
         }
 
         return field;
@@ -290,7 +290,7 @@ public abstract class Field<T> {
         try {
             hivePreparedStatement.setObject(index, value);
         } catch (SQLException e) {
-            logger.warn("Could not set value : " + value.toString() + " into hive statement due to error :", e);
+            log.warn("Could not set value : " + value.toString() + " into hive statement due to error :", e);
         }
         return hivePreparedStatement;
     }

@@ -6,6 +6,7 @@ import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
 import com.cloudera.frisch.randomdatagen.model.type.Field;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -23,6 +24,7 @@ import java.util.Map;
  * ORC File sink
  */
 @SuppressWarnings("unchecked")
+@Slf4j
 public class ORCSink implements SinkInterface {
 
     private final TypeDescription schema;
@@ -68,9 +70,9 @@ public class ORCSink implements SinkInterface {
                 writer.close();
             }
         } catch (IOException e) {
-            logger.error(" Unable to close local file with error :", e);
+            log.error(" Unable to close local file with error :", e);
         } catch (NullPointerException e) {
-            logger.info("Writer was already closed");
+            log.info("Writer was already closed");
         }
     }
 
@@ -90,7 +92,7 @@ public class ORCSink implements SinkInterface {
                     batch.reset();
                 }
             } catch (IOException e) {
-                logger.error("Can not write data to the local file due to error: ", e);
+                log.error("Can not write data to the local file due to error: ", e);
             }
         }
 
@@ -100,14 +102,14 @@ public class ORCSink implements SinkInterface {
                 batch.reset();
             }
         } catch (IOException e) {
-            logger.error("Can not write data to the local file due to error: ", e);
+            log.error("Can not write data to the local file due to error: ", e);
         }
 
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
             try {
                 writer.close();
             } catch (IOException e) {
-                logger.error(" Unable to close local file with error :", e);
+                log.error(" Unable to close local file with error :", e);
             }
         }
     }
@@ -119,7 +121,7 @@ public class ORCSink implements SinkInterface {
                 OrcFile.writerOptions(new Configuration())
                     .setSchema(schema));
         } catch (IOException e) {
-            logger.warn("Could not create writer to ORC HDFS file due to error:", e);
+            log.warn("Could not create writer to ORC HDFS file due to error:", e);
         }
     }
 

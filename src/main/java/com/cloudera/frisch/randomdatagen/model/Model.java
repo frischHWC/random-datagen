@@ -5,6 +5,7 @@ import com.cloudera.frisch.randomdatagen.model.conditions.ConditionalEvaluator;
 import com.cloudera.frisch.randomdatagen.model.type.Field;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.SchemaBuilder;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
 import org.apache.hadoop.hive.ql.exec.vector.VectorizedRowBatch;
@@ -25,12 +26,11 @@ import java.util.stream.Collectors;
  * This class describes also how to generate random data
  * It also describe how to initialize certain systems for that model (i.e. table creation)
  */
+@Slf4j
 @Getter
 @Setter
 @SuppressWarnings("unchecked")
 public class Model<T extends Field> {
-
-    private static final Logger logger = Logger.getLogger(Model.class);
 
     // This is to keep right order of fields
     @Getter @Setter
@@ -85,8 +85,8 @@ public class Model<T extends Field> {
         // Verify model before going further
         verifyModel();
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Model created is : " + this);
+        if (log.isDebugEnabled()) {
+            log.debug("Model created is : " + this);
         }
     }
 
@@ -143,7 +143,7 @@ public class Model<T extends Field> {
                 new RowGeneratorThread<>(numberPerThread, this, fieldsRandomName, fieldsComputedName, fields);
             threadToStart.start();
             threadsStarted.add(threadToStart);
-            logger.info("Started 1 thread to generate: " + numberPerThread + " rows ");
+            log.info("Started 1 thread to generate: " + numberPerThread + " rows ");
         }
 
         threadsStarted.forEach(t -> {
@@ -151,7 +151,7 @@ public class Model<T extends Field> {
                 t.join();
                 rows.addAll(t.getRows());
             } catch (InterruptedException e) {
-                logger.warn("A thread was interrupted, its results will not be processed", e);
+                log.warn("A thread was interrupted, its results will not be processed", e);
             }
         });
 
@@ -369,7 +369,7 @@ public class Model<T extends Field> {
         });
         sb.deleteCharAt(sb.length() - 2);
         sb.append(") ");
-        logger.debug("Schema is : " + sb.toString());
+        log.debug("Schema is : " + sb.toString());
         return sb.toString();
     }
 
@@ -385,7 +385,7 @@ public class Model<T extends Field> {
         fields.forEach((name, f) -> sb.append("?, "));
         sb.deleteCharAt(sb.length() - 2);
         sb.append(" ) ");
-        logger.debug("Insert is : " + sb.toString());
+        log.debug("Insert is : " + sb.toString());
         return sb.toString();
     }
 

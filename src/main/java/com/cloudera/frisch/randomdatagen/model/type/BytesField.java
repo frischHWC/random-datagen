@@ -1,5 +1,6 @@
 package com.cloudera.frisch.randomdatagen.model.type;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -14,7 +15,7 @@ import java.nio.ByteBuffer;
 import java.sql.SQLException;
 import java.util.List;
 
-
+@Slf4j
 public class BytesField extends Field<byte[]> {
 
     BytesField(String name, Integer length, List<byte[]> possibleValues) {
@@ -82,7 +83,7 @@ public class BytesField extends Field<byte[]> {
         try {
             hivePreparedStatement.setString(index, DatatypeConverter.printHexBinary(value).toUpperCase());
         } catch (SQLException e) {
-            logger.warn("Could not set value : " + DatatypeConverter.printHexBinary(value).toUpperCase() + " into hive statement due to error :", e);
+            log.warn("Could not set value : " + DatatypeConverter.printHexBinary(value).toUpperCase() + " into hive statement due to error :", e);
         }
         return hivePreparedStatement;
     }

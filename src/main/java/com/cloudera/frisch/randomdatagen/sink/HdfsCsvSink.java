@@ -7,6 +7,7 @@ import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
  * This is an HDFSCSV sink using Hadoop 3.2 API
  * Each instance manages one connection to a file system
  */
+@Slf4j
 public class HdfsCsvSink implements SinkInterface {
 
     private FileSystem fileSystem;
@@ -58,7 +60,7 @@ public class HdfsCsvSink implements SinkInterface {
         try {
             fileSystem = FileSystem.get(URI.create(hdfsUri), config);
         } catch (IOException e) {
-            logger.error("Could not access to HDFSCSV !", e);
+            log.error("Could not access to HDFSCSV !", e);
         }
 
         Utils.createHdfsDirectory(fileSystem, directoryName);
@@ -79,7 +81,7 @@ public class HdfsCsvSink implements SinkInterface {
         try {
         fsDataOutputStream.close();
         } catch (IOException e) {
-            logger.error(" Unable to close HDFSCSV file with error :", e);
+            log.error(" Unable to close HDFSCSV file with error :", e);
         }
     }
 
@@ -100,7 +102,7 @@ public class HdfsCsvSink implements SinkInterface {
                 fsDataOutputStream.close();
             }
         } catch (IOException e) {
-            logger.error("Can not write data to the HDFSCSV file due to error: ", e);
+            log.error("Can not write data to the HDFSCSV file due to error: ", e);
         }
     }
 
@@ -112,7 +114,7 @@ public class HdfsCsvSink implements SinkInterface {
                     System.getProperty("line.separator"));
             }
         } catch (IOException e) {
-            logger.error("Can not write header to the hdfs file due to error: ", e);
+            log.error("Can not write header to the hdfs file due to error: ", e);
         }
     }
 
@@ -120,9 +122,9 @@ public class HdfsCsvSink implements SinkInterface {
         try {
             Utils.deleteHdfsFile(fileSystem, path);
             fsDataOutputStream = fileSystem.create(new Path(path), replicationFactor);
-            logger.debug("Successfully created hdfs file : " + path);
+            log.debug("Successfully created hdfs file : " + path);
         } catch (IOException e) {
-            logger.error("Tried to create hdfs file : " + path + " with no success :", e);
+            log.error("Tried to create hdfs file : " + path + " with no success :", e);
         }
     }
 

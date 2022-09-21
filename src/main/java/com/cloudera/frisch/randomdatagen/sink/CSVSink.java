@@ -6,6 +6,7 @@ import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
  * This is a CSV sink to write to one or multiple CSV files locally
  *
  */
+@Slf4j
 public class CSVSink implements SinkInterface {
 
     private FileOutputStream outputStream;
@@ -58,7 +60,7 @@ public class CSVSink implements SinkInterface {
                 outputStream.close();
             }
         } catch (IOException e) {
-            logger.error(" Unable to close local file with error :", e);
+            log.error(" Unable to close local file with error :", e);
         }
     }
 
@@ -76,7 +78,7 @@ public class CSVSink implements SinkInterface {
                         outputStream.write(r.getBytes());
                         outputStream.write(lineSeparator.getBytes());
                     } catch (IOException e) {
-                        logger.error("Could not write row: " + r + " to file: " + outputStream.getChannel());
+                        log.error("Could not write row: " + r + " to file: " + outputStream.getChannel());
                     }
                 });
             outputStream.write(lineSeparator.getBytes());
@@ -85,7 +87,7 @@ public class CSVSink implements SinkInterface {
                 outputStream.close();
             }
         } catch (IOException e) {
-            logger.error("Can not write data to the local file due to error: ", e);
+            log.error("Can not write data to the local file due to error: ", e);
         }
     }
 
@@ -96,7 +98,7 @@ public class CSVSink implements SinkInterface {
                 outputStream.write(lineSeparator.getBytes());
             }
         } catch (IOException e) {
-            logger.error("Can not write header to the local file due to error: ", e);
+            log.error("Can not write header to the local file due to error: ", e);
         }
     }
 
@@ -105,9 +107,9 @@ public class CSVSink implements SinkInterface {
             File file = new File(path);
             file.createNewFile();
             outputStream = new FileOutputStream(path, false);
-            logger.debug("Successfully created local file : " + path);
+            log.debug("Successfully created local file : " + path);
         } catch (IOException e) {
-            logger.error("Tried to create file : " + path + " with no success :", e);
+            log.error("Tried to create file : " + path + " with no success :", e);
         }
     }
 

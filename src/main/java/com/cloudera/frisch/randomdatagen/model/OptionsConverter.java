@@ -1,10 +1,10 @@
 package com.cloudera.frisch.randomdatagen.model;
 
-import org.apache.log4j.Logger;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class OptionsConverter {
-
-    private static final Logger logger = Logger.getLogger(OptionsConverter.class);
 
     public enum PrimaryKeys {
         KAFKA_MSG_KEY,
@@ -33,7 +33,7 @@ public class OptionsConverter {
             case "KUDU_RANGE_KEYS":
                 return PrimaryKeys.KUDU_RANGE_KEYS;
             default:
-                logger.warn("Option was not recognized: " + option + " , please verify your JSON");
+                log.warn("Option was not recognized: " + option + " , please verify your JSON");
                 return null;
         }
     }
@@ -89,7 +89,7 @@ public class OptionsConverter {
             case "AVRO_NAME":
                 return TableNames.AVRO_NAME;
             default:
-                logger.warn("Option was not recognized: " + option + " , please verify your JSON");
+                log.warn("Option was not recognized: " + option + " , please verify your JSON");
                 return null;
         }
     }
@@ -166,7 +166,7 @@ public class OptionsConverter {
             case "HDFS_REPLICATION_FACTOR":
                 return Options.HDFS_REPLICATION_FACTOR;
             default:
-                logger.warn("Option was not recognized: " + option + " , please verify your JSON");
+                log.warn("Option was not recognized: " + option + " , please verify your JSON");
                 return null;
         }
     }

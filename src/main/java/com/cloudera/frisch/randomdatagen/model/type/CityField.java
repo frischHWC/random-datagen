@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.model.type;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hive.ql.exec.vector.ColumnVector;
@@ -21,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 public class CityField extends Field<CityField.City> {
 
     public class City {
@@ -83,7 +84,7 @@ public class CityField extends Field<CityField.City> {
                     })
                     .collect(Collectors.toList());
         } catch (Exception e) {
-            logger.warn("Could not load world cities, error : " + e);
+            log.warn("Could not load world cities, error : " + e);
             return Collections.singletonList(new City("world", "0", "0", "world"));
         }
     }
@@ -157,7 +158,7 @@ public class CityField extends Field<CityField.City> {
         try {
             hivePreparedStatement.setString(index, value.getName());
         } catch (SQLException e) {
-            logger.warn("Could not set value : " + value + " into hive statement due to error :", e);
+            log.warn("Could not set value : " + value + " into hive statement due to error :", e);
         }
         return hivePreparedStatement;
     }

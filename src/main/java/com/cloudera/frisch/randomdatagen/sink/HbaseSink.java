@@ -6,6 +6,7 @@ import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.NamespaceDescriptor;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  * It requires in application.properties to define zookeeper quorum, port, znode and type of authentication (simple or kerberos)
  * Each instance is only able to manage one connection to one specific table defined by property hbase.table.name in application.properties
  */
+@Slf4j
 public class HbaseSink implements SinkInterface {
 
     private Connection connection;
@@ -77,7 +79,7 @@ public class HbaseSink implements SinkInterface {
             this.table = connection.getTable(tableName);
 
         } catch (IOException e) {
-            logger.error("Could not initiate HBase connection due to error: ", e);
+            log.error("Could not initiate HBase connection due to error: ", e);
             System.exit(1);
         }
     }
@@ -88,7 +90,7 @@ public class HbaseSink implements SinkInterface {
             table.close();
             connection.close();
         } catch (IOException e) {
-            logger.error("Impossible to close connection to HBase due to error: ", e);
+            log.error("Impossible to close connection to HBase due to error: ", e);
             System.exit(1);
         }
     }
@@ -101,7 +103,7 @@ public class HbaseSink implements SinkInterface {
                 .collect(Collectors.toList());
             table.put(putList);
         } catch (Exception e) {
-            logger.error("Could not write to HBase rows with error : ", e);
+            log.error("Could not write to HBase rows with error : ", e);
         }
     }
 
@@ -110,11 +112,11 @@ public class HbaseSink implements SinkInterface {
             try {
                 admin.getNamespaceDescriptor(namespace);
             } catch (NamespaceNotFoundException e) {
-                logger.debug("Namespace " + namespace + " does not exists, hence it will be created");
+                log.debug("Namespace " + namespace + " does not exists, hence it will be created");
                 admin.createNamespace(NamespaceDescriptor.create(namespace).build());
             }
         } catch (IOException e) {
-            logger.error("Could not create namespace " + namespace + " in Hbase, due to following error: ", e);
+            log.error("Could not create namespace " + namespace + " in Hbase, due to following error: ", e);
         }
     }
 

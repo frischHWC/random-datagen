@@ -1,9 +1,5 @@
 package com.cloudera.frisch.randomdatagen.config;
 
-import lombok.Getter;
-
-import java.util.*;
-
 
 public class SinkParser {
 

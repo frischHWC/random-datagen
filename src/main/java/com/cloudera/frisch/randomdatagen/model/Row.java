@@ -8,6 +8,7 @@ import com.cloudera.frisch.randomdatagen.sink.storedobjects.OzoneObject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericRecord;
@@ -21,7 +22,6 @@ import org.apache.hive.jdbc.HivePreparedStatement;
 import org.apache.kudu.client.Insert;
 import org.apache.kudu.client.KuduTable;
 import org.apache.kudu.client.PartialRow;
-import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 
 import java.nio.charset.StandardCharsets;
@@ -32,12 +32,12 @@ import java.util.*;
  * This class represents finest structure: a row
  * It should only be populated by Model when calling a generation of random data
  */
+@Slf4j
 @Getter
 @Setter
 @NoArgsConstructor
 @SuppressWarnings("unchecked")
 public class Row<T extends Field> {
-    private static final Logger logger = Logger.getLogger(Row.class);
 
     // A linkedHashMap is required to keep order in fields
     @Getter @Setter
@@ -220,7 +220,7 @@ public class Row<T extends Field> {
                     bytesColumnVectorBytes.setVal(rowNumber, (byte[]) values.get(field));
                     break;
                 default:
-                    logger.warn("Cannot get types of Orc column: " + field + " as field is " + model.getFieldFromName(field).getClass().getSimpleName() );
+                    log.warn("Cannot get types of Orc column: " + field + " as field is " + model.getFieldFromName(field).getClass().getSimpleName() );
             }
         });
 

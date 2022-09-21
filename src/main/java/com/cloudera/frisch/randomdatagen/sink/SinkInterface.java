@@ -7,8 +7,6 @@ import java.util.List;
 
 public interface SinkInterface {
 
-    Logger logger = Logger.getLogger(SinkInterface.class);
-
     void sendOneBatchOfRows(List<Row> rows);
 
     void terminate();
