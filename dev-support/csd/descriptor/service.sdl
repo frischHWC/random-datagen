@@ -107,7 +107,8 @@
           "start"
         ],
         "environmentVariables": {
-          "MAX_HEAP_SIZE": "${max_heap_size}"
+          "MAX_HEAP_SIZE": "${max_heap_size}",
+          "SERVER_PORT": "${app_port}"
         }
       },
       "configWriter": {

@@ -15,17 +15,21 @@ import java.util.Properties;
 @Component
 public class PropertiesLoader {
 
+    private SpringConfig springConfig;
+
+    private Map<ApplicationConfigs, String> properties;
+
     @Autowired
-    private static SpringConfig springConfig;
+    public PropertiesLoader(SpringConfig springConfig) {
+        this.springConfig = springConfig;
+        properties = new HashMap<>();
 
-    private static final Map<ApplicationConfigs, String> properties = new HashMap<>();
-
-    private PropertiesLoader()  {
         // Load config file
         java.util.Properties propertiesAsProperties = new java.util.Properties();
 
         String pathToApplicationProperties = "src/main/resources/application.properties";
-        if(springConfig.activeProfile.equalsIgnoreCase("cdp")) {
+        if(springConfig.getActiveProfile()
+            .equalsIgnoreCase("cdp")) {
             log.info("Detected to be in cdp profile, so will load service.properties file");
             pathToApplicationProperties = "service.properties";
         }
@@ -39,12 +43,19 @@ public class PropertiesLoader {
         }
 
         propertiesAsProperties.forEach((propertyKey, propertyValue) -> {
-            ApplicationConfigs propAsAppConfig = ApplicationConfigMapper.getApplicationConfigFromProperty(propertyKey.toString());
-            if(propAsAppConfig!=null){
-                String propValue = getPropertyResolvingPlaceholder(propertyKey.toString(), propertiesAsProperties);
-                
-                if(propValue!=null && !propValue.isEmpty()) {
-                    properties.put(propAsAppConfig, propValue);
+            // Keys starting with spring or server are considered as internal spring-boot used and should not be taken
+            if(!propertyKey.toString().startsWith("spring.") && !propertyKey.toString().startsWith("server.")) {
+                ApplicationConfigs propAsAppConfig =
+                    ApplicationConfigMapper.getApplicationConfigFromProperty(
+                        propertyKey.toString());
+                if (propAsAppConfig != null) {
+                    String propValue =
+                        getPropertyResolvingPlaceholder(propertyKey.toString(),
+                            propertiesAsProperties);
+
+                    if (propValue != null && !propValue.isEmpty()) {
+                        properties.put(propAsAppConfig, propValue);
+                    }
                 }
             }
         });
