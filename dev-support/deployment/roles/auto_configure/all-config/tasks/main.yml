@@ -16,6 +16,10 @@
   vars:
     query: "items[?type == 'HDFS'].name | [0]"
 
+- set_fact:
+    hdfs_name: "none"
+  when: not hdfs_exists
+
 - name: DEBUG - hdfs_name
   debug:
     msg: "{{ hdfs_name }}"
@@ -39,6 +43,10 @@
   vars:
     query: "items[?type == 'HBASE'].name | [0]"
 
+- set_fact:
+    hbase_name: "none"
+  when: not hbase_exists
+
 - name: DEBUG - hbase_name
   debug:
     msg: "{{ hbase_name }}"
@@ -60,6 +68,10 @@
     hive_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
   vars:
     query: "items[?type == 'HIVE'].name | [0]"
+
+- set_fact:
+    hive_name: "none"
+  when: not hive_exists
 
 - name: DEBUG - hive_name
   debug:
@@ -84,6 +96,10 @@
   vars:
     query: "items[?type == 'SOLR'].name | [0]"
 
+- set_fact:
+    solr_name: "none"
+  when: not solr_exists
+
 - name: DEBUG - solr_name
   debug:
     msg: "{{ solr_name }}"
@@ -106,6 +122,10 @@
   vars:
     query: "items[?type == 'OZONE'].name | [0]"
 
+- set_fact:
+    ozone_name: "none"
+  when: not ozone_exists
+
 - name: DEBUG - ozone_name
   debug:
     msg: "{{ ozone_name }}"
@@ -127,6 +147,10 @@
     kafka_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
   vars:
     query: "items[?type == 'KAFKA'].name | [0]"
+
+- set_fact:
+    kafka_name: "none"
+  when: not kafka_exists
 
 - name: DEBUG - kafka_name
   debug:
@@ -151,6 +175,10 @@
   vars:
     query: "items[?type == 'KUDU'].name | [0]"
 
+- set_fact:
+    kudu_name: "none"
+  when: not kudu_exists
+
 - name: DEBUG - kudu_name
   debug:
     msg: "{{ kudu_name }}"
@@ -172,6 +200,10 @@
     sr_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
   vars:
     query: "items[?type == 'SCHEMAREGISTRY'].name | [0]"
+
+- set_fact:
+    sr_name: "none"
+  when: not sr_exists
 
 - name: DEBUG - sr_name
   debug:
@@ -195,6 +227,10 @@
   vars:
     query: "items[?type == 'RANGER'].name | [0]"
 
+- set_fact:
+    ranger_name: "none"
+  when: not ranger_exists
+
 - name: DEBUG - ranger_name
   debug:
     msg: "{{ ranger_name }}"
@@ -216,6 +252,10 @@
     knox_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
   vars:
     query: "items[?type == 'KNOX'].name | [0]"
+
+- set_fact:
+    knox_name: "none"
+  when: not knox_exists
 
 - name: DEBUG - knox_name
   debug:
