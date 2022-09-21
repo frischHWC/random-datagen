@@ -1,16 +1,114 @@
 # WARNING: These two properties are required to make the spring boot work with all dependencies
 server.tomcat.additional-tld-skip-patterns=*.jar
 spring.mvc.pathmatch.matching-strategy=ANT_PATH_MATCHER
+
 # When deployed to CDP, should be set to 'cdp'
 spring.profiles.active=cdp
 
-# General conf that should be set when starting the program
+# General conf 
 app.name="Data Generator"
 hadoop.user=datagen
 hadoop.home=/user/datagen
-kerberos.user=datagen
-kerberos.keytab=${CONF_DIR}/datagen.keytab
 
-{% for key, value in globals | dictsort() -%}
-{{ key | replace('_', '.') }} = {{ value }}
-{% endfor -%}
+# Kerberos Config
+kerberos.enabled={{ globals['kerberos_enabled'] }}
+kerberos.user={{ globals['kerberos_princ_name'] }}
+kerberos.keytab=#{CONF_DIR}/datagen.keytab
+
+# TLS Config
+tls.enabled={{ globals['tls_enabled'] }}
+truststore.location=
+truststore.password=
+keystore.location=
+keystore.password=
+
+# These are default config file's path in a CDP cluster
+# In case below settings are not set, these files are used to extrapolate them
+hadoop.core.site.path=
+hadoop.hdfs.site.path=
+hadoop.ozone.site.path=
+hadoop.hbase.site.path=
+hadoop.hive.site.path=
+solr.env.path=
+kafka.conf.client.path=
+kafka.conf.cluster.path=
+schema.registry.conf.path=
+kudu.conf.path=
+
+# NB: A value #{VALUE} is a placeholder to another defined value in this file
+
+# Other configurations that are either derived from previous files if empty or must be set using APIs when loading data
+# HDFS
+hdfs.uri=
+hdfs.auth.kerberos=#{kerberos.enabled}
+# It is not needed to fill below configuration if KERBEROS is not activated
+hdfs.auth.kerberos.user=#{kerberos.user}
+hdfs.auth.kerberos.keytab=#{kerberos.keytab}
+
+
+# HBASE
+hbase.zookeeper.quorum=
+hbase.zookeeper.port=
+hbase.zookeeper.znode=
+hbase.auth.kerberos=#{kerberos.enabled}
+# It is not needed to fill below configuration if KERBEROS is not activated
+hbase.security.user=#{kerberos.user}
+hbase.security.keytab=#{kerberos.keytab}
+
+
+# OZONE
+ozone.service.id=
+ozone.auth.kerberos=#{kerberos.enabled}
+# It is not needed to fill below configuration if KERBEROS is not activated
+ozone.auth.kerberos.user=#{kerberos.user}
+ozone.auth.kerberos.keytab=#{kerberos.keytab}
+
+
+# HIVE
+hive.zookeeper.quorum=
+hive.zookeeper.znode=
+hive.auth.kerberos=#{kerberos.enabled}
+# It is not needed to fill below configuration if KERBEROS is not activated
+hive.security.user=#{kerberos.user}
+hive.security.keytab=#{kerberos.keytab}
+hive.truststore.location=#{truststore.location}
+hive.truststore.password=#{truststore.password}
+
+
+# SOLR
+solr.server.url=
+solr.server.port=
+solr.tls.enabled=#{tls.enabled}
+solr.auth.kerberos=#{kerberos.enabled}
+# It is not needed to fill below configuration if KERBEROS is not activated
+solr.auth.kerberos.keytab=#{kerberos.keytab}
+solr.auth.kerberos.user=#{kerberos.user}
+solr.truststore.location=#{truststore.location}
+solr.truststore.password=#{truststore.password}
+
+
+# KAFKA
+kafka.brokers=
+kafka.security.protocol=
+schema.registry.url=
+schema.registry.tls.enabled=#{tls.enabled}
+# It is not needed to fill below configuration if KERBEROS is not activated (i.e. protocol is PLAINTEXT)
+kafka.keystore.location=#{keystore.location}
+kafka.truststore.location=#{truststore.location}
+kafka.keystore.password=#{keystore.password}
+kafka.keystore.key.password=#{keystore.password}
+kafka.truststore.password=#{truststore.password}
+kafka.sasl.mechanism=
+kafka.sasl.kerberos.service.name=
+kafka.auth.kerberos.keytab=#{kerberos.keytab}
+kafka.auth.kerberos.user=#{kerberos.user}
+
+
+# KUDU
+kudu.master.server=
+kudu.auth.kerberos=#{kerberos.enabled}
+# It is not needed to fill below configuration if KERBEROS is not activated
+kudu.security.user=#{kerberos.user}
+kudu.security.keytab=#{kerberos.keytab}
+kudu.truststore.location=#{truststore.location}
+kudu.truststore.password=#{truststore.password}

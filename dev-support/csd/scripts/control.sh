@@ -4,8 +4,6 @@ CMD=$1
 case $CMD in
   (start)
     echo "Starting DATAGEN"
-    echo $CONF_DIR
-    echo $(pwd)
     envsubst < "${CONF_DIR}/service.properties" > "${CONF_DIR}/service.properties.tmp"
     mv "${CONF_DIR}/service.properties.tmp" "${CONF_DIR}/service.properties"
     exec ${JAVA_HOME}/bin/java -jar -Dspring.profiles.active=cdp -Xmx${MAX_HEAP_SIZE}G ${DATAGEN_JAR_PATH}

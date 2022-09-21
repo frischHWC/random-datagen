@@ -2,11 +2,14 @@ package com.cloudera.frisch.randomdatagen.config;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+
+@Component
 public class PropertiesLoader {
 
     @Autowired
@@ -52,7 +55,7 @@ public class PropertiesLoader {
         String property = "null";
         try {
              property = properties.getProperty(key);
-            if(property.length() > 1 && property.substring(0,2).equalsIgnoreCase("${")) {
+            if(property.length() > 1 && property.substring(0,2).equalsIgnoreCase("#{")) {
                 property = PropertiesLoader.getProperty(property.substring(2,property.length()-1));
             }
         } catch (Exception e) {
