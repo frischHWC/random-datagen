@@ -1,6 +1,6 @@
 {
-  "name": "DATAGEN",
-  "label": "DATAGEN",
+  "name": "Datagen",
+  "label": "Datagen",
   "description": "The service to generate Data into various services of CDP platform",
   "version": "1.0",
   "parcel": {
@@ -370,9 +370,10 @@
           "default": "",
           "type": "string"
         },
+
         {
           "name": "core_site_path",
-          "label": "Hadoop Core Site Path",
+          "label": "AUTO-DISCOVERY: Hadoop Core Site Path",
           "description": "Path to core-site.xml. This is used to auto-discover services: HDFS. (if settings are not explicitly set)",
           "default": "/etc/hadoop/conf/core-site.xml",
           "type": "path",
@@ -381,7 +382,7 @@
         },
         {
           "name": "hdfs_site_path",
-          "label": "Hadoop HDFS Site Path",
+          "label": "AUTO-DISCOVERY: Hadoop HDFS Site Path",
           "description": "Path to hdfs-site.xml. This is used to auto-discover services: HDFS. (if settings are not explicitly set)",
           "default": "/etc/hadoop/conf/hdfs-site.xml",
           "type": "path",
@@ -390,7 +391,7 @@
         },
         {
           "name": "ozone_site_path",
-          "label": "Hadoop Ozone Site Path",
+          "label": "AUTO-DISCOVERY: Hadoop Ozone Site Path",
           "description": "Path to ozone-site.xml. This is used to auto-discover services: OZONE. (if settings are not explicitly set)",
           "default": "/etc/hadoop/conf/ozone-site.xml",
           "type": "path",
@@ -399,7 +400,7 @@
         },
         {
           "name": "hbase_site_path",
-          "label": "Hadoop HBase Site Path",
+          "label": "AUTO-DISCOVERY: Hadoop HBase Site Path",
           "description": "Path to hbase-site.xml. This is used to auto-discover services: HBASE. (if settings are not explicitly set)",
           "default": "/etc/hbase/conf/hbase-site.xml",
           "type": "path",
@@ -408,7 +409,7 @@
         },
         {
           "name": "hive_site_path",
-          "label": "Hadoop Hive Site Path",
+          "label": "AUTO-DISCOVERY: Hadoop Hive Site Path",
           "description": "Path to core-site.xml. This is used to auto-discover services: HIVE. (if settings are not explicitly set)",
           "default": "/etc/hive/conf/hive-site.xml",
           "type": "path",
@@ -417,7 +418,7 @@
         },
         {
           "name": "solr_env_path",
-          "label": "Solr env.sh path",
+          "label": "AUTO-DISCOVERY: Solr env.sh path",
           "description": "Path to solr-env.sh. This is used to auto-discover services: SOLR. (if settings are not explicitly set)",
           "default": "/etc/solr/conf/solr-env.sh",
           "type": "path",
@@ -426,7 +427,7 @@
         },
         {
           "name": "kafka_client_conf_path",
-          "label": "Kafka client conf Path",
+          "label": "AUTO-DISCOVERY: Kafka client conf Path",
           "description": "Path to kafka-client.conf. This is used to auto-discover services: KAFKA. (if settings are not explicitly set)",
           "default": "/etc/kafka/conf/kafka-client.conf",
           "type": "path",
@@ -435,7 +436,7 @@
         },
         {
           "name": "kafka_cluster_conf_path",
-          "label": "Kafka cluster conf path",
+          "label": "AUTO-DISCOVERY: Kafka cluster conf path",
           "description": "Path to cluster-config.properties. This is used to auto-discover services: KAFKA. (if settings are not explicitly set)",
           "default": "/etc/kafka/conf/kafka-cluster-configs.properties",
           "type": "path",
@@ -444,7 +445,7 @@
         },
         {
           "name": "schema_registry_conf_path",
-          "label": "Schema Registry Configuration Path",
+          "label": "AUTO-DISCOVERY: Schema Registry Configuration Path",
           "description": "Path to schema_registry_client.properties. This is used to auto-discover services: KAFKA & SCHEMA REGISTRY. (if settings are not explicitly set)",
           "default": "/etc/schemaregistry/conf/schema_registry_client.properties",
           "type": "path",
@@ -453,7 +454,7 @@
         },
         {
           "name": "kudu_conf_path",
-          "label": "Kudu configuration Path.",
+          "label": "AUTO-DISCOVERY: Kudu configuration Path.",
           "description": "Path to Kudu Confiuration File. This is used to auto-discover services: KUDU. (if settings are not explicitly set)",
           "default": "",
           "type": "path",

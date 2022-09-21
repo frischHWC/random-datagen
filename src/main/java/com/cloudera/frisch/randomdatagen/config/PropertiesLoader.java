@@ -105,6 +105,7 @@ public class PropertiesLoader {
             && properties.get(ApplicationConfigs.HADOOP_HDFS_SITE_PATH)!=null
             && properties.get(ApplicationConfigs.HADOOP_CORE_SITE_PATH)!=null) {
             log.info("Going to auto-discover hdfs.uri");
+
         }
 
         if(properties.get(ApplicationConfigs.HBASE_ZK_QUORUM)==null
