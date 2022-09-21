@@ -10,13 +10,3 @@
     path: "{{ item }}"
     state: absent
   with_items: "{{ jars_compiled.files | map(attribute='path') | list }}"
-
-- name: Restart CM 
-  systemd:
-    state: restarted
-    name: cloudera-scm-server
-
-# TODO: make sure CM is restarted
-- name: Wait 1 minute to make sure CM is restarted
-  pause:
-    seconds: 60

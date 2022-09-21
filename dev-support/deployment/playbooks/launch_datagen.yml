@@ -7,5 +7,6 @@
   gather_facts: false
   roles: 
     - auto_configure/cm-config
+    - auto_configure/all-config
     - launch_datagen/add_service
     - launch_datagen/launch_command

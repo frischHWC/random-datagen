@@ -1,0 +1,169 @@
+---
+### GET SOLR CONFIGS ###
+
+- set_fact:
+    solr_service_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'SOLR' && name != 'infra_solr'].name | [0]"
+
+- name: DEBUG - solr_service_name
+  debug:
+    msg: "{{ solr_service_name }}"
+  when: debug | default(false)
+
+
+- name: Get SolR full config
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ solr_service_name }}/config?view=full"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: solr_full_config
+
+- name: Get SolR Server full config
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ solr_service_name }}/roleConfigGroups/{{ solr_service_name }}-SOLR_SERVER-BASE/config?view=full"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: solr_server_full_config
+
+- name: Get SolR roles repartition
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ solr_service_name }}/roles"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: solr_roles
+
+
+
+### SET SolR CONFIGS ###
+
+# Set SoLR protocol
+
+- set_fact:
+    solr_ssl: "{{ solr_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'solr_use_ssl'].value | [0]"
+
+- set_fact:
+    solr_ssl: "{{ solr_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'solr_use_ssl'].default | [0]"
+  when: solr_ssl == ""
+
+- name: DEBUG - solr_ssl
+  debug:
+    msg: "{{ solr_ssl }}"
+  when: debug | default(false)
+
+- set_fact:
+    solr_protocol: "{{ 'https' if solr_ssl else 'http' }}"
+
+- name: DEBUG - solr_protocol
+  debug:
+    msg: "{{ solr_protocol }}"
+  when: debug | default(false)
+
+
+# Set SolR port
+
+- set_fact:
+    solr_port: "{{ solr_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'solr_https_port'].value | [0]"
+  when: solr_ssl
+
+- set_fact:
+    solr_port: "{{ solr_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'solr_https_port'].default | [0]"
+  when: solr_ssl and solr_port == "" 
+
+- set_fact:
+    solr_port: "{{ solr_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'solr_http_port'].value | [0]"
+  when: not solr_ssl
+
+- set_fact:
+    solr_port: "{{ solr_server_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'solr_http_port'].default | [0]"
+  when: not solr_ssl and solr_port == ""
+
+
+# Set SolR Servers
+
+- set_fact:
+    solr_hosts: "{{ solr_roles.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'SOLR_SERVER'].hostRef.hostname | [0]"
+
+- name: DEBUG - solr_hosts
+  debug:
+    msg: "{{ solr_hosts }}"
+  when: debug | default(false)
+
+- set_fact:
+    solr_url: "{{ solr_protocol }}://{{ solr_hosts }}:{{ solr_port }}"
+
+- name: DEBUG - solr_url
+  debug:
+    msg: "{{ solr_url }}"
+  when: debug | default(false)
+
+
+# Kerberos
+- set_fact:
+    solr_auth: "{{ solr_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'solr_security_authentication'].value | [0]"
+
+- set_fact:
+    solr_auth: "{{ solr_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'solr_security_authentication' ].default | [0]"
+  when: solr_auth == ''
+
+- set_fact:
+    solr_kerberos: "{{ true if solr_auth == 'kerberos' else false }}"
+
+- name: DEBUG - solr_kerberos
+  debug:
+    msg: "{{ solr_kerberos }}"
+  when: debug | default(false)  
+
+
+# TLS
+- set_fact:
+    solr_tls: "{{ solr_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'solr_use_ssl'].value | [0]"
+
+- set_fact:
+    solr_tls: "{{ solr_full_config.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?name == 'solr_use_ssl'].default | [0]"
+  when: solr_tls == ''
+
+- name: DEBUG - solr_tls
+  debug:
+    msg: "{{ solr_tls }}"
+  when: debug | default(false)  

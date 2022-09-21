@@ -1,41 +1,223 @@
 ---
-# Check which services are deployed and available to setup the gen_<Service> vars
+# Check which services are deployed and available to setup the <Service>_exists vars and also their name as <service>_name
 
 - set_fact:
-    gen_kafka: "{{ true if (cloudera_manager_all_services.json | community.general.json_query(query)) == 'STARTED' else false }}"
+    hdfs_exists: "{{ true if (cloudera_manager_all_services.json | community.general.json_query(query)) == 'STARTED' else false }}"
   vars:
-    query: "items[?type == 'KAFKA'].serviceState | [0]"
-  when: gen_kafka is not defined
+    query: "items[?type == 'HDFS'].serviceState | [0]"
 
-- name: DEBUG - gen_kafka
+- name: DEBUG - hdfs_exists
   debug:
-    msg: "{{ gen_kafka }}"
+    msg: "{{ hdfs_exists }}"
   when: debug | default(false)
 
 - set_fact:
-    sr_service_exists: "{{ cloudera_manager_all_services.json | community.general.json_query(query) | length > 0 }}"
+    hdfs_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'HDFS'].name | [0]"
+
+- name: DEBUG - hdfs_name
+  debug:
+    msg: "{{ hdfs_name }}"
+  when: debug | default(false)
+
+
+
+
+- set_fact:
+    hbase_exists: "{{ true if (cloudera_manager_all_services.json | community.general.json_query(query)) == 'STARTED' else false }}"
+  vars:
+    query: "items[?type == 'HBASE'].serviceState | [0]"
+
+- name: DEBUG - hbase_exists
+  debug:
+    msg: "{{ hbase_exists }}"
+  when: debug | default(false)
+
+- set_fact:
+    hbase_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'HBASE'].name | [0]"
+
+- name: DEBUG - hbase_name
+  debug:
+    msg: "{{ hbase_name }}"
+  when: debug | default(false)
+
+
+
+- set_fact:
+    hive_exists: "{{ true if (cloudera_manager_all_services.json | community.general.json_query(query)) == 'STARTED' else false }}"
+  vars:
+    query: "items[?type == 'HIVE'].serviceState | [0]"
+
+- name: DEBUG - hive_exists
+  debug:
+    msg: "{{ hive_exists }}"
+  when: debug | default(false)
+
+- set_fact:
+    hive_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'HIVE'].name | [0]"
+
+- name: DEBUG - hive_name
+  debug:
+    msg: "{{ hive_name }}"
+  when: debug | default(false)
+
+
+
+- set_fact:
+    solr_exists: "{{ true if ((cloudera_manager_all_services.json | community.general.json_query(query)) == 'STARTED') and ((cloudera_manager_all_services.json | community.general.json_query(query2)) > 1) else false }}"
+  vars:
+    query: "items[?type == 'SOLR'].serviceState | [0]"
+    query2: "items[?type == 'SOLR'].serviceState | length(@) "
+
+- name: DEBUG - solr_exists
+  debug:
+    msg: "{{ solr_exists }}"
+  when: debug | default(false)
+
+- set_fact:
+    solr_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'SOLR'].name | [0]"
+
+- name: DEBUG - solr_name
+  debug:
+    msg: "{{ solr_name }}"
+  when: debug | default(false)
+
+
+
+- set_fact:
+    ozone_exists: "{{ true if (cloudera_manager_all_services.json | community.general.json_query(query)) == 'STARTED' else false }}"
+  vars:
+    query: "items[?type == 'OZONE'].serviceState | [0]"
+
+- name: DEBUG - ozone_exists
+  debug:
+    msg: "{{ ozone_exists }}"
+  when: debug | default(false)
+
+- set_fact:
+    ozone_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'OZONE'].name | [0]"
+
+- name: DEBUG - ozone_name
+  debug:
+    msg: "{{ ozone_name }}"
+  when: debug | default(false)
+
+
+
+- set_fact:
+    kafka_exists: "{{ true if (cloudera_manager_all_services.json | community.general.json_query(query)) == 'STARTED' else false }}"
+  vars:
+    query: "items[?type == 'KAFKA'].serviceState | [0]"
+
+- name: DEBUG - kafka_exists
+  debug:
+    msg: "{{ kafka_exists }}"
+  when: debug | default(false)
+
+- set_fact:
+    kafka_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'KAFKA'].name | [0]"
+
+- name: DEBUG - kafka_name
+  debug:
+    msg: "{{ kafka_name }}"
+  when: debug | default(false)
+
+
+
+
+- set_fact:
+    kudu_exists: "{{ true if (cloudera_manager_all_services.json | community.general.json_query(query)) == 'STARTED' else false }}"
+  vars:
+    query: "items[?type == 'KUDU'].serviceState | [0]"
+
+- name: DEBUG - kudu_exists
+  debug:
+    msg: "{{ kudu_exists }}"
+  when: debug | default(false)
+
+- set_fact:
+    kudu_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'KUDU'].name | [0]"
+
+- name: DEBUG - kudu_name
+  debug:
+    msg: "{{ kudu_name }}"
+  when: debug | default(false)
+
+
+
+- set_fact:
+    sr_exists: "{{ cloudera_manager_all_services.json | community.general.json_query(query) | length > 0 }}"
   vars:
     query: "items[?type == 'SCHEMAREGISTRY'].name"
 
-- name: DEBUG - Schema Registry exists
+- name: DEBUG - sr_exists
   debug:
-    msg: "{{ sr_service_exists }}"
-  when: debug | default(false)
-
-
-- set_fact:
-    config_kafka: "{{ true if gen_kafka and (kafka_url is not defined or kafka_protocol is not defined) else false }}"  
-
-- name: DEBUG - config_kafka
-  debug:
-    msg: "{{ config_kafka }}"
+    msg: "{{ sr_exists }}"
   when: debug | default(false)
 
 - set_fact:
-    config_schema_registry: "{{ true if gen_kafka and sr_service_exists and sr_url is not defined else false }}"  
+    sr_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'SCHEMAREGISTRY'].name | [0]"
 
-- name: DEBUG - config_schema_registry
+- name: DEBUG - sr_name
   debug:
-    msg: "{{ config_schema_registry }}"
+    msg: "{{ sr_name }}"
   when: debug | default(false)
 
+
+
+- set_fact:
+    ranger_exists: "{{ true if (cloudera_manager_all_services.json | community.general.json_query(query)) == 'STARTED' else false }}"
+  vars:
+    query: "items[?type == 'RANGER'].serviceState | [0]"
+
+- name: DEBUG - ranger_exists
+  debug:
+    msg: "{{ ranger_exists }}"
+  when: debug | default(false)
+
+- set_fact:
+    ranger_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'RANGER'].name | [0]"
+
+- name: DEBUG - ranger_name
+  debug:
+    msg: "{{ ranger_name }}"
+  when: debug | default(false)
+
+
+
+- set_fact:
+    knox_exists: "{{ true if (cloudera_manager_all_services.json | community.general.json_query(query)) == 'STARTED' else false }}"
+  vars:
+    query: "items[?type == 'KNOX'].serviceState | [0]"
+
+- name: DEBUG - knox_exists
+  debug:
+    msg: "{{ knox_exists }}"
+  when: debug | default(false)
+
+- set_fact:
+    knox_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'KNOX'].name | [0]"
+
+- name: DEBUG - knox_name
+  debug:
+    msg: "{{ knox_name }}"
+  when: debug | default(false)
