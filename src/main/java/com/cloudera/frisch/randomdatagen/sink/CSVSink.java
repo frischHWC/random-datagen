@@ -2,6 +2,7 @@ package com.cloudera.frisch.randomdatagen.sink;
 
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
@@ -10,6 +11,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -29,7 +31,7 @@ public class CSVSink implements SinkInterface {
     /**
      * Init local CSV file with header
      */
-    CSVSink(Model model) {
+    CSVSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.model = model;
         this.counter = 0;
         this.lineSeparator = System.getProperty("line.separator");

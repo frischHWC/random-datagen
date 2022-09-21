@@ -452,8 +452,8 @@
         },
         {
           "name": "kudu_conf_path",
-          "label": "Kudu configuration Path. This is used to auto-discover services: KUDU. (if settings are not explicitly set)",
-          "description": "Path to .",
+          "label": "Kudu configuration Path.",
+          "description": "Path to Kudu Confiuration File. This is used to auto-discover services: KUDU. (if settings are not explicitly set)",
           "default": "",
           "type": "path",
           "pathType": "serviceSpecific",

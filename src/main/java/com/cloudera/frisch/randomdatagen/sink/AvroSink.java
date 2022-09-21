@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.sink;
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
@@ -13,6 +14,7 @@ import org.apache.avro.io.DatumWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Avro Sink to create Local Avro files
@@ -32,7 +34,7 @@ public class AvroSink implements SinkInterface {
     /**
      * Init local Avro file with header
      */
-    AvroSink(Model model) {
+    AvroSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.schema = model.getAvroSchema();
         this.datumWriter = new GenericDatumWriter<>(schema);
         this.model = model;

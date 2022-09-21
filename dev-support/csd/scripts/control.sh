@@ -6,7 +6,7 @@ case $CMD in
     echo "Starting DATAGEN"
     envsubst < "${CONF_DIR}/service.properties" > "${CONF_DIR}/service.properties.tmp"
     mv "${CONF_DIR}/service.properties.tmp" "${CONF_DIR}/service.properties"
-    exec ${JAVA_HOME}/bin/java -jar -Dspring.profiles.active=cdp -Xmx${MAX_HEAP_SIZE}G ${DATAGEN_JAR_PATH}
+    exec ${JAVA_HOME}/bin/java -jar -Dspring.profiles.active=cdp -Xmx${MAX_HEAP_SIZE}G ${DATAGEN_JAR_PATH} --spring.config.location=file:${CONF_DIR}/service.properties
     ;;
  (local_json)
      echo "Generates JSON Data Locally"

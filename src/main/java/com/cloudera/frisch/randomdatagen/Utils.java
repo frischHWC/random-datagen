@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen;
 
 
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.SinkParser;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
@@ -139,15 +140,15 @@ public class Utils {
      * Setup haddop env by setting up needed Hadoop system property and adding to configuration required files
      * @param config Hadoop configuration to set up
      */
-    public static void setupHadoopEnv(Configuration config) {
+    public static void setupHadoopEnv(Configuration config, Map<ApplicationConfigs, String> properties) {
 
-        config.addResource(new Path("file://"+ PropertiesLoader.getProperty("hadoop.core.site.path")));
-        config.addResource(new Path("file://"+ PropertiesLoader.getProperty("hadoop.hdfs.site.path")));
-        config.addResource(new Path("file://"+ PropertiesLoader.getProperty("hadoop.ozone.site.path")));
-        config.addResource(new Path("file://"+ PropertiesLoader.getProperty("hadoop.hbase.site.path")));
+        config.addResource(new Path("file://"+ properties.get(ApplicationConfigs.HADOOP_CORE_SITE_PATH)));
+        config.addResource(new Path("file://"+ properties.get(ApplicationConfigs.HADOOP_HDFS_SITE_PATH)));
+        config.addResource(new Path("file://"+ properties.get(ApplicationConfigs.HADOOP_OZONE_SITE_PATH)));
+        config.addResource(new Path("file://"+ properties.get(ApplicationConfigs.HADOOP_HBASE_SITE_PATH)));
 
-        System.setProperty("HADOOP_USER_NAME", PropertiesLoader.getProperty("hadoop.user"));
-        System.setProperty("hadoop.home.dir", PropertiesLoader.getProperty("hadoop.home"));
+        System.setProperty("HADOOP_USER_NAME", properties.get(ApplicationConfigs.HADOOP_USER));
+        System.setProperty("hadoop.home.dir", properties.get(ApplicationConfigs.HADOOP_HOME));
     }
 
     /**

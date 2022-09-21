@@ -24,11 +24,12 @@ public class DataGenerationController {
   @PostMapping(value = "/csv")
   public void generateIntoCSV(
       @RequestParam String modelFilePath,
+      @RequestParam Integer threads,
       @RequestParam Long numberOfBatches,
       @RequestParam Long rowsPerBatch
   ) {
-    dataGenerationService.generateDate(modelFilePath, numberOfBatches,rowsPerBatch,
-        Collections.singletonList("CSV"));
+    dataGenerationService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+        Collections.singletonList("CSV"), null);
   }
 
 

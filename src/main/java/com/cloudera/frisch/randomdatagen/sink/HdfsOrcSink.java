@@ -2,6 +2,7 @@ package com.cloudera.frisch.randomdatagen.sink;
 
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
@@ -39,13 +40,14 @@ public class HdfsOrcSink implements SinkInterface {
     private final Boolean oneFilePerIteration;
     private final short replicationFactor;
     private final Configuration conf;
+    private String hdfsUri;
 
     /**
      * Initiate HDFS connection with Kerberos or not
      *
      * @return filesystem connection to HDFS
      */
-    public HdfsOrcSink(Model model) {
+    public HdfsOrcSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.model = model;
         this.counter = 0;
         this.directoryName = (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH);
@@ -54,18 +56,19 @@ public class HdfsOrcSink implements SinkInterface {
         this.replicationFactor = (short) model.getOptionsOrDefault(OptionsConverter.Options.HDFS_REPLICATION_FACTOR);
         this.conf = new Configuration();
         conf.set("dfs.replication", String.valueOf(replicationFactor));
+        this.hdfsUri = properties.get(ApplicationConfigs.HDFS_URI);
 
         org.apache.hadoop.conf.Configuration config = new org.apache.hadoop.conf.Configuration();
-        Utils.setupHadoopEnv(config);
+        Utils.setupHadoopEnv(config, properties);
 
         // Set all kerberos if needed (Note that connection will require a user and its appropriate keytab with right privileges to access folders and files on HDFSCSV)
-        if (Boolean.parseBoolean(PropertiesLoader.getProperty("hdfs.auth.kerberos"))) {
-            Utils.loginUserWithKerberos(PropertiesLoader.getProperty("hdfs.auth.kerberos.user"),
-                    PropertiesLoader.getProperty("hdfs.auth.kerberos.keytab"), config);
+        if (Boolean.parseBoolean(properties.get(ApplicationConfigs.HDFS_AUTH_KERBEROS))) {
+            Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.HDFS_AUTH_KERBEROS_USER),
+                properties.get(ApplicationConfigs.HDFS_AUTH_KERBEROS_KEYTAB),config);
         }
 
         try {
-            fileSystem = FileSystem.get(URI.create(PropertiesLoader.getProperty("hdfs.uri")), config);
+            fileSystem = FileSystem.get(URI.create(hdfsUri), config);
         } catch (IOException e) {
             logger.error("Could not access to ORC HDFS !", e);
         }
@@ -81,7 +84,7 @@ public class HdfsOrcSink implements SinkInterface {
         }
 
         if (!oneFilePerIteration) {
-            creatFileWithOverwrite(PropertiesLoader.getProperty("hdfs.uri") + directoryName + fileName + ".orc");
+            creatFileWithOverwrite(hdfsUri + directoryName + fileName + ".orc");
         }
 
     }
@@ -100,7 +103,7 @@ public class HdfsOrcSink implements SinkInterface {
     @Override
     public void sendOneBatchOfRows(List<Row> rows) {
         if (oneFilePerIteration) {
-            creatFileWithOverwrite(PropertiesLoader.getProperty("hdfs.uri") + directoryName + fileName + "-" + String.format("%010d", counter) + ".orc");
+            creatFileWithOverwrite(hdfsUri + directoryName + fileName + "-" + String.format("%010d", counter) + ".orc");
             counter++;
         }
 

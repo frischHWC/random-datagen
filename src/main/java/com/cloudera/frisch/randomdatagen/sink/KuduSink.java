@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.sink;
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
@@ -11,6 +12,7 @@ import org.apache.kudu.client.*;
 
 import java.security.PrivilegedExceptionAction;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is a kudu sink based on Kudu 1.11.0 API
@@ -25,29 +27,29 @@ public class KuduSink implements SinkInterface {
     private final Model model;
 
 
-    KuduSink(Model model) {
+    KuduSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.tableName = (String) model.getTableNames().get(OptionsConverter.TableNames.KUDU_TABLE_NAME);
         this.model = model;
 
         try {
 
-            System.setProperty("javax.net.ssl.trustStore", PropertiesLoader.getProperty("kudu.truststore.location"));
-            System.setProperty("javax.net.ssl.trustStorePassword", PropertiesLoader.getProperty("kudu.truststore.password"));
+            System.setProperty("javax.net.ssl.trustStore", properties.get(ApplicationConfigs.KUDU_TRUSTSTORE_LOCATION));
+            System.setProperty("javax.net.ssl.trustStorePassword", properties.get(ApplicationConfigs.KUDU_TRUSTSTORE_PASSWORD));
 
-            if (Boolean.parseBoolean(PropertiesLoader.getProperty("kudu.auth.kerberos"))) {
-                Utils.loginUserWithKerberos(PropertiesLoader.getProperty("kudu.security.user"),
-                        PropertiesLoader.getProperty("kudu.security.keytab"), new Configuration());
+            if (Boolean.parseBoolean(properties.get(ApplicationConfigs.KUDU_AUTH_KERBEROS))) {
+                Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.KUDU_AUTH_KERBEROS_USER),
+                    properties.get(ApplicationConfigs.KUDU_AUTH_KERBEROS_KEYTAB), new Configuration());
 
                 UserGroupInformation.getLoginUser().doAs(
                         new PrivilegedExceptionAction<KuduClient>() {
                             @Override
                             public KuduClient run() throws Exception {
-                                client = new KuduClient.KuduClientBuilder(PropertiesLoader.getProperty("kudu.master.server")).build();
+                                client = new KuduClient.KuduClientBuilder(properties.get(ApplicationConfigs.KUDU_URL)).build();
                                 return client;
                             }
                         });
             } else {
-                this.client = new KuduClient.KuduClientBuilder(PropertiesLoader.getProperty("kudu.master.server")).build();
+                this.client = new KuduClient.KuduClientBuilder(properties.get(ApplicationConfigs.KUDU_URL)).build();
             }
 
             createTableIfNotExists();

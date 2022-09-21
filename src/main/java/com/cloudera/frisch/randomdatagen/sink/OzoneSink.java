@@ -2,6 +2,7 @@ package com.cloudera.frisch.randomdatagen.sink;
 
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
@@ -17,6 +18,7 @@ import org.apache.hadoop.ozone.om.exceptions.OMException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -32,20 +34,20 @@ public class OzoneSink implements SinkInterface {
     private final ReplicationFactor replicationFactor;
 
 
-    OzoneSink(Model model) {
+    OzoneSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.volumeName = (String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME);
         this.replicationFactor = ReplicationFactor.valueOf((int) model.getOptionsOrDefault(OptionsConverter.Options.OZONE_REPLICATION_FACTOR));
 
         try {
             OzoneConfiguration config = new OzoneConfiguration();
-            Utils.setupHadoopEnv(config);
+            Utils.setupHadoopEnv(config, properties);
 
-            if (Boolean.parseBoolean(PropertiesLoader.getProperty("ozone.auth.kerberos"))) {
-                Utils.loginUserWithKerberos(PropertiesLoader.getProperty("ozone.auth.kerberos.user"),
-                        PropertiesLoader.getProperty("ozone.auth.kerberos.keytab"), config);
+            if (Boolean.parseBoolean(properties.get(ApplicationConfigs.OZONE_AUTH_KERBEROS))) {
+                Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.OZONE_AUTH_KERBEROS_USER),
+                    properties.get(ApplicationConfigs.OZONE_AUTH_KERBEROS_KEYTAB), config);
             }
 
-            this.ozClient = OzoneClientFactory.getRpcClient(PropertiesLoader.getProperty("ozone.service.id"), config);
+            this.ozClient = OzoneClientFactory.getRpcClient(properties.get(ApplicationConfigs.OZONE_SERVICE_ID), config);
             this.objectStore = ozClient.getObjectStore();
 
             if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
@@ -104,11 +106,11 @@ public class OzoneSink implements SinkInterface {
                 logger.info("Bucket: " + bucketName + " under volume : " + volume.getName() + " already exists ");
             } else {
                 logger.error("An error occurred while creating volume " +
-                        PropertiesLoader.getProperty("ozone.volume.name") + " : ", e);
+                        this.volumeName + " : ", e);
             }
         } catch (IOException e) {
             logger.error("Could not create bucket to Ozone volume: " +
-                    PropertiesLoader.getProperty("ozone.volume.name") + " and bucket : " + bucketName + " due to error: ", e);
+                    this.volumeName + " and bucket : " + bucketName + " due to error: ", e);
         }
 
     }

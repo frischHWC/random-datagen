@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.sink;
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
@@ -15,10 +16,7 @@ import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import static com.hortonworks.registries.schemaregistry.serdes.avro.AvroSnapshotSerializer.SERDES_PROTOCOL_VERSION;
@@ -35,13 +33,13 @@ public class KafkaSink implements SinkInterface {
     private final Schema schema;
     private final MessageType messagetype;
 
-    KafkaSink(Model model) {
+    KafkaSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.topic =  (String) model.getTableNames().get(OptionsConverter.TableNames.KAFKA_TOPIC);
         this.schema = model.getAvroSchema();
         this.messagetype = convertStringToMessageType((String) model.getOptions().get(OptionsConverter.Options.KAFKA_MESSAGE_TYPE));
 
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, PropertiesLoader.getProperty("kafka.brokers"));
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.get(ApplicationConfigs.KAFKA_BROKERS));
         props.put(ProducerConfig.ACKS_CONFIG, model.getOptionsOrDefault(
             OptionsConverter.Options.KAFKA_ACKS_CONFIG));
         props.put(ProducerConfig.RETRIES_CONFIG, model.getOptionsOrDefault(
@@ -51,15 +49,15 @@ public class KafkaSink implements SinkInterface {
         if(messagetype==MessageType.AVRO) {
             String schemaRegistryProtocol = "http";
           // SSL configs
-            if (Boolean.parseBoolean(PropertiesLoader.getProperty("schema.registry.tls"))) {
+            if (Boolean.parseBoolean(properties.get(ApplicationConfigs.SCHEMA_REGISTRY_TLS_ENABLED))) {
                 System.setProperty("javax.net.ssl.trustStore",
-                    PropertiesLoader.getProperty("kafka.truststore.location"));
+                    properties.get(ApplicationConfigs.KAFKA_TRUSTSTORE_LOCATION));
                 System.setProperty("javax.net.ssl.trustStorePassword",
-                    PropertiesLoader.getProperty("kafka.truststore.password"));
+                    properties.get(ApplicationConfigs.KAFKA_TRUSTSTORE_PASSWORD));
                 System.setProperty("javax.net.ssl.keyStore",
-                    PropertiesLoader.getProperty("kafka.keystore.location"));
+                    properties.get(ApplicationConfigs.KAFKA_KEYSTORE_LOCATION));
                 System.setProperty("javax.net.ssl.keyStorePassword",
-                    PropertiesLoader.getProperty("kafka.keystore.password"));
+                    properties.get(ApplicationConfigs.KAFKA_KEYSTORE_PASSWORD));
                 schemaRegistryProtocol = "https";
             }
 
@@ -67,7 +65,7 @@ public class KafkaSink implements SinkInterface {
                 "com.hortonworks.registries.schemaregistry.serdes.avro.kafka.KafkaAvroSerializer");
             props.put(
                 SchemaRegistryClient.Configuration.SCHEMA_REGISTRY_URL.name(),
-                schemaRegistryProtocol + "://" + PropertiesLoader.getProperty("schema.registry.url") + "/api/v1");
+                schemaRegistryProtocol + "://" + properties.get(ApplicationConfigs.SCHEMA_REGISTRY_URL) + "/api/v1");
             props.put(SERDES_PROTOCOL_VERSION, METADATA_ID_VERSION_PROTOCOL);
 
         } else {
@@ -75,33 +73,33 @@ public class KafkaSink implements SinkInterface {
               "org.apache.kafka.common.serialization.StringSerializer");
         }
 
-        String securityProtocol = PropertiesLoader.getProperty("kafka.security.protocol");
+        String securityProtocol = properties.get(ApplicationConfigs.KAFKA_SECURITY_PROTOCOL);
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, securityProtocol);
 
         //Kerberos config
         if (securityProtocol.equalsIgnoreCase("SASL_PLAINTEXT") || securityProtocol.equalsIgnoreCase("SASL_SSL")) {
             Utils.createJaasConfigFile("kafka-jaas-randomdatagen.config", "KafkaClient",
-                    PropertiesLoader.getProperty("kafka.auth.kerberos.keytab"), PropertiesLoader.getProperty("kafka.auth.kerberos.user"),
+                properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB), properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_USER),
                     true, false, false);
             Utils.createJaasConfigFile("kafka-jaas-randomdatagen.config", "RegistryClient",
-                    PropertiesLoader.getProperty("kafka.auth.kerberos.keytab"), PropertiesLoader.getProperty("kafka.auth.kerberos.user"),
+                properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB), properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_USER),
                     true, false, true);
             System.setProperty("java.security.auth.login.config", "kafka-jaas-randomdatagen.config");
 
-            props.put(SaslConfigs.SASL_MECHANISM, PropertiesLoader.getProperty("kafka.sasl.mechanism"));
-            props.put(SaslConfigs.SASL_KERBEROS_SERVICE_NAME, PropertiesLoader.getProperty("kafka.sasl.kerberos.service.name"));
+            props.put(SaslConfigs.SASL_MECHANISM, properties.get(ApplicationConfigs.KAFKA_SASL_MECHANISM));
+            props.put(SaslConfigs.SASL_KERBEROS_SERVICE_NAME, properties.get(ApplicationConfigs.KAFKA_SASL_KERBEROS_SERVICE_NAME));
 
-            Utils.loginUserWithKerberos(PropertiesLoader.getProperty("kafka.auth.kerberos.user"),
-                    PropertiesLoader.getProperty("kafka.auth.kerberos.keytab"), new Configuration());
+            Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_USER),
+                properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB), new Configuration());
         }
 
         // SSL configs
         if (securityProtocol.equalsIgnoreCase("SASL_SSL") || securityProtocol.equalsIgnoreCase("SSL")) {
-            props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, PropertiesLoader.getProperty("kafka.keystore.location"));
-            props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, PropertiesLoader.getProperty("kafka.truststore.location"));
-            props.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, PropertiesLoader.getProperty("kafka.keystore.key.password"));
-            props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, PropertiesLoader.getProperty("kafka.keystore.pasword"));
-            props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, PropertiesLoader.getProperty("kafka.truststore.password"));
+            props.put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, properties.get(ApplicationConfigs.KAFKA_KEYSTORE_LOCATION));
+            props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, properties.get(ApplicationConfigs.KAFKA_TRUSTSTORE_LOCATION));
+            props.put(SslConfigs.SSL_KEY_PASSWORD_CONFIG, properties.get(ApplicationConfigs.KAFKA_KEYSTORE_PASSWORD));
+            props.put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, properties.get(ApplicationConfigs.KAFKA_KEYSTORE_KEYPASSWORD));
+            props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, properties.get(ApplicationConfigs.KAFKA_TRUSTSTORE_PASSWORD));
         }
 
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {

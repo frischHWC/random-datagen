@@ -2,6 +2,7 @@ package com.cloudera.frisch.randomdatagen.sink;
 
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
@@ -17,6 +18,7 @@ import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 
 public class ParquetSink implements SinkInterface {
@@ -33,7 +35,7 @@ public class ParquetSink implements SinkInterface {
     /**
      * Init local Parquet file
      */
-    ParquetSink(Model model) {
+    ParquetSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.counter = 0;
         this.model = model;
         this.directoryName = (String) model.getTableNames().get(OptionsConverter.TableNames.LOCAL_FILE_PATH);

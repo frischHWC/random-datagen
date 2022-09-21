@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.sink;
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
@@ -14,6 +15,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
@@ -30,6 +32,7 @@ import java.util.concurrent.CountDownLatch;
 public class HiveSink implements SinkInterface {
 
     private final int threads_number;
+    private String hiveUri;
     private Connection hiveConnection;
     private HdfsParquetSink hdfsSink;
     private final String database;
@@ -40,7 +43,7 @@ public class HiveSink implements SinkInterface {
     private final String queue;
 
 
-    HiveSink(Model model) {
+    HiveSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.hiveOnHDFS = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.HIVE_ON_HDFS);
         this.threads_number = (Integer) model.getOptionsOrDefault(OptionsConverter.Options.HIVE_THREAD_NUMBER);
         this.database = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_DATABASE);
@@ -49,25 +52,23 @@ public class HiveSink implements SinkInterface {
             tableName + "_tmp" : (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_TEMPORARY_TABLE_NAME);
         this.queue = (String) model.getOptionsOrDefault(OptionsConverter.Options.HIVE_TEZ_QUEUE_NAME);
         String locationTemporaryTable = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH);
+        this.hiveUri = "jdbc:hive2://" + properties.get(ApplicationConfigs.HIVE_ZK_QUORUM) + "/" +
+            database + ";serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" +
+            properties.get(ApplicationConfigs.HIVE_ZK_ZNODE) + "?tez.queue.name=" + queue;
 
         try {
-            if (Boolean.parseBoolean(PropertiesLoader.getProperty("hive.auth.kerberos"))) {
-                Utils.loginUserWithKerberos(PropertiesLoader.getProperty("hive.security.user"),
-                        PropertiesLoader.getProperty("hive.security.keytab"), new Configuration());
+            if (Boolean.parseBoolean(properties.get(ApplicationConfigs.HIVE_AUTH_KERBEROS))) {
+                Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.HIVE_AUTH_KERBEROS_USER),
+                    properties.get(ApplicationConfigs.HIVE_AUTH_KERBEROS_KEYTAB), new Configuration());
             }
 
-            System.setProperty("javax.net.ssl.trustStore", PropertiesLoader.getProperty("hive.truststore.location"));
-            System.setProperty("javax.net.ssl.trustStorePassword", PropertiesLoader.getProperty("hive.truststore.password"));
+            System.setProperty("javax.net.ssl.trustStore", properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_LOCATION));
+            System.setProperty("javax.net.ssl.trustStorePassword", properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_PASSWORD));
 
-            java.util.Properties properties = new Properties();
-            properties.put("tez.queue.name", queue);
+            java.util.Properties propertiesForHive = new Properties();
+            propertiesForHive.put("tez.queue.name", queue);
 
-            this.hiveConnection = DriverManager.getConnection("jdbc:hive2://" +
-                            PropertiesLoader.getProperty("hive.zookeeper.server") + "/" +
-                            ";serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" +
-                            PropertiesLoader.getProperty("hive.zookeeper.namespace") +
-                            "?tez.queue.name=" + queue
-                    , properties);
+            this.hiveConnection = DriverManager.getConnection(hiveUri, propertiesForHive);
 
             prepareAndExecuteStatement("CREATE DATABASE IF NOT EXISTS " + database);
 
@@ -84,7 +85,7 @@ public class HiveSink implements SinkInterface {
                 // If using an HDFS sink, we want it to use the Hive HDFS File path and not the Hdfs file path
                 model.getTableNames().put(OptionsConverter.TableNames.HDFS_FILE_PATH,
                     model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH));
-                this.hdfsSink = new HdfsParquetSink(model);
+                this.hdfsSink = new HdfsParquetSink(model, properties);
 
                 logger.info("Creating temporary table: " + tableNameTemporary);
                 prepareAndExecuteStatement(
@@ -172,12 +173,8 @@ public class HiveSink implements SinkInterface {
 
         @Override
         public void run() {
-            try (HiveConnection hiveConnectionPerThread = new HiveConnection("jdbc:hive2://" +
-                    PropertiesLoader.getProperty("hive.zookeeper.server") + "/" +
-                    database +
-                    ";serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" +
-                    PropertiesLoader.getProperty("hive.zookeeper.namespace")
-                    , new Properties())) {
+            try (HiveConnection hiveConnectionPerThread =
+                     new HiveConnection(hiveUri, new Properties())) {
 
                 HivePreparedStatement hivePreparedStatementByThread =
                         (HivePreparedStatement) hiveConnectionPerThread.prepareStatement(insertStatement);

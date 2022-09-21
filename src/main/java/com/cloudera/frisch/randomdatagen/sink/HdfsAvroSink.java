@@ -2,6 +2,7 @@ package com.cloudera.frisch.randomdatagen.sink;
 
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
@@ -18,6 +19,7 @@ import org.apache.hadoop.fs.Path;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is an HDFS Avro sink using Hadoop 3.2 API
@@ -36,30 +38,32 @@ public class HdfsAvroSink implements SinkInterface {
     private final String fileName;
     private final Boolean oneFilePerIteration;
     private final short replicationFactor;
+    private String hdfsUri;
 
     /**
      * Initiate HDFS-AVRO connection with Kerberos or not
      *
      */
-    HdfsAvroSink(Model model) {
+    HdfsAvroSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.counter = 0;
         this.model = model;
         this.directoryName = (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH);
         this.fileName = (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME);
         this.oneFilePerIteration = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION);
         this.replicationFactor = (short) model.getOptionsOrDefault(OptionsConverter.Options.HDFS_REPLICATION_FACTOR);
+        this.hdfsUri = properties.get(ApplicationConfigs.HDFS_URI);
 
         org.apache.hadoop.conf.Configuration config = new org.apache.hadoop.conf.Configuration();
-        Utils.setupHadoopEnv(config);
+        Utils.setupHadoopEnv(config, properties);
 
         // Set all kerberos if needed (Note that connection will require a user and its appropriate keytab with right privileges to access folders and files on HDFSCSV)
-        if (Boolean.parseBoolean(PropertiesLoader.getProperty("hdfs.auth.kerberos"))) {
-            Utils.loginUserWithKerberos(PropertiesLoader.getProperty("hdfs.auth.kerberos.user"),
-                    PropertiesLoader.getProperty("hdfs.auth.kerberos.keytab"), config);
+        if (Boolean.parseBoolean(properties.get(ApplicationConfigs.HDFS_AUTH_KERBEROS))) {
+            Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.HDFS_AUTH_KERBEROS_USER),
+                properties.get(ApplicationConfigs.HDFS_AUTH_KERBEROS_KEYTAB),config);
         }
 
         try {
-            this.fileSystem = FileSystem.get(URI.create(PropertiesLoader.getProperty("hdfs.uri")), config);
+            this.fileSystem = FileSystem.get(URI.create(hdfsUri), config);
         } catch (IOException e) {
             logger.error("Could not access to HDFSAVRO !", e);
         }

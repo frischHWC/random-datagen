@@ -2,6 +2,7 @@ package com.cloudera.frisch.randomdatagen.sink;
 
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
@@ -18,6 +19,7 @@ import org.apache.parquet.hadoop.metadata.CompressionCodecName;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is an HDFS PARQUET sink using Hadoop 3.2 API
@@ -34,12 +36,13 @@ public class HdfsParquetSink implements SinkInterface {
     private final Boolean oneFilePerIteration;
     private final short replicationFactor;
     private final Configuration conf;
+    private String hdfsUri;
 
     /**
      * Initiate HDFS connection with Kerberos or not
      * @return filesystem connection to HDFS
      */
-    public HdfsParquetSink(Model model) {
+    public HdfsParquetSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.directoryName = (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH);
         this.fileName = (String) model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME);
         this.oneFilePerIteration = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION);
@@ -48,18 +51,19 @@ public class HdfsParquetSink implements SinkInterface {
         this.replicationFactor = (short) model.getOptionsOrDefault(OptionsConverter.Options.HDFS_REPLICATION_FACTOR);
         this.conf = new Configuration();
         conf.set("dfs.replication", String.valueOf(replicationFactor));
+        this.hdfsUri = properties.get(ApplicationConfigs.HDFS_URI);
 
         org.apache.hadoop.conf.Configuration config = new org.apache.hadoop.conf.Configuration();
-        Utils.setupHadoopEnv(config);
+        Utils.setupHadoopEnv(config, properties);
 
         // Set all kerberos if needed (Note that connection will require a user and its appropriate keytab with right privileges to access folders and files on HDFSCSV)
-        if (Boolean.parseBoolean(PropertiesLoader.getProperty("hdfs.auth.kerberos"))) {
-            Utils.loginUserWithKerberos(PropertiesLoader.getProperty("hdfs.auth.kerberos.user"),
-                    PropertiesLoader.getProperty("hdfs.auth.kerberos.keytab"),config);
+        if (Boolean.parseBoolean(properties.get(ApplicationConfigs.HDFS_AUTH_KERBEROS))) {
+            Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.HDFS_AUTH_KERBEROS_USER),
+                properties.get(ApplicationConfigs.HDFS_AUTH_KERBEROS_KEYTAB),config);
         }
 
         try {
-            this.fileSystem = FileSystem.get(URI.create(PropertiesLoader.getProperty("hdfs.uri")), config);
+            this.fileSystem = FileSystem.get(URI.create(hdfsUri), config);
         } catch (IOException e) {
             logger.error("Could not access to HDFS PARQUET !", e);
         }
@@ -73,7 +77,7 @@ public class HdfsParquetSink implements SinkInterface {
         }
 
         if (!oneFilePerIteration) {
-            createFileWithOverwrite(PropertiesLoader.getProperty("hdfs.uri") + directoryName + fileName + ".parquet");
+            createFileWithOverwrite(hdfsUri + directoryName + fileName + ".parquet");
         }
 
     }
@@ -92,7 +96,7 @@ public class HdfsParquetSink implements SinkInterface {
     public void sendOneBatchOfRows(List<Row> rows){
         try {
             if (oneFilePerIteration) {
-                createFileWithOverwrite(PropertiesLoader.getProperty("hdfs.uri") + directoryName + fileName + "-" + String.format("%010d", counter) + ".parquet");
+                createFileWithOverwrite(hdfsUri + directoryName + fileName + "-" + String.format("%010d", counter) + ".parquet");
                 counter++;
             }
 

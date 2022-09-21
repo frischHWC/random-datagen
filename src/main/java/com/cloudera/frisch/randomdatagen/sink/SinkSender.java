@@ -1,5 +1,6 @@
 package com.cloudera.frisch.randomdatagen.sink;
 
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.SinkParser;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import org.apache.log4j.Logger;
@@ -7,6 +8,7 @@ import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 
 public class SinkSender {
@@ -22,59 +24,59 @@ public class SinkSender {
      * @return list of sinks initialized
      */
     @SuppressWarnings("unchecked")
-    public static List<SinkInterface> sinksInit(Model model, List<SinkParser.sinks> sinks) {
+    public static List<SinkInterface> sinksInit(Model model, Map<ApplicationConfigs, String> properties, List<SinkParser.sinks> sinks) {
         List<SinkInterface> sinkList = new ArrayList<>();
 
         sinks.forEach(sink -> {
             SinkInterface sinkToInitAndStart = null;
             switch (sink) {
                 case HDFSCSV:
-                    sinkToInitAndStart = new HdfsCsvSink(model);
+                    sinkToInitAndStart = new HdfsCsvSink(model, properties);
                     break;
                 case HDFSJSON:
-                    sinkToInitAndStart = new HdfsJsonSink(model);
+                    sinkToInitAndStart = new HdfsJsonSink(model, properties);
                     break;
                 case HDFSAVRO:
-                    sinkToInitAndStart = new HdfsAvroSink(model);
+                    sinkToInitAndStart = new HdfsAvroSink(model, properties);
                     break;
                 case HDFSORC:
-                    sinkToInitAndStart = new HdfsOrcSink(model);
+                    sinkToInitAndStart = new HdfsOrcSink(model, properties);
                     break;
                 case HDFSPARQUET:
-                    sinkToInitAndStart = new HdfsParquetSink(model);
+                    sinkToInitAndStart = new HdfsParquetSink(model, properties);
                     break;
                 case HBASE:
-                    sinkToInitAndStart = new HbaseSink(model);
+                    sinkToInitAndStart = new HbaseSink(model, properties);
                     break;
                 case HIVE:
-                    sinkToInitAndStart = new HiveSink(model);
+                    sinkToInitAndStart = new HiveSink(model, properties);
                     break;
                 case OZONE:
-                    sinkToInitAndStart = new OzoneSink(model);
+                    sinkToInitAndStart = new OzoneSink(model, properties);
                     break;
                 case SOLR:
-                    sinkToInitAndStart = new SolRSink(model);
+                    sinkToInitAndStart = new SolRSink(model, properties);
                     break;
                 case KAFKA:
-                    sinkToInitAndStart = new KafkaSink(model);
+                    sinkToInitAndStart = new KafkaSink(model, properties);
                     break;
                 case KUDU:
-                    sinkToInitAndStart = new KuduSink(model);
+                    sinkToInitAndStart = new KuduSink(model, properties);
                     break;
                 case CSV:
-                    sinkToInitAndStart = new CSVSink(model);
+                    sinkToInitAndStart = new CSVSink(model, properties);
                     break;
                 case JSON:
-                    sinkToInitAndStart = new JsonSink(model);
+                    sinkToInitAndStart = new JsonSink(model, properties);
                     break;
                 case AVRO:
-                    sinkToInitAndStart = new AvroSink(model);
+                    sinkToInitAndStart = new AvroSink(model, properties);
                     break;
                 case PARQUET:
-                    sinkToInitAndStart = new ParquetSink(model);
+                    sinkToInitAndStart = new ParquetSink(model, properties);
                     break;
                 case ORC:
-                    sinkToInitAndStart = new ORCSink(model);
+                    sinkToInitAndStart = new ORCSink(model, properties);
                     break;
                  default:
                      logger.warn("The sink " + sink + " provided has not been recognized as an expected sink");

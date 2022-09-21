@@ -2,6 +2,7 @@ package com.cloudera.frisch.randomdatagen.sink;
 
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
@@ -15,6 +16,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -31,21 +33,21 @@ public class HbaseSink implements SinkInterface {
     private final TableName tableName;
     private Admin admin;
 
-    HbaseSink(Model model) {
+    HbaseSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.fullTableName = model.getTableNames().get(OptionsConverter.TableNames.HBASE_NAMESPACE) + ":" +
             model.getTableNames().get(OptionsConverter.TableNames.HBASE_TABLE_NAME);
         this.tableName = TableName.valueOf(fullTableName);
 
         Configuration config = HBaseConfiguration.create();
-        config.set("hbase.zookeeper.quorum", PropertiesLoader.getProperty("hbase.zookeeper.quorum"));
-        config.set("hbase.zookeeper.property.clientPort", PropertiesLoader.getProperty("hbase.zookeeper.property.clientPort"));
-        config.set("zookeeper.znode.parent", PropertiesLoader.getProperty("zookeeper.znode.parent"));
-        Utils.setupHadoopEnv(config);
+        config.set("hbase.zookeeper.quorum", properties.get(ApplicationConfigs.HBASE_ZK_QUORUM));
+        config.set("hbase.zookeeper.property.clientPort", properties.get(ApplicationConfigs.HBASE_ZK_QUORUM_PORT));
+        config.set("zookeeper.znode.parent", properties.get(ApplicationConfigs.HBASE_ZK_ZNODE));
+        Utils.setupHadoopEnv(config, properties);
 
         // Setup Kerberos auth if needed
-        if (Boolean.parseBoolean(PropertiesLoader.getProperty("hbase.auth.kerberos"))) {
-            Utils.loginUserWithKerberos(PropertiesLoader.getProperty("hbase.security.user"),
-                    PropertiesLoader.getProperty("hbase.security.keytab"), config);
+        if (Boolean.parseBoolean(properties.get(ApplicationConfigs.HBASE_AUTH_KERBEROS))) {
+            Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.HBASE_AUTH_KERBEROS_USER),
+                properties.get(ApplicationConfigs.HBASE_AUTH_KERBEROS_KEYTAB), config);
             config.set("hbase.security.authentication", "kerberos");
         }
 

@@ -1,6 +1,7 @@
 package com.cloudera.frisch.randomdatagen.sink;
 
 import com.cloudera.frisch.randomdatagen.Utils;
+import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
@@ -14,6 +15,7 @@ import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -28,29 +30,29 @@ public class SolRSink implements SinkInterface {
     private final Model model;
 
 
-    SolRSink(Model model) {
+    SolRSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.collection = (String) model.getTableNames().get(OptionsConverter.TableNames.SOLR_COLLECTION);
         this.model = model;
 
         String protocol = "http";
 
-        if(Boolean.parseBoolean(PropertiesLoader.getProperty("solr.security.ssl"))) {
-            System.setProperty("javax.net.ssl.trustStore", PropertiesLoader.getProperty("solr.truststore.location"));
-            System.setProperty("javax.net.ssl.trustStorePassword", PropertiesLoader.getProperty("solr.truststore.password"));
+        if(Boolean.parseBoolean(properties.get(ApplicationConfigs.SOLR_TLS_ENABLED))) {
+            System.setProperty("javax.net.ssl.trustStore", properties.get(ApplicationConfigs.SOLR_TRUSTSTORE_LOCATION));
+            System.setProperty("javax.net.ssl.trustStorePassword", properties.get(ApplicationConfigs.SOLR_TRUSTSTORE_PASSWORD));
 
             protocol = "https";
         }
 
         HttpSolrClient.Builder solrClientBuilder = new HttpSolrClient.Builder(protocol + "://" +
-                PropertiesLoader.getProperty("solr.server.url").trim() + ":" +
-                PropertiesLoader.getProperty("solr.server.port").trim() + "/solr")
+                properties.get(ApplicationConfigs.SOLR_SERVER_HOST).trim() + ":" +
+                properties.get(ApplicationConfigs.SOLR_SERVER_PORT).trim() + "/solr")
                 .withConnectionTimeout(10000)
                 .withSocketTimeout(60000);
 
-        if (Boolean.parseBoolean(PropertiesLoader.getProperty("solr.auth.kerberos"))) {
+        if (Boolean.parseBoolean(properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS))) {
             Utils.createJaasConfigFile("solr-jaas-randomdatagen.config", "SolrJClient",
-                    PropertiesLoader.getProperty("solr.auth.kerberos.keytab"),
-                    PropertiesLoader.getProperty("solr.auth.kerberos.user"),
+                    properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_KEYTAB),
+                    properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_USER),
                     true, null, false);
             System.setProperty("java.security.auth.login.config", "solr-jaas-randomdatagen.config");
             System.setProperty("solr.kerberos.jaas.appname", "SolrJClient");
@@ -72,8 +74,8 @@ public class SolRSink implements SinkInterface {
         createSolRCollectionIfNotExists();
 
         // Set base URL directly to the collection, note that this is required
-        httpSolrClient.setBaseURL(protocol + "://" + PropertiesLoader.getProperty("solr.server.url") + ":" +
-                PropertiesLoader.getProperty("solr.server.port") + "/solr/" + collection);
+        httpSolrClient.setBaseURL(protocol + "://" + properties.get(ApplicationConfigs.SOLR_SERVER_HOST) + ":" +
+            properties.get(ApplicationConfigs.SOLR_SERVER_PORT) + "/solr/" + collection);
     }
 
     @Override
