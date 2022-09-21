@@ -149,25 +149,26 @@ public class PropertiesLoader {
         }
 
         if(properties.get(ApplicationConfigs.KAFKA_BROKERS)==null
-            && properties.get(ApplicationConfigs.KAFKA_CONF_CLIENT_PATH)!=null
-            && properties.get(ApplicationConfigs.KAFKA_CONF_CLUSTER_PATH)!=null) {
+            && properties.get(ApplicationConfigs.KAFKA_CONF_CLIENT_PATH)!=null) {
             log.info("Going to auto-discover kafka.brokers");
         }
 
-        if(properties.get(ApplicationConfigs.KAFKA_SECURITY_PROTOCOL)==null
-            && properties.get(ApplicationConfigs.KAFKA_CONF_CLIENT_PATH)!=null
-            && properties.get(ApplicationConfigs.KAFKA_CONF_CLUSTER_PATH)!=null) {
+        if(properties.get(ApplicationConfigs.KAFKA_SECURITY_PROTOCOL)==null) {
             log.info("Going to auto-discover kafka.security.protocol");
+            // TODO: Use tls enabled and kerberos enabled or not
+
         }
 
         if(properties.get(ApplicationConfigs.SCHEMA_REGISTRY_URL)==null
             && properties.get(ApplicationConfigs.SCHEMA_REGISTRY_CONF_PATH)!=null) {
             log.info("Going to auto-discover schema.registry.url");
+            // TODO: See later how to ge that
         }
 
         if(properties.get(ApplicationConfigs.KUDU_URL)==null
             && properties.get(ApplicationConfigs.KUDU_CONF_PATH)!=null) {
             log.info("Going to auto-discover kudu.master.server");
+            // TODO: See later how to ge that
         }
 
     }

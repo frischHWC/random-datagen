@@ -1,5 +1,5 @@
 {
-  "name": "Datagen",
+  "name": "DATAGEN",
   "label": "Datagen",
   "description": "The service to generate Data into various services of CDP platform",
   "version": "1.0",
@@ -430,15 +430,6 @@
           "label": "AUTO-DISCOVERY: Kafka client conf Path",
           "description": "Path to kafka-client.conf. This is used to auto-discover services: KAFKA. (if settings are not explicitly set)",
           "default": "/etc/kafka/conf/kafka-client.conf",
-          "type": "path",
-          "pathType": "serviceSpecific",
-          "mode": "0755"
-        },
-        {
-          "name": "kafka_cluster_conf_path",
-          "label": "AUTO-DISCOVERY: Kafka cluster conf path",
-          "description": "Path to cluster-config.properties. This is used to auto-discover services: KAFKA. (if settings are not explicitly set)",
-          "default": "/etc/kafka/conf/kafka-cluster-configs.properties",
           "type": "path",
           "pathType": "serviceSpecific",
           "mode": "0755"
