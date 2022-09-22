@@ -14,7 +14,13 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.security.UserGroupInformation;
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,6 +38,9 @@ public class Utils {
 
     private static final long oneHour = 1000 * 60 *60;
     private static final long oneMinute = 1000 * 60;
+
+    private static DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
 
     /**
      * Generates a random password between 5 & 35 characters composed of all possible characters
@@ -484,6 +493,34 @@ public class Utils {
 
         });
         log.info("****************************************************************");
+    }
+
+
+    public static String getPropertyFromXMLFile(String filePath, String property) {
+        String value = "";
+        try {
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document doc = builder.parse(new File(filePath));
+
+            NodeList nodesList = doc.getElementsByTagName("property");
+            for(int i=0; i<nodesList.getLength(); i++) {
+                Node propertyNode = nodesList.item(i);
+                if(propertyNode.getNodeType() == Node.ELEMENT_NODE) {
+                    Element propertyElement = (Element) propertyNode;
+                    if(propertyElement.getElementsByTagName("name").item(0).getTextContent()
+                        .equalsIgnoreCase(property)) {
+                        value = propertyElement.getElementsByTagName("value").item(0).getTextContent();
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            log.error("Could not inspect file: {} to find property: {} - returning empty value", filePath, property);
+            log.error("Error: ", e);
+        }
+
+        log.debug("Return value: {} from file: {} for property: {}", value, filePath, property);
+        return value;
     }
 
 

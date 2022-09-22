@@ -9,4 +9,8 @@
         <name>hive.zookeeper.client.port</name>
         <value>2181</value>
     </property>
+    <property>
+        <name>hive.server2.zookeeper.namespace</name>
+        <value>hiveserver2</value>
+    </property>
 </configuration>

@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,12 +27,12 @@ public class DataGenerationService {
   @Autowired
   private PropertiesLoader propertiesLoader;
 
-  public void generateData(String modelFilePath,
-                           Integer numberOfThreads,
-                           Long numberOfBatches,
-                           Long rowsPerBatch,
+  public void generateData(@Nullable String modelFilePath,
+                           @Nullable Integer numberOfThreads,
+                           @Nullable Long numberOfBatches,
+                           @Nullable Long rowsPerBatch,
                            List<String> sinksListAsString,
-                           Map<ApplicationConfigs, String> extraProperties)
+                           @Nullable Map<ApplicationConfigs, String> extraProperties)
   {
     log.info("Starting Generation");
     long start = System.currentTimeMillis();
@@ -40,7 +41,7 @@ public class DataGenerationService {
     Map<ApplicationConfigs, String> properties = propertiesLoader.getPropertiesCopy();
 
     if(extraProperties!=null && !extraProperties.isEmpty()) {
-      log.info("Found extra properties sent with the call, these wil replace defaults ones");
+      log.info("Found extra properties sent with the call, these will replace defaults ones");
       properties.putAll(extraProperties);
     }
 
@@ -74,8 +75,14 @@ public class DataGenerationService {
       if(properties.get(ApplicationConfigs.CUSTOM_DATA_MODEL_DEFAULT)!=null) {
         modelFile = properties.get(ApplicationConfigs.CUSTOM_DATA_MODEL_DEFAULT);
       } else {
-        modelFile = properties.get(ApplicationConfigs.DATA_MODEL_DEFAULT);
+        modelFile = properties.get(ApplicationConfigs.DATA_MODEL_PATH_DEFAULT) +
+            properties.get(ApplicationConfigs.DATA_MODEL_DEFAULT);
       }
+    }
+    if(modelFilePath!=null && !modelFilePath.contains("/")){
+      log.info("Model file passed is identified as one of the one provided, so will look for it in data model path: {} ",
+          properties.get(ApplicationConfigs.DATA_MODEL_PATH_DEFAULT));
+      modelFile = properties.get(ApplicationConfigs.DATA_MODEL_PATH_DEFAULT) + modelFilePath;
     }
 
     // Parsing model
@@ -103,7 +110,7 @@ public class DataGenerationService {
 
     // Launch Generation of data
     for(long i = 1; i < batches; i++) {
-      log.info("Start to process batch " + i + "/" + batches + " of " + rows + " rows");
+      log.info("Start to process batch {}/{} of {} rows", i, batches, rows);
 
       List<Row> randomDataList = model.generateRandomRows(rows, threads);
 
@@ -115,7 +122,7 @@ public class DataGenerationService {
         randomDataList.forEach(data -> log.debug("Data is : " + data.toString()));
       }
 
-      log.info("Finished to process batch " + i + "/" + batches + " of " + rows + " rows");
+      log.info("Finished to process batch {}/{} of {} rows", i, batches, rows);
     }
 
     // Terminate all sinks
@@ -126,6 +133,6 @@ public class DataGenerationService {
 
     // Compute and print time taken
     log.info("Generation Finished");
-    log.info("Data Generation took : " + Utils.formatTimetaken(System.currentTimeMillis()-start) + " to run");
+    log.info("Data Generation took : {} to run", Utils.formatTimetaken(System.currentTimeMillis()-start));
   }
 }

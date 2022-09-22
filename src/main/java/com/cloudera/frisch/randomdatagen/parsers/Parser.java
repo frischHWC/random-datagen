@@ -12,7 +12,5 @@ public interface Parser {
 
     // TODO: Implement a yaml parser
 
-    Logger logger = Logger.getLogger(Parser.class);
-
     Model renderModelFromFile();
 }

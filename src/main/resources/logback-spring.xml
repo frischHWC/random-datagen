@@ -12,6 +12,8 @@
             </layout>
         </appender>
 
+        <logger name="com.cloudera.frisch" level="DEBUG" />
+
         <!-- LOG everything at INFO level -->
         <root level="info">
             <appender-ref ref="Console" />

@@ -27,6 +27,8 @@ public class ApplicationConfigMapper {
       return ApplicationConfigs.NUMBER_OF_BATCHES_DEFAULT;
     case "number.rows.default":
       return ApplicationConfigs.NUMBER_OF_ROWS_DEFAULT;
+    case "data.model.path":
+      return ApplicationConfigs.DATA_MODEL_PATH_DEFAULT;
     case "data.model.default":
       return ApplicationConfigs.DATA_MODEL_DEFAULT;
     case "custom.data.model":

@@ -23,13 +23,13 @@ public class JsonParser<T extends Field> implements Parser {
     public JsonParser(String jsonFilePath) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            log.info("Model used is from Json file : " + jsonFilePath);
+            log.info("Model used is from Json file : {} ", jsonFilePath);
             root = mapper.readTree(new File(jsonFilePath));
-            log.debug("JSON file content is :" + root.toPrettyString());
+            log.debug("JSON file content is : {}", root.toPrettyString());
         } catch (IOException e) {
-            log.error("Could not read JSON file: " + jsonFilePath + ", please verify its structure, error is : ", e);
+            log.error("Could not read JSON file: {}, please verify its structure, error is : ", jsonFilePath, e);
         } catch (NullPointerException e) {
-            log.error("Model file has not been found at : " + jsonFilePath + " , please verify it exists, error is: ", e);
+            log.error("Model file has not been found at : {} , please verify it exists, error is: ", jsonFilePath,  e);
             System.exit(1);
         }
     }
