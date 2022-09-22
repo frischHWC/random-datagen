@@ -244,7 +244,7 @@ public abstract class Field<T> {
      */
 
     public String toStringValue(T value) {
-        return value.toString();
+        return value!=null ? value.toString() : "null";
     }
     public T toCastValue(String value) {
         return (T) value;
