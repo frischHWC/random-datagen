@@ -171,7 +171,7 @@
       "name": "person",
       "type": "CSV",
       "filters": ["country=France"],
-      "file": "dictionaries/person_test.csv",
+      "file": "src/main/resources/dictionaries/person_test.csv",
       "field": "name"
     },
     {
@@ -199,21 +199,21 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/tmp/datagen/hdfs/full/"},
+    {"HDFS_FILE_PATH": "/tmp/random_datagen/hdfs/full_model/"},
     {"HDFS_FILE_NAME": "full"},
-    {"HIVE_HDFS_FILE_PATH": "/tmp/datagen/hive/full/"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/hive/full_model/"},
     {"HBASE_TABLE_NAME": "full"},
-    {"HBASE_NAMESPACE": "datagen"},
-    {"KAFKA_TOPIC": "datagen_full"},
-    {"OZONE_VOLUME": "datagen"},
-    {"SOLR_COLLECTION": "datagen_full"},
-    {"HIVE_DATABASE": "datagen"},
-    {"HIVE_TABLE_NAME":  "full"},
-    {"HIVE_TEMPORARY_TABLE_NAME":  "full_tmp"},
-    {"KUDU_TABLE_NAME":  "datagen.full"},
-    {"LOCAL_FILE_PATH":  "/tmp/datagen/full/"},
-    {"LOCAL_FILE_NAME":  "datagen-full"},
-    {"AVRO_NAME":  "datagenfull"}
+    {"HBASE_NAMESPACE": "random_datagen"},
+    {"KAFKA_TOPIC": "random_datagen"},
+    {"OZONE_VOLUME": "random-datagen"},
+    {"SOLR_COLLECTION": "random_datagen"},
+    {"HIVE_DATABASE": "random_datagen"},
+    {"HIVE_TABLE_NAME":  "full_rd"},
+    {"HIVE_TEMPORARY_TABLE_NAME":  "full_tmp_test"},
+    {"KUDU_TABLE_NAME":  "random_datagen.full_kudu"},
+    {"LOCAL_FILE_PATH":  "/tmp/random_datagen/full/"},
+    {"LOCAL_FILE_NAME":  "random-datagen"},
+    {"AVRO_NAME":  "randomdata"}
   ],
   "Primary_Keys": [
     {"KAFKA_MSG_KEY": "bigSize"},

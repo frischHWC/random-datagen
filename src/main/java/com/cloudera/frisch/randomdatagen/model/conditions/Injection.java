@@ -23,16 +23,20 @@ public class Injection {
 
   Injection(String injection) {
     for(String s: injection.split("[$]")) {
-      if (s.charAt(0)!='{') {
-        log.debug(s + " is not a variable name");
-        injectedFieldNames.add(new InjectedField(s, false));
-      } else {
-        String fieldToAdd = s.substring(1,s.indexOf('}'));
-        log.debug(fieldToAdd + " is found as a variable name");
-        injectedFieldNames.add(new InjectedField(fieldToAdd, true));
-        if(s.length()>s.indexOf('}')){
-          log.debug(s.substring(s.indexOf('}')+1) + " is not a variable name");
-          injectedFieldNames.add(new InjectedField(s.substring(s.indexOf('}')+1), false));
+      if(s.length()!=0) {
+        if (s.charAt(0) != '{') {
+          log.debug(s + " is not a variable name");
+          injectedFieldNames.add(new InjectedField(s, false));
+        } else {
+          String fieldToAdd = s.substring(1, s.indexOf('}'));
+          log.debug(fieldToAdd + " is found as a variable name");
+          injectedFieldNames.add(new InjectedField(fieldToAdd, true));
+          if (s.length() > s.indexOf('}')) {
+            log.debug(
+                s.substring(s.indexOf('}') + 1) + " is not a variable name");
+            injectedFieldNames.add(
+                new InjectedField(s.substring(s.indexOf('}') + 1), false));
+          }
         }
       }
     }

@@ -223,7 +223,10 @@
           "type": "string_enum",
           "validValues": [
             "full-model.json",
-            "customer-model.json",
+            "customer-france-model.json",
+            "customer-germany-model.json",
+            "customer-italy-model.json",
+            "customer-spain-model.json",
             "transaction-model.json",
             "sensor-model.json"
           ]
