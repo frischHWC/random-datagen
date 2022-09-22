@@ -30,7 +30,7 @@ export DEBUG=true
 export LOG_DIR="/tmp/datagen-deploy-logs/"$(date +%m-%d-%Y-%H-%M-%S)
 
 # Target Directory
-export TARGET_DIR="/tmp/datagen/"
+export TARGET_DIR="/tmp/datagen"
 
 # Datagen Repository
 export DATA_GEN_GIT_URL="https://github.infra.cloudera.com/frisch/datagen"

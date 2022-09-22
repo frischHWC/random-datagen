@@ -75,13 +75,6 @@
     mode: '0755'
     remote_src: true
 
-- name: Copy log4j.properties
-  copy:
-    src: "{{ target_dir }}/git-repo/src/main/resources/log4j.properties"
-    dest: "{{ target_dir }}/parcel/{{ dg_name }}/log4j.properties"
-    mode: '0755'
-    remote_src: true
-
 - name: Copy logback-spring.xml
   copy:
     src: "{{ target_dir }}/git-repo/src/main/resources/logback-spring.xml"

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
 
 
 @Slf4j
@@ -19,6 +20,24 @@ public class DataGenerationController {
   private DataGenerationService dataGenerationService;
 
   // TODO: Make a map of future and be able to retrieve status of a generation sent
+
+  // TODO: Make a test generator that returns one json row of a model
+
+  // TODO: Make a health poller to report status
+
+  // TODO: Add some metrics to gather through entire life of this process
+
+  @PostMapping(value = "/multiplesinks")
+  public void generateIntoMultipleSinks(
+      @RequestParam(required = false, name = "model") String modelFilePath,
+      @RequestParam(required = false, name = "threads") Integer threads,
+      @RequestParam(required = false, name = "batches") Long numberOfBatches,
+      @RequestParam(required = false, name = "rows") Long rowsPerBatch,
+      @RequestParam(required = true, name = "sinks") List<String> sinks
+  ) {
+    dataGenerationService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+        sinks, null);
+  }
 
   @PostMapping(value = "/csv")
   public void generateIntoCsv(
