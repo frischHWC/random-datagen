@@ -103,14 +103,13 @@ public class PropertiesLoader {
         log.info("Starting auto-discover of properties after load of properties file");
 
         if(properties.get(ApplicationConfigs.HDFS_URI)==null
-            && properties.get(ApplicationConfigs.HADOOP_HDFS_SITE_PATH)!=null
             && properties.get(ApplicationConfigs.HADOOP_CORE_SITE_PATH)!=null) {
             log.info("Going to auto-discover hdfs.uri");
 
-            properties.put(ApplicationConfigs.HDFS_URI,
-                Utils.getPropertyFromXMLFile(
-                    properties.get(ApplicationConfigs.HADOOP_HDFS_SITE_PATH),
-                    "dfs.nameservices"));
+            String hdfsUri = Utils.getPropertyFromXMLFile(
+                properties.get(ApplicationConfigs.HADOOP_CORE_SITE_PATH), "fs.defaultFS") + "/";
+
+            properties.put(ApplicationConfigs.HDFS_URI,hdfsUri);
         }
 
         if(properties.get(ApplicationConfigs.HBASE_ZK_QUORUM)==null

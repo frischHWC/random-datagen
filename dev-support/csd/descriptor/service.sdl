@@ -155,7 +155,7 @@
       "externalLink": {
         "name": "datagen_swagger",
         "label": "Datagen Swagger Web UI",
-        "url": "http://${host}:8080/swagger-ui.html"
+        "url": "http://${host}:${app_port}/swagger-ui.html"
       },
       "topology": {
         "minInstances": "0",
@@ -219,11 +219,13 @@
           "description": "The Model of data to use to generate data",
           "required": true,
           "configurableInWizard": true,
-          "default": "full_model.json",
+          "default": "full-model.json",
           "type": "string_enum",
           "validValues": [
-            "test_model.json",
-            "full_model.json"
+            "full-model.json",
+            "customer-model.json",
+            "transaction-model.json",
+            "sensor-model.json"
           ]
         },
         {
@@ -455,7 +457,7 @@
         {
           "name": "custom_model_path",
           "label": "Custom Model Path",
-          "description": "The custom Model Path to use instead of the furnished data model. This file must exists on the machine where the web server is installed",
+          "description": "The custom Model Path to use instead of the furnished data model. This file must exists on the machine where the web server is installed. Learn how to create a model here: https://github.com/frischHWC/random-datagen#data-generated",
           "default": "",
           "type": "path",
           "pathType": "serviceSpecific",
