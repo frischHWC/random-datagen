@@ -152,6 +152,17 @@
           "instance": "${host}"
         }
       ],
+        "metricsSource": {
+          "metricsFormat": "SIMPLE",
+          "httpSource": {
+            "httpUrl": "http://${host}:${app_port}/metrics/all",
+            "httpsUrl": "https://${host}:${app_port}/metrics/all",
+            "sslEnabled": "false",
+            "mtlsEnabled": "false",
+            "kerberosEnabled": "false",
+            "kerberosPrincipal": "${principal}"
+          }
+        },
       "sslServer": {
         "keystoreFormat": "jks",
         "keyIdentifier": "clientkey",

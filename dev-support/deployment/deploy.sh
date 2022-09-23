@@ -171,25 +171,6 @@ then
 fi
 
 
-
-# Launch playbook to gather info on CM and roles deployed (especially for KAFKA) ?
-if [ "${DEBUG}" = "true" ]
-then
-    echo " Command launched: ansible-playbook -i ${HOSTS_TEMP} -e @${EXTRA_VARS_TEMP} playbooks/auto-configure.yml  "
-    echo " Follow advancement at: ${LOG_DIR}/auto-configure.log "
-fi
-ansible-playbook -i ${HOSTS_TEMP} -e @${EXTRA_VARS_TEMP} playbooks/auto-configure.yml 2>&1 > ${LOG_DIR}/auto-configure.log
-OUTPUT=$(tail -20 ${LOG_DIR}/auto-configure.log | grep -A20 RECAP | grep -v "failed=0" | wc -l | xargs)
-if [ "${OUTPUT}" == "2" ]
-then
-  echo " SUCCESS: Auto Configuration made "
-else
-  echo " FAILURE: Could not auto configure " 
-  echo " See details in file: ${LOG_DIR}/auto-configure.log "
-  exit 1
-fi
-
-
 # Launch playbook to clone repo on edge host, mvn clean package, create the CSD, create the parcel
 if [ "${DEBUG}" = "true" ]
 then

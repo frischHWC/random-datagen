@@ -27,6 +27,9 @@ public class DataGenerationService {
   @Autowired
   private PropertiesLoader propertiesLoader;
 
+  @Autowired
+  private MetricsService metricsService;
+
   public void generateData(@Nullable String modelFilePath,
                            @Nullable Integer numberOfThreads,
                            @Nullable Long numberOfBatches,
@@ -127,6 +130,9 @@ public class DataGenerationService {
 
     // Terminate all sinks
     sinks.forEach(SinkInterface::terminate);
+
+    // Add metrics
+    metricsService.updateMetrics(batches, rows, sinksList);
 
     // Recap of what has been generated
     Utils.recap(batches, rows, sinksList, model);
