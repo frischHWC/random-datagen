@@ -63,7 +63,7 @@ public class DataGenerationService {
 
     Long rows = 1L;
     if(rowsPerBatch!=null) {
-      rows = numberOfBatches;
+      rows = rowsPerBatch;
     } else if (properties.get(ApplicationConfigs.NUMBER_OF_ROWS_DEFAULT)!=null) {
       rows = Long.valueOf(properties.get(ApplicationConfigs.NUMBER_OF_ROWS_DEFAULT));
     }

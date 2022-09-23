@@ -33,8 +33,10 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "rows") Long rowsPerBatch,
       @RequestParam(name = "sinks") List<String> sinks
   ) {
-    dataGenerationService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
-        sinks, null);
+    StringBuffer sinkList = new StringBuffer();
+    sinks.forEach(s -> {sinkList.append(s) ; sinkList.append(" ; ");});
+    log.debug("Received request with model: {} , threads: {} , batches: {}, rows: {}, to sinks: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch, sinkList);
+    dataGenerationService.generateData(modelFilePath, threads, numberOfBatches, rowsPerBatch, sinks, null);
   }
 
   @PostMapping(value = "/csv")
@@ -44,6 +46,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
       @RequestParam(required = false, name = "rows") Long rowsPerBatch
   ) {
+    log.debug("Received request for CSV with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
     dataGenerationService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
         Collections.singletonList("CSV"), null);
   }
@@ -55,6 +58,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
       @RequestParam(required = false, name = "rows") Long rowsPerBatch
   ) {
+    log.debug("Received request for JSON with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
     dataGenerationService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
         Collections.singletonList("JSON"), null);
   }
@@ -66,6 +70,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
       @RequestParam(required = false, name = "rows") Long rowsPerBatch
   ) {
+    log.debug("Received request for Avro with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
     dataGenerationService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
         Collections.singletonList("AVRO"), null);
   }
@@ -77,6 +82,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
       @RequestParam(required = false, name = "rows") Long rowsPerBatch
   ) {
+    log.debug("Received request for Parquet with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
     dataGenerationService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
         Collections.singletonList("PARQUET"), null);
   }
@@ -88,6 +94,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
       @RequestParam(required = false, name = "rows") Long rowsPerBatch
   ) {
+    log.debug("Received request for ORC with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
     dataGenerationService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
         Collections.singletonList("ORC"), null);
   }
@@ -107,6 +114,8 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
   ) {
+    log.debug("Received request for HDFS-CSV with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
     Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
     if(hdfsSitePath!=null && !hdfsSitePath.isEmpty()){
       extraProperties.put(ApplicationConfigs.HADOOP_HDFS_SITE_PATH, hdfsSitePath);
@@ -143,6 +152,8 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
   ) {
+    log.debug("Received request for HDFS-AVRO with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
     Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
     if(hdfsSitePath!=null && !hdfsSitePath.isEmpty()){
       extraProperties.put(ApplicationConfigs.HADOOP_HDFS_SITE_PATH, hdfsSitePath);
@@ -179,6 +190,8 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
   ) {
+    log.debug("Received request for HDFS-JSON with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
     Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
     if(hdfsSitePath!=null && !hdfsSitePath.isEmpty()){
       extraProperties.put(ApplicationConfigs.HADOOP_HDFS_SITE_PATH, hdfsSitePath);
@@ -215,6 +228,8 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
   ) {
+    log.debug("Received request for HDFS-PARQUET with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
     Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
     if(hdfsSitePath!=null && !hdfsSitePath.isEmpty()){
       extraProperties.put(ApplicationConfigs.HADOOP_HDFS_SITE_PATH, hdfsSitePath);
@@ -251,6 +266,8 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
   ) {
+    log.debug("Received request for HDFS-ORC with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
     Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
     if(hdfsSitePath!=null && !hdfsSitePath.isEmpty()){
       extraProperties.put(ApplicationConfigs.HADOOP_HDFS_SITE_PATH, hdfsSitePath);
@@ -288,6 +305,8 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
   ) {
+    log.debug("Received request for HBASE with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
     Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
     if(hbaseSitePath!=null && !hbaseSitePath.isEmpty()){
       extraProperties.put(ApplicationConfigs.HADOOP_HBASE_SITE_PATH, hbaseSitePath);
@@ -329,6 +348,8 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
   ) {
+    log.debug("Received request for HIVE with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
     Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
     if(hiveSitePath!=null && !hiveSitePath.isEmpty()){
       extraProperties.put(ApplicationConfigs.HADOOP_HIVE_SITE_PATH, hiveSitePath);
@@ -370,6 +391,8 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
   ) {
+    log.debug("Received request for OZONE with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
     Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
     if(ozoneSitePath!=null && !ozoneSitePath.isEmpty()){
       extraProperties.put(ApplicationConfigs.HADOOP_OZONE_SITE_PATH, ozoneSitePath);
@@ -408,6 +431,8 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
   ) {
+    log.debug("Received request for KAFKA with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
     Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
     if(kafkaBrokers!=null && !kafkaBrokers.isEmpty()){
       extraProperties.put(ApplicationConfigs.KAFKA_BROKERS, kafkaBrokers);
@@ -461,6 +486,8 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
   ) {
+    log.debug("Received request for SOLR with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
     Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
     if(solrHost!=null && !solrHost.isEmpty()){
       extraProperties.put(ApplicationConfigs.SOLR_SERVER_HOST, solrHost);
@@ -503,6 +530,8 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
   ) {
+    log.debug("Received request for KUDU with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
     Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
     if(kuduServers!=null && !kuduServers.isEmpty()){
       extraProperties.put(ApplicationConfigs.HADOOP_HDFS_SITE_PATH, kuduServers);
