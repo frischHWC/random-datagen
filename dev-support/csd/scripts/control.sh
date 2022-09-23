@@ -34,7 +34,7 @@ case $CMD in
   (gen_transaction_hbase)
     SERVER_PORT=$2
     echo "Starting to Generate Transaction Data into HBase"
-    curl -X POST -H  "accept: */*" http://localhost:${SERVER_PORT}/datagen/hbase?model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Ftransaction%2Ftransaction-model.json&rows=1000batches=100
+    curl -X POST -H  "accept: */*" http://localhost:${SERVER_PORT}/datagen/hbase?model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Ffinance%2Ftransaction-model.json&rows=1000batches=100
     ;;
   (gen_sensor_hive)
     SERVER_PORT=$2
@@ -50,7 +50,7 @@ case $CMD in
     echo "Starting to Generate Local data for test purposes"
     curl -X POST -H  "accept: */*" http://localhost:${SERVER_PORT}/datagen/json?model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-france-model.json&rows=10batches=1
     sleep 5
-    curl -X POST -H  "accept: */*" http://localhost:${SERVER_PORT}/datagen/csv?model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Ftransaction%2Ftransaction-model.json&rows=10batches=1
+    curl -X POST -H  "accept: */*" http://localhost:${SERVER_PORT}/datagen/csv?model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Ffinance%2Ftransaction-model.json&rows=10batches=1
     sleep 5
     curl -X POST -H  "accept: */*" http://localhost:${SERVER_PORT}/datagen/csv?model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Findustry%2Fplant-model.json&rows=10batches=1
     sleep 5
