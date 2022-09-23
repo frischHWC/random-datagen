@@ -54,6 +54,15 @@
                         "hostRef" : {
                           "hostId" : "{{ edge_host_id }}",
                           "hostname" : "{{ edge_host }}"
+                        },
+                        "config" : {
+                            "items" :
+                            [
+                                {
+                                    "name" : "threads",
+                                    "value" : 4
+                                }
+                            ]
                         }
                     }
                 ],
