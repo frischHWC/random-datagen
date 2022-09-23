@@ -132,7 +132,8 @@
         ],
         "environmentVariables": {
           "MAX_HEAP_SIZE": "${max_heap_size}",
-          "SERVER_PORT": "${app_port}"
+          "SERVER_PORT": "${app_port}",
+          "PRINCIPAL": ${principal}
         }
       },
       "configWriter": {

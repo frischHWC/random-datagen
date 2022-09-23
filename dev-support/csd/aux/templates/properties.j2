@@ -21,7 +21,7 @@ custom.data.model={{ globals['custom_model_path'] }}
 
 # Kerberos Config
 kerberos.enabled={{ globals['kerberos_enabled'] }}
-kerberos.user={{ globals['kerberos_princ_name'] }}
+kerberos.user=${PRINCIPAL}
 kerberos.keytab=${CONF_DIR}/datagen.keytab
 
 # TLS Config
