@@ -65,20 +65,6 @@
                             ]
                         }
                     }
-                ],
-                "roleConfigGroups" : [ {
-                    "name" : "DATAGEN_SERVER",
-                    "roleType" : "DATAGEN_SERVER",
-                    "config" : {
-                        "items" : 
-                        [ 
-                            {
-                              "name" : "threads",
-                              "value" : 4
-                            }
-                        ]
-                      }
-                  }
                 ]
             }
     ]

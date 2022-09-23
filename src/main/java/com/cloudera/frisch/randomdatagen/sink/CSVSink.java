@@ -105,7 +105,8 @@ public class CSVSink implements SinkInterface {
     void createFileWithOverwrite(String path) {
         try {
             File file = new File(path);
-            file.createNewFile();
+            if(!file.getParentFile().mkdirs()) { log.warn("Could not create parent dir");}
+            if(!file.createNewFile()) { log.warn("Could not create file");}
             outputStream = new FileOutputStream(path, false);
             log.debug("Successfully created local file : " + path);
         } catch (IOException e) {

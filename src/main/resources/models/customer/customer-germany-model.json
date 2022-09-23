@@ -3,22 +3,24 @@
     {
       "name": "name",
       "type": "NAME",
-      "filters": ["France"]
+      "filters": ["Germany"]
     },
     {
       "name": "id",
-      "type": "INCREMENT_INTEGER"
+      "type": "INCREMENT_INTEGER",
+      "min": 21001,
+      "max": 30000
     },
     {
       "name": "birthdate",
       "type": "BIRTHDATE",
-      "min": "1/1/1950",
-      "max": "1/1/2002"
+      "min": "1/1/1970",
+      "max": "1/1/2004"
     },
     {
       "name": "city",
       "type": "CITY",
-      "filters": ["France"]
+      "filters": ["Germany"]
     },
     {
       "name": "country",
@@ -31,39 +33,39 @@
       "name": "email",
       "type": "STRING",
       "conditionals": {
-        "injection": "${name}@company.fr"
+        "injection": "${name}@company.de"
       }
     },
     {
       "name": "phone_number",
       "type": "PHONE",
-      "filters": ["France"]
+      "filters": ["Germany"]
     },
     {
       "name": "membership",
       "type": "STRING",
       "possible_values_weighted": {
-        "BRONZE": 64,
-        "SILVER": 16,
-        "GOLD": 9,
-        "PLATINUM": 11
+        "BRONZE": 37,
+        "SILVER": 31,
+        "GOLD": 19,
+        "PLATINUM": 13
       }
     }
   ],
   "Table_Names": [
     {"HDFS_FILE_PATH": "/tmp/datagen/hdfs/customer/"},
-    {"HDFS_FILE_NAME": "customer-fr"},
+    {"HDFS_FILE_NAME": "customer-it"},
     {"HIVE_HDFS_FILE_PATH": "/tmp/datagen/hive/customer/"},
     {"HBASE_TABLE_NAME": "customer"},
     {"HBASE_NAMESPACE": "datagen"},
     {"KAFKA_TOPIC": "datagen_customer"},
     {"OZONE_VOLUME": "customer"},
-    {"SOLR_COLLECTION": "customer"},
+    {"SOLR_COLLECTION": "datagen_customer"},
     {"HIVE_DATABASE": "datagen"},
     {"HIVE_TABLE_NAME":  "customer"},
     {"KUDU_TABLE_NAME":  "datagen.customer"},
     {"LOCAL_FILE_PATH":  "/tmp/datagen/customer/"},
-    {"LOCAL_FILE_NAME":  "customer-fr"},
+    {"LOCAL_FILE_NAME":  "customer"},
     {"AVRO_NAME":  "datagencustomer"}
   ],
   "Primary_Keys": [

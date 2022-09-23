@@ -3,22 +3,24 @@
     {
       "name": "name",
       "type": "NAME",
-      "filters": ["Spain"]
+      "filters": ["Japan"]
     },
     {
       "name": "id",
-      "type": "INCREMENT_INTEGER"
+      "type": "INCREMENT_INTEGER",
+      "min": 52001,
+      "max": 63000
     },
     {
       "name": "birthdate",
       "type": "BIRTHDATE",
-      "min": "1/1/1950",
-      "max": "1/1/2002"
+      "min": "1/1/1935",
+      "max": "1/1/1985"
     },
     {
       "name": "city",
       "type": "CITY",
-      "filters": ["Spain"]
+      "filters": ["Japan"]
     },
     {
       "name": "country",
@@ -31,39 +33,39 @@
       "name": "email",
       "type": "STRING",
       "conditionals": {
-        "injection": "${name}@company.es"
+        "injection": "${name}@company.jp"
       }
     },
     {
       "name": "phone_number",
       "type": "PHONE",
-      "filters": ["Spain"]
+      "filters": ["Japan"]
     },
     {
       "name": "membership",
       "type": "STRING",
       "possible_values_weighted": {
-        "BRONZE": 80,
-        "SILVER": 17,
-        "GOLD": 1,
-        "PLATINUM": 2
+        "BRONZE": 64,
+        "SILVER": 13,
+        "GOLD": 13,
+        "PLATINUM": 10
       }
     }
   ],
   "Table_Names": [
     {"HDFS_FILE_PATH": "/tmp/datagen/hdfs/customer/"},
-    {"HDFS_FILE_NAME": "customer-es"},
+    {"HDFS_FILE_NAME": "customer-jp"},
     {"HIVE_HDFS_FILE_PATH": "/tmp/datagen/hive/customer/"},
     {"HBASE_TABLE_NAME": "customer"},
     {"HBASE_NAMESPACE": "datagen"},
     {"KAFKA_TOPIC": "datagen_customer"},
     {"OZONE_VOLUME": "customer"},
-    {"SOLR_COLLECTION": "customer"},
+    {"SOLR_COLLECTION": "datagen_customer"},
     {"HIVE_DATABASE": "datagen"},
     {"HIVE_TABLE_NAME":  "customer"},
     {"KUDU_TABLE_NAME":  "datagen.customer"},
     {"LOCAL_FILE_PATH":  "/tmp/datagen/customer/"},
-    {"LOCAL_FILE_NAME":  "customer-es"},
+    {"LOCAL_FILE_NAME":  "customer-jp"},
     {"AVRO_NAME":  "datagencustomer"}
   ],
   "Primary_Keys": [

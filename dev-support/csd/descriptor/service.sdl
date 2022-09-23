@@ -46,10 +46,34 @@
   },
   "commands": [
     {
-      "name": "gen_json_local",
-      "label": "Generates local JSON",
-      "description": "Generates JSON Data locally",
-      "roleCommand": "gen_json_local",
+      "name": "gen_customer",
+      "label": "Generates Customer Data in HDFS (Parquet) & Hive",
+      "description": "Generates Customer Data",
+      "roleCommand": "gen_customer_hdfs_hive",
+      "roleName": "DATAGEN_SERVER",
+      "runMode": "single"
+    },
+    {
+      "name": "gen_transaction",
+      "label": "Generates Transaction Data in HBase",
+      "description": "Generates Transaction Data",
+      "roleCommand": "gen_transaction_hbase",
+      "roleName": "DATAGEN_SERVER",
+      "runMode": "single"
+    },
+    {
+      "name": "gen_sensor",
+      "label": "Generates Sensor Data to Hive",
+      "description": "Generates Sensor Data",
+      "roleCommand": "gen_sensor_hive",
+      "roleName": "DATAGEN_SERVER",
+      "runMode": "single"
+    },
+    {
+      "name": "gen_local",
+      "label": "Generates Local Data as CSV & JSON",
+      "description": "Generates Local Data",
+      "roleCommand": "gen_local_data",
       "roleName": "DATAGEN_SERVER",
       "runMode": "single"
     }
@@ -166,9 +190,9 @@
       },
       "commands": [
         {
-          "name": "gen_json_local",
-          "label": "Gen JSON locally",
-          "description": "Generates JSON Data locally",
+          "name": "gen_customer_hdfs_hive",
+          "label": "Generate Customer Data",
+          "description": "Generates Customer Data to HDFS in Parquet & Hive",
           "expectedExitCodes": [
             0
           ],
@@ -176,7 +200,56 @@
           "commandRunner": {
             "program": "scripts/control.sh",
             "args": [
-              "local_json"
+              "gen_customer_hdfs_hive",
+              "${app_port}"
+            ]
+          }
+        },
+        {
+          "name": "gen_transaction_hbase",
+          "label": "Generate Transaction Data",
+          "description": "Generates Transaction Data to HBase",
+          "expectedExitCodes": [
+            0
+          ],
+          "requiredRoleState": "running",
+          "commandRunner": {
+            "program": "scripts/control.sh",
+            "args": [
+              "gen_transaction_hbase",
+              "${app_port}"
+            ]
+          }
+        },
+        {
+          "name": "gen_sensor_hive",
+          "label": "Generate Sensor Data",
+          "description": "Generates Sensor Data to Hive",
+          "expectedExitCodes": [
+            0
+          ],
+          "requiredRoleState": "running",
+          "commandRunner": {
+            "program": "scripts/control.sh",
+            "args": [
+              "gen_sensor_hive",
+              "${app_port}"
+            ]
+          }
+        },
+        {
+          "name": "gen_local_data",
+          "label": "Generate All Local Data",
+          "description": "Generates Local Data from different models locally as csv or json",
+          "expectedExitCodes": [
+            0
+          ],
+          "requiredRoleState": "running",
+          "commandRunner": {
+            "program": "scripts/control.sh",
+            "args": [
+              "gen_local_data",
+              "${app_port}"
             ]
           }
         }
@@ -223,12 +296,19 @@
           "type": "string_enum",
           "validValues": [
             "full-model.json",
-            "customer-france-model.json",
-            "customer-germany-model.json",
-            "customer-italy-model.json",
-            "customer-spain-model.json",
-            "transaction-model.json",
-            "sensor-model.json"
+            "customer/customer-china-model.json",
+            "customer/customer-france-model.json",
+            "customer/customer-germany-model.json",
+            "customer/customer-india-model.json",
+            "customer/customer-italy-model.json",
+            "customer/customer-japan-model.json",
+            "customer/customer-spain-model.json",
+            "customer/customer-turkey-model.json",
+            "customer/customer-usa-model.json",
+            "finance/transaction-model.json",
+            "industry/sensor-model.json",
+            "industry/sensor-data-model.json",
+            "industry/plant-model.json"
           ]
         },
         {

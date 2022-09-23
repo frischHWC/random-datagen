@@ -3,16 +3,20 @@
     {
       "name": "sender_id",
       "type": "INTEGER",
-      "length": 10000
+      "min": 0,
+      "max": 100000
     },
     {
       "name": "receiver_id",
       "type": "INTEGER",
-      "length": 10000
+      "min": 0,
+      "max": 100000
     },
     {
       "name": "amount",
-      "type": "FLOAT"
+      "type": "FLOAT",
+      "min": 0,
+      "max": 5000
     },
     {
       "name": "execution_date",
@@ -21,22 +25,22 @@
     {
       "name": "currency",
       "type": "STRING",
-      "possible_values": ["EUR", "DOL", "YEN"]
+      "possible_values": ["EUR", "USD", "YEN"]
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/tmp/random_datagen/hdfs/transaction/"},
+    {"HDFS_FILE_PATH": "/tmp/datagen/hdfs/transaction/"},
     {"HDFS_FILE_NAME": "transaction"},
-    {"HIVE_HDFS_FILE_PATH": "/tmp/random_datagen/hive/transaction/"},
+    {"HIVE_HDFS_FILE_PATH": "/tmp/datagen/hive/transaction/"},
     {"HBASE_TABLE_NAME": "transaction"},
-    {"HBASE_NAMESPACE": "random_datagen"},
+    {"HBASE_NAMESPACE": "datagen"},
     {"KAFKA_TOPIC": "transaction"},
     {"OZONE_VOLUME": "transaction"},
     {"SOLR_COLLECTION": "transaction"},
-    {"HIVE_DATABASE": "random_datagen"},
+    {"HIVE_DATABASE": "datagen"},
     {"HIVE_TABLE_NAME":  "transaction"},
-    {"KUDU_TABLE_NAME":  "random_datagen.transaction"},
-    {"LOCAL_FILE_PATH":  "/tmp/random_datagen/transaction/"},
+    {"KUDU_TABLE_NAME":  "datagen.transaction"},
+    {"LOCAL_FILE_PATH":  "/tmp/datagen/transaction/"},
     {"LOCAL_FILE_NAME":  "transaction"},
     {"AVRO_NAME":  "transaction"}
   ],

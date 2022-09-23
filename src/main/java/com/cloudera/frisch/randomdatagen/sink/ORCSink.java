@@ -15,6 +15,7 @@ import org.apache.orc.OrcFile;
 import org.apache.orc.TypeDescription;
 import org.apache.orc.Writer;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -117,6 +118,7 @@ public class ORCSink implements SinkInterface {
     private void creatFileWithOverwrite(String path) {
         try {
             Utils.deleteLocalFile(path);
+            if(!new File(path).getParentFile().mkdirs()) { log.warn("Could not create parent dir");}
             writer = OrcFile.createWriter(new Path(path),
                 OrcFile.writerOptions(new Configuration())
                     .setSchema(schema));

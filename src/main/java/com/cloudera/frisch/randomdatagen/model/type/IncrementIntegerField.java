@@ -18,13 +18,19 @@ public class IncrementIntegerField extends Field<Integer> {
 
     private Integer counter = 0;
 
-    IncrementIntegerField(String name, Integer length, List<Integer> possibleValues) {
+    IncrementIntegerField(String name, Integer length, List<Integer> possibleValues, String min, String max) {
         this.name = name;
         if(length==null || length==-1) {
             this.length = Integer.MAX_VALUE;
         } else {
             this.length = length;
         }
+        if(min==null) {
+            this.min = 0L;
+        } else {
+            this.min = Long.parseLong(min);
+        }
+        counter = this.min.intValue();
         this.possibleValues = possibleValues;
     }
 

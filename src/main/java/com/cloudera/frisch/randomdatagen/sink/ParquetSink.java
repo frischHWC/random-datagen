@@ -94,6 +94,7 @@ public class ParquetSink implements SinkInterface {
     private void createFileWithOverwrite(String path) {
         try {
             Utils.deleteLocalFile(path);
+            if(!new File(path).getParentFile().mkdirs()) { log.warn("Could not create parent dir");}
             this.writer = AvroParquetWriter
                     .<GenericRecord>builder(new Path(path))
                     .withSchema(schema)

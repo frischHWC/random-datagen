@@ -157,7 +157,7 @@ public abstract class Field<T> {
                 field = new IntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()), possible_values_weighted, min, max);
                 break;
             case "INCREMENT_INTEGER":
-                field = new IncrementIntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()));
+                field = new IncrementIntegerField(name, length, possibleValues.stream().map(JsonNode::asInt).collect(Collectors.toList()), min, max);
                 break;
             case "BOOLEAN":
                 field = new BooleanField(name, length, possibleValues.stream().map(JsonNode::asBoolean).collect(Collectors.toList()), possible_values_weighted);
@@ -169,7 +169,7 @@ public abstract class Field<T> {
                 field = new LongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()), possible_values_weighted, min, max);
                 break;
             case "INCREMENT_LONG":
-                field = new IncrementLongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()));
+                field = new IncrementLongField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()), min, max);
                 break;
             case "TIMESTAMP":
                 field = new TimestampField(name, length, possibleValues.stream().map(JsonNode::asLong).collect(Collectors.toList()));

@@ -171,7 +171,7 @@
       "name": "person",
       "type": "CSV",
       "filters": ["country=France"],
-      "file": "dictionaries/person_test.csv",
+      "file": "/opt/cloudera/parcels/DATAGEN/dictionaries/person_test.csv",
       "field": "name"
     },
     {
