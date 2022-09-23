@@ -133,7 +133,7 @@
         "environmentVariables": {
           "MAX_HEAP_SIZE": "${max_heap_size}",
           "SERVER_PORT": "${app_port}",
-          "PRINCIPAL": ${principal}
+          "PRINCIPAL": "${principal}"
         }
       },
       "configWriter": {
@@ -456,7 +456,6 @@
           "default": "",
           "type": "string"
         },
-
         {
           "name": "core_site_path",
           "label": "AUTO-DISCOVERY: Hadoop Core Site Path",
