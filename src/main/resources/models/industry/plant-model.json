@@ -33,34 +33,31 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/user/datagen/hdfs/sensor/"},
-    {"HDFS_FILE_NAME": "sensor"},
-    {"HIVE_HDFS_FILE_PATH": "/user/datagen/hive/sensor/"},
-    {"HBASE_TABLE_NAME": "sensor"},
-    {"HBASE_NAMESPACE": "datagen"},
-    {"KAFKA_TOPIC": "sensor"},
-    {"OZONE_VOLUME": "sensor"},
-    {"SOLR_COLLECTION": "sensor"},
-    {"HIVE_DATABASE": "datagen"},
-    {"HIVE_TABLE_NAME":  "sensor"},
-    {"KUDU_TABLE_NAME":  "datagen.sensor"},
-    {"LOCAL_FILE_PATH":  "/home/datagen/sensor/"},
-    {"LOCAL_FILE_NAME":  "sensor"},
-    {"AVRO_NAME":  "sensor"}
+    {"HDFS_FILE_PATH": "/user/datagen/hdfs/industry/plant/"},
+    {"HDFS_FILE_NAME": "sensor-plant"},
+    {"HIVE_HDFS_FILE_PATH": "/user/datagen/hive/industry/plant/"},
+    {"HBASE_TABLE_NAME": "plant"},
+    {"HBASE_NAMESPACE": "datagen-industry"},
+    {"KAFKA_TOPIC": "datagen_industry_plant"},
+    {"OZONE_VOLUME": "datagen-industry-plant"},
+    {"SOLR_COLLECTION": "datagen-industry-plant"},
+    {"HIVE_DATABASE": "datagen-industry"},
+    {"HIVE_TABLE_NAME":  "plant"},
+    {"KUDU_TABLE_NAME":  "datagen.industry_plant"},
+    {"LOCAL_FILE_PATH":  "/home/datagen/industry/plant/"},
+    {"LOCAL_FILE_NAME":  "plant"},
+    {"AVRO_NAME":  "datagenindustryplant"}
   ],
   "Primary_Keys": [
-    {"KAFKA_MSG_KEY": "currency"},
-    {"HBASE_PRIMARY_KEY":  "sender_id,receiver_id,execution_date"},
-    {"OZONE_BUCKET":  "currency"},
-    {"OZONE_KEY":  "sender_id,receiver_id,execution_date"},
-    {"KUDU_PRIMARY_KEYS":  "sender_id"},
-    {"KUDU_HASH_KEYS":  "sender_id"},
-    {"KUDU_RANGE_KEYS":  "execution_date"}
+    {"KAFKA_MSG_KEY": "country"},
+    {"HBASE_PRIMARY_KEY":  "plant_id"},
+    {"OZONE_BUCKET":  "country"},
+    {"OZONE_KEY":  "plant_id"},
+    {"KUDU_PRIMARY_KEYS":  "plant_id,country"},
+    {"KUDU_HASH_KEYS":  "plant_id"},
+    {"KUDU_RANGE_KEYS":  "country"}
   ],
   "Options": [
-    {"HBASE_COLUMN_FAMILIES_MAPPING": "parties:sender_id,receiver_id;details:amount,execution_date,currency"},
-    {"SOLR_SHARDS":  1},
-    {"SOLR_REPLICAS":  1},
-    {"KUDU_REPLICAS":  1}
+    {"HBASE_COLUMN_FAMILIES_MAPPING": "technical:plant_id;location:country,city,lat,long"}
   ]
 }

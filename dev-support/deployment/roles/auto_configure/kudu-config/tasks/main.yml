@@ -23,6 +23,7 @@
     validate_certs: no
     body_format: json
   register: kudu_roles
+  when: kudu_exists
 
 - name: Get Kudu full config
   uri:
@@ -36,6 +37,7 @@
     validate_certs: no
     body_format: json
   register: kudu_full_config
+  when: kudu_exists
 
 
 - name: Get Kudu Master full config
@@ -50,6 +52,7 @@
     validate_certs: no
     body_format: json
   register: kudu_master_full_config
+  when: kudu_exists
 
  
 ### SET Kudu CONFIGS ###
@@ -59,17 +62,18 @@
     kudu_tls: "{{ kudu_master_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'ssl_enabled'].value | [0]"
+  when: kudu_exists
 
 - set_fact:
     kudu_tls: "{{ kudu_master_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'ssl_enabled'].default | [0]"
-  when: kudu_tls == ''
+  when: kudu_exists and kudu_tls == ''
 
 - name: DEBUG - kudu_tls
   debug:
     msg: "{{ kudu_tls }}"
-  when: debug | default(false)  
+  when: kudu_exists and debug | default(false)
 
 # Set Kudu Master
 
@@ -77,33 +81,35 @@
     kudu_hosts: "{{ kudu_roles.json | community.general.json_query(query) }}"
   vars:
     query: "items[?type == 'KUDU_MASTER'].hostRef.hostname"
+  when: kudu_exists
 
 - name: DEBUG - kudu_hosts
   debug:
     msg: "{{ kudu_hosts }}"
-  when: debug | default(false)
+  when: kudu_exists and debug | default(false)
 
 # Set Kudu URL
 - set_fact:
     kudu_port: "7051"
-  when: kudu_tls
+  when: kudu_exists and kudu_tls
 
 - set_fact:
     kudu_port: "7050"
-  when: kudu_port == ''
+  when: kudu_exists and kudu_port == ''
 
 - name: DEBUG - kudu_port
   debug:
     msg: "{{ kudu_port }}"
-  when: debug | default(false)
+  when: kudu_exists and debug | default(false)
 
 - set_fact:
     kudu_url: "{% for host in kudu_hosts %}{{ host }}:{{ kudu_port }}{% if not loop.last %},{% endif %}{% endfor %}"
+  when: kudu_exists
 
 - name: DEBUG - kudu_url
   debug:
     msg: "{{ kudu_url }}"
-  when: debug | default(false)
+  when: kudu_exists and debug | default(false)
 
 
 # Kerberos
@@ -111,16 +117,17 @@
     kudu_kerberos: "{{ kudu_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'enable_security'].value | [0]"
+  when: kudu_exists
 
 - set_fact:
     kudu_kerberos: "{{ kudu_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'enable_security'].default | [0]"
-  when: kudu_kerberos == ''
+  when: kudu_exists and kudu_kerberos == ''
 
 - name: DEBUG - kudu_kerberos
   debug:
     msg: "{{ kudu_kerberos }}"
-  when: debug | default(false)  
+  when: kudu_exists and debug | default(false)
 
   

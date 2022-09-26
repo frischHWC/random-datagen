@@ -7,46 +7,6 @@
                 "type" : "DATAGEN",
                 "serviceVersion" : "CDH 7.1.7",
                 "displayName" : "Datagen",
-                "config": {
-                    "items" : [ 
-                        {
-                            "name" : "hdfs_service",
-                            "value" : "{{ hdfs_name }}"
-                        },
-                        {
-                            "name" : "hbase_service",
-                            "value" : "{{ hbase_name }}"
-                        },
-                        {
-                            "name" : "hive_service",
-                            "value" : "{{ hive_name }}"
-                        },
-                        {
-                            "name" : "kafka_service",
-                            "value" : "{{ kafka_name }}"
-                        },
-                        {
-                            "name" : "kudu_service",
-                            "value" : "{{ kudu_name }}"
-                        },
-                        {
-                            "name" : "ozone_service",
-                            "value" : "{{ ozone_name }}"
-                        },
-                        {
-                            "name" : "solr_service",
-                            "value" : "{{ solr_name }}"
-                        },
-                        {
-                            "name" : "ranger_service",
-                            "value" : "{{ ranger_name }}"
-                        },
-                        {
-                            "name" : "schemaregistry_service",
-                            "value" : "{{ sr_name }}"
-                        }
-                    ] 
-                },
                 "roles": [
                     {
                         "name" : "DATAGEN_SERVER",

@@ -268,3 +268,20 @@
     validate_certs: no
     body_format: json
   register: cloudera_manager_all_services
+
+- set_fact:
+    cluster_name_streaming: "{{ cluster_name }}"
+  when: cluster_name_streaming == ''
+
+- name: Get All services from CM for streaming cluster (Kafka + SR)
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name_streaming }}/services/"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: cloudera_manager_all_services_streaming

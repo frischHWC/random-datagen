@@ -128,7 +128,7 @@
 
 - name: Pause to acknowledge parcels
   pause:
-    seconds: 15
+    seconds: 5
 
 ### Download and activate DATAGEN ###
 - name: Start Download

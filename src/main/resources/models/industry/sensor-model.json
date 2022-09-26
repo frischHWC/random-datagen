@@ -19,34 +19,30 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/user/datagen/hdfs/sensor/"},
+    {"HDFS_FILE_PATH": "/user/datagen/hdfs/industry/sensor/"},
     {"HDFS_FILE_NAME": "sensor"},
-    {"HIVE_HDFS_FILE_PATH": "/user/datagen/hive/sensor/"},
+    {"HIVE_HDFS_FILE_PATH": "/user/datagen/hive/industry/sensor/"},
     {"HBASE_TABLE_NAME": "sensor"},
-    {"HBASE_NAMESPACE": "datagen"},
-    {"KAFKA_TOPIC": "sensor"},
-    {"OZONE_VOLUME": "sensor"},
-    {"SOLR_COLLECTION": "sensor"},
-    {"HIVE_DATABASE": "datagen"},
+    {"HBASE_NAMESPACE": "datagen-industry"},
+    {"KAFKA_TOPIC": "industry_sensor"},
+    {"OZONE_VOLUME": "datagen-industry-sensor"},
+    {"SOLR_COLLECTION": "datagen-industry-sensor"},
+    {"HIVE_DATABASE": "datagen_industry"},
     {"HIVE_TABLE_NAME":  "sensor"},
-    {"KUDU_TABLE_NAME":  "datagen.sensor"},
-    {"LOCAL_FILE_PATH":  "/home/datagen/sensor/"},
+    {"KUDU_TABLE_NAME":  "datagen-industry.sensor"},
+    {"LOCAL_FILE_PATH":  "/home/datagen/industry/sensor/"},
     {"LOCAL_FILE_NAME":  "sensor"},
-    {"AVRO_NAME":  "sensor"}
+    {"AVRO_NAME":  "datagenindustrysensor"}
   ],
   "Primary_Keys": [
-    {"KAFKA_MSG_KEY": "currency"},
-    {"HBASE_PRIMARY_KEY":  "sender_id,receiver_id,execution_date"},
-    {"OZONE_BUCKET":  "currency"},
-    {"OZONE_KEY":  "sender_id,receiver_id,execution_date"},
-    {"KUDU_PRIMARY_KEYS":  "sender_id"},
-    {"KUDU_HASH_KEYS":  "sender_id"},
-    {"KUDU_RANGE_KEYS":  "execution_date"}
+    {"KAFKA_MSG_KEY": "sensor_id"},
+    {"HBASE_PRIMARY_KEY":  "sensor_id"},
+    {"OZONE_BUCKET":  "sensor_type"},
+    {"OZONE_KEY":  "sensor_id"},
+    {"KUDU_PRIMARY_KEYS":  "sensor_id"},
+    {"KUDU_HASH_KEYS":  "sensor_id"}
   ],
   "Options": [
-    {"HBASE_COLUMN_FAMILIES_MAPPING": "parties:sender_id,receiver_id;details:amount,execution_date,currency"},
-    {"SOLR_SHARDS":  1},
-    {"SOLR_REPLICAS":  1},
-    {"KUDU_REPLICAS":  1}
+    {"HBASE_COLUMN_FAMILIES_MAPPING": "parties:sender_id,receiver_id;details:amount,execution_date,currency"}
   ]
 }

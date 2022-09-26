@@ -1,0 +1,17 @@
+{
+  "items" :
+  [
+    {
+      "name": "solr_host",
+      "value": "{{ solr_hosts }}"
+    },
+    {
+      "name": "solr_port",
+      "value": "{{ solr_port }}"
+    },
+    {
+      "name": "solr_tls_enabled",
+      "value": {{ solr_tls }}
+    }
+  ]
+}

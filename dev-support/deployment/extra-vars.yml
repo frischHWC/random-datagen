@@ -3,11 +3,13 @@
 cluster_name: ${CLUSTER_NAME}
 
 # CM info required
-cloudera_manager_host: ${CM_HOST} 
+cloudera_manager_host: ${CM_HOST}
+cloudera_manager_port: ${CM_PORT}
+cloudera_manager_protocol: ${CM_PROTOCOL}
 cloudera_manager_user: ${CM_USER} 
 cloudera_manager_password: ${CM_PASSWORD}
 
-# Ranger info require
+# Ranger info required
 ranger_password: ${RANGER_PASSWORD}
 
 # Versioning
@@ -17,6 +19,9 @@ dg_full_version: ${DATAGEN_VERSION}.${CDP_VERSION}
 dg_name: DATAGEN-${DATAGEN_VERSION}.${CDP_VERSION}
 distro_suffix: ${DISTRO_SUFFIX}
 parcel_name: DATAGEN-${DATAGEN_VERSION}.${CDP_VERSION}-${DISTRO_SUFFIX}
+
+# Cluster Name streaming
+cluster_name_streaming: ${CLUSTER_NAME_STREAMING}
 
 # Edge Node for data gen
 edge_host: ${EDGE_HOST}

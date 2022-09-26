@@ -17,7 +17,7 @@
     query: "items[?type == 'HDFS'].name | [0]"
 
 - set_fact:
-    hdfs_name: "none"
+    hdfs_name: ""
   when: not hdfs_exists
 
 - name: DEBUG - hdfs_name
@@ -44,7 +44,7 @@
     query: "items[?type == 'HBASE'].name | [0]"
 
 - set_fact:
-    hbase_name: "none"
+    hbase_name: ""
   when: not hbase_exists
 
 - name: DEBUG - hbase_name
@@ -70,7 +70,7 @@
     query: "items[?type == 'HIVE'].name | [0]"
 
 - set_fact:
-    hive_name: "none"
+    hive_name: ""
   when: not hive_exists
 
 - name: DEBUG - hive_name
@@ -94,10 +94,10 @@
 - set_fact:
     solr_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
   vars:
-    query: "items[?type == 'SOLR'].name | [0]"
+    query: "items[?type == 'SOLR' && name != 'infra_solr'].name | [0]"
 
 - set_fact:
-    solr_name: "none"
+    solr_name: ""
   when: not solr_exists
 
 - name: DEBUG - solr_name
@@ -123,40 +123,13 @@
     query: "items[?type == 'OZONE'].name | [0]"
 
 - set_fact:
-    ozone_name: "none"
+    ozone_name: ""
   when: not ozone_exists
 
 - name: DEBUG - ozone_name
   debug:
     msg: "{{ ozone_name }}"
   when: debug | default(false)
-
-
-
-- set_fact:
-    kafka_exists: "{{ true if (cloudera_manager_all_services.json | community.general.json_query(query)) == 'STARTED' else false }}"
-  vars:
-    query: "items[?type == 'KAFKA'].serviceState | [0]"
-
-- name: DEBUG - kafka_exists
-  debug:
-    msg: "{{ kafka_exists }}"
-  when: debug | default(false)
-
-- set_fact:
-    kafka_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
-  vars:
-    query: "items[?type == 'KAFKA'].name | [0]"
-
-- set_fact:
-    kafka_name: "none"
-  when: not kafka_exists
-
-- name: DEBUG - kafka_name
-  debug:
-    msg: "{{ kafka_name }}"
-  when: debug | default(false)
-
 
 
 
@@ -176,7 +149,7 @@
     query: "items[?type == 'KUDU'].name | [0]"
 
 - set_fact:
-    kudu_name: "none"
+    kudu_name: ""
   when: not kudu_exists
 
 - name: DEBUG - kudu_name
@@ -187,7 +160,33 @@
 
 
 - set_fact:
-    sr_exists: "{{ cloudera_manager_all_services.json | community.general.json_query(query) | length > 0 }}"
+    kafka_exists: "{{ true if (cloudera_manager_all_services_streaming.json | community.general.json_query(query)) == 'STARTED' else false }}"
+  vars:
+    query: "items[?type == 'KAFKA'].serviceState | [0]"
+
+- name: DEBUG - kafka_exists
+  debug:
+    msg: "{{ kafka_exists }}"
+  when: debug | default(false)
+
+- set_fact:
+    kafka_name: "{{ cloudera_manager_all_services_streaming.json | community.general.json_query(query) }}"
+  vars:
+    query: "items[?type == 'KAFKA'].name | [0]"
+
+# When using a streaming cluster, kafka link should not be made
+- set_fact:
+    kafka_name: ""
+  when: not kafka_exists or cluster_name_streaming != ''
+
+- name: DEBUG - kafka_name
+  debug:
+    msg: "{{ kafka_name }}"
+  when: debug | default(false)
+
+
+- set_fact:
+    sr_exists: "{{ cloudera_manager_all_services_streaming.json | community.general.json_query(query) | length > 0 }}"
   vars:
     query: "items[?type == 'SCHEMAREGISTRY'].name"
 
@@ -197,13 +196,14 @@
   when: debug | default(false)
 
 - set_fact:
-    sr_name: "{{ cloudera_manager_all_services.json | community.general.json_query(query) }}"
+    sr_name: "{{ cloudera_manager_all_services_streaming.json | community.general.json_query(query) }}"
   vars:
     query: "items[?type == 'SCHEMAREGISTRY'].name | [0]"
 
+# When using a streaming cluster, schema registry link should not be made
 - set_fact:
-    sr_name: "none"
-  when: not sr_exists
+    sr_name: ""
+  when: not sr_exists or cluster_name_streaming != ''
 
 - name: DEBUG - sr_name
   debug:
@@ -228,7 +228,7 @@
     query: "items[?type == 'RANGER'].name | [0]"
 
 - set_fact:
-    ranger_name: "none"
+    ranger_name: ""
   when: not ranger_exists
 
 - name: DEBUG - ranger_name
@@ -254,7 +254,7 @@
     query: "items[?type == 'KNOX'].name | [0]"
 
 - set_fact:
-    knox_name: "none"
+    knox_name: ""
   when: not knox_exists
 
 - name: DEBUG - knox_name

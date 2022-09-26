@@ -9,7 +9,10 @@
     state: restarted
     name: cloudera-scm-server
 
-# TODO: make sure CM is restarted
-- name: Wait 1 minute to make sure CM is restarted
-  pause:
-    seconds: 60
+- name: wait cloudera-scm-server
+  wait_for:
+    host: "{{ cloudera_manager_host }}"
+    port: "{{ cloudera_manager_port }}"
+    delay: 20
+    state: started
+    timeout: 300

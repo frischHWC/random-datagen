@@ -9,5 +9,9 @@
     - auto_configure/cm-config
     - auto_configure/all-config
     - auto_configure/ranger-config
+    - auto_configure/kafka-config
+    - auto_configure/solr-config
+    - auto_configure/kudu-config
+    - auto_configure/schema-registry-config
     - launch_datagen/add_service
     - launch_datagen/launch_command

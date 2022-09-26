@@ -49,9 +49,20 @@
     body_format: json
   when: datagen_parcel_exists
 
-- name: Wait 1 minute to make sure parcel is deactivated
-  pause:
-    seconds: 60
+- name: Check DATAGEN is deactivated
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/parcels/products/DATAGEN/versions/{{ datagen_parcel_version }}"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    method: GET
+  register: dg_download
+  until: dg_download.json.stage != "ACTIVATED"
+  retries: 100
+  delay: 1
   when: datagen_parcel_exists
 
 - name: Remove completely Parcel 
@@ -67,9 +78,20 @@
     body_format: json
   when: datagen_parcel_exists
 
-- name: Wait 1 minute to make sure parcel is deactivated
-  pause:
-    seconds: 60
+- name: Check DATAGEN is no more distributed
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/parcels/products/DATAGEN/versions/{{ datagen_parcel_version }}"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    method: GET
+  register: dg_download
+  until: dg_download.json.stage != "DISTRIBUTED" and dg_download.json.stage != "ACTIVATED"
+  retries: 100
+  delay: 5
   when: datagen_parcel_exists
 
 - name: Remove Downloadable Parcel
@@ -85,6 +107,20 @@
     body_format: json
   when: datagen_parcel_exists
 
-# TODO: Make sure parcel does not exists anymore with a GET
+- name: Check DATAGEN is no more distributed
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/parcels/products/DATAGEN/versions/{{ datagen_parcel_version }}"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    method: GET
+  register: dg_download
+  until: dg_download.json.stage != "DOWNLOADED" and dg_download.json.stage != "DISTRIBUTED" and dg_download.json.stage != "ACTIVATED"
+  retries: 100
+  delay: 1
+  when: datagen_parcel_exists
 
 

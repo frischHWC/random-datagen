@@ -16,6 +16,8 @@ export SSH_PASSWORD=""
 
 # Cloudera Manager related
 export CM_HOST=""
+export CM_PORT="7183"
+export CM_PROTOCOL="https"
 export CM_USER="admin"
 export CM_PASSWORD="admin"
 
@@ -27,6 +29,8 @@ export CDP_VERSION="7.1.7.1000"
 export DATAGEN_VERSION="0.1.5"
 export DISTRO_SUFFIX="el7"
 
+# If using a streaming cluster for Kafka and Schema Registry (specify its name using this variable)
+export CLUSTER_NAME_STREAMING=""
 
 # DEBUG
 export DEBUG=true
@@ -56,6 +60,8 @@ function usage()
     echo "  --ssh-password=$SSH_PASSWORD : To connect to clusters' host or provide a ssh-key (Default) "
     echo ""
     echo "  --cm-host=$CM_HOST : Cloudera Manger Host  (Default) "
+    echo "  --cm-port=$CM_PORT : Cloudera Manger Host  (Default) $CM_PORT"
+    echo "  --cm-protocol=$CM_PROTOCOL : Cloudera Manger Host  (Default) $CM_PROTOCOL"
     echo "  --cm-user=$CM_USER : Cloudera Manger User (Default) $CM_USER "
     echo "  --cm-password=$CM_PASSWORD : Cloudera Manger Password (associated to the above user) (Default) $CM_PASSWORD "
     echo ""
@@ -64,6 +70,8 @@ function usage()
     echo "  --cdp-version=$CDP_VERSION : Version of CDP on which Datagen is deployed (Default) $CDP_VERSION "
     echo "  --datagen-version=$DATAGEN_VERSION : Version of Datagen that will be set for this deployment  (Default) $DATAGEN_VERSION"
     echo "  --distro-suffix=$DISTRO_SUFFIX : Version of OS to deploy datagen  (Default) $DISTRO_SUFFIX"
+    echo ""
+    echo "  --cluster-name-streaming=$CLUSTER_NAME_STREAMING The name of the streaming cluster to interact with (that contains Kafka) (Default) "
     echo ""
     echo "  --debug=$DEBUG : To set DEBUG log-level (Default) $DEBUG "
     echo "  --log-dir=$LOG_DIR : Log directory (Default) $LOG_DIR "
@@ -100,6 +108,12 @@ while [ "$1" != "" ]; do
         --cm-host)
             CM_HOST=$VALUE
             ;;
+        --cm-port)
+            CM_PORT=$VALUE
+            ;;
+        --cm-protocol)
+            CM_PROTOCOL=$VALUE
+            ;;
         --cm-user)
             CM_USER=$VALUE
             ;;
@@ -117,6 +131,9 @@ while [ "$1" != "" ]; do
             ;;
         --distro-suffix)
             DISTRO_SUFFIX=$VALUE
+            ;;
+        --cluster-name-streaming)
+            CLUSTER_NAME_STREAMING=$VALUE
             ;;
         --debug)
             DEBUG=$VALUE

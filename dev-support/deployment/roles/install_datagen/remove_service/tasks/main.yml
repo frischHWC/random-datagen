@@ -22,9 +22,20 @@
     validate_certs: no
   when: datagen_service_exists
 
-- name: Wait to acknowledge service to be stopped
-  pause:
-    seconds: 15
+- name: Check DATAGEN is stopped
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/datagen"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    method: GET
+  register: dg_status
+  until: dg_status.json.serviceState == "STOPPED"
+  retries: 100
+  delay: 1
   when: datagen_service_exists
 
 - name: Delete Services if it exists

@@ -1,7 +1,18 @@
 ---
-- name: Wait for service to be up and running
-  pause:
-    seconds: 10
+- name: Check DATAGEN is running
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/datagen"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    method: GET
+  register: dg_status
+  until: dg_status.json.serviceState == "STARTED"
+  retries: 100
+  delay: 5
 
 - name: Generate customer Data
   uri:
@@ -14,10 +25,22 @@
     return_content: yes
     validate_certs: no
 
+- name: Check that no command is currently running on the service
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/datagen/commands"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: result
+  until: result.content|length == 19
+  retries: 60
+  delay: 30
 
-- name: Wait for service to be available again
-  pause:
-    seconds: 60
 
 - name: Generate Local Data
   uri:
@@ -31,9 +54,22 @@
     validate_certs: no
 
 
-- name: Wait for service to be available again
-  pause:
-    seconds: 20
+- name: Check that no command is currently running on the service
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/datagen/commands"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: result
+  until: result.content|length == 19
+  retries: 60
+  delay: 30
+
 
 - name: Generate Sensor Data
   uri:
@@ -46,9 +82,23 @@
     return_content: yes
     validate_certs: no
 
-- name: Wait for service to be available again
-  pause:
-    seconds: 60
+
+- name: Check that no command is currently running on the service
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/datagen/commands"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: GET
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+    body_format: json
+  register: result
+  until: result.content|length == 19
+  retries: 60
+  delay: 30
+
 
 - name: Generate Transaction Data
   uri:

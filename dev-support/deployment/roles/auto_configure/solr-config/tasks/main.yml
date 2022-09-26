@@ -24,6 +24,7 @@
     validate_certs: no
     body_format: json
   register: solr_full_config
+  when: solr_exists
 
 - name: Get SolR Server full config
   uri:
@@ -37,6 +38,7 @@
     validate_certs: no
     body_format: json
   register: solr_server_full_config
+  when: solr_exists
 
 - name: Get SolR roles repartition
   uri:
@@ -50,6 +52,7 @@
     validate_certs: no
     body_format: json
   register: solr_roles
+  when: solr_exists
 
 
 
@@ -61,25 +64,27 @@
     solr_ssl: "{{ solr_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'solr_use_ssl'].value | [0]"
+  when: solr_exists
 
 - set_fact:
     solr_ssl: "{{ solr_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'solr_use_ssl'].default | [0]"
-  when: solr_ssl == ""
+  when: solr_exists and solr_ssl == ""
 
 - name: DEBUG - solr_ssl
   debug:
     msg: "{{ solr_ssl }}"
-  when: debug | default(false)
+  when: solr_exists and debug | default(false)
 
 - set_fact:
     solr_protocol: "{{ 'https' if solr_ssl else 'http' }}"
+  when: solr_exists
 
 - name: DEBUG - solr_protocol
   debug:
     msg: "{{ solr_protocol }}"
-  when: debug | default(false)
+  when: solr_exists and debug | default(false)
 
 
 # Set SolR port
@@ -88,25 +93,25 @@
     solr_port: "{{ solr_server_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'solr_https_port'].value | [0]"
-  when: solr_ssl
+  when: solr_exists and solr_ssl
 
 - set_fact:
     solr_port: "{{ solr_server_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'solr_https_port'].default | [0]"
-  when: solr_ssl and solr_port == "" 
+  when: solr_exists and solr_ssl and solr_port == ""
 
 - set_fact:
     solr_port: "{{ solr_server_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'solr_http_port'].value | [0]"
-  when: not solr_ssl
+  when: solr_exists and not solr_ssl
 
 - set_fact:
     solr_port: "{{ solr_server_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'solr_http_port'].default | [0]"
-  when: not solr_ssl and solr_port == ""
+  when: solr_exists and not solr_ssl and solr_port == ""
 
 
 # Set SolR Servers
@@ -115,19 +120,21 @@
     solr_hosts: "{{ solr_roles.json | community.general.json_query(query) }}"
   vars:
     query: "items[?type == 'SOLR_SERVER'].hostRef.hostname | [0]"
+  when: solr_exists
 
 - name: DEBUG - solr_hosts
   debug:
     msg: "{{ solr_hosts }}"
-  when: debug | default(false)
+  when: solr_exists and debug | default(false)
 
 - set_fact:
     solr_url: "{{ solr_protocol }}://{{ solr_hosts }}:{{ solr_port }}"
+  when: solr_exists
 
 - name: DEBUG - solr_url
   debug:
     msg: "{{ solr_url }}"
-  when: debug | default(false)
+  when: solr_exists and debug | default(false)
 
 
 # Kerberos
@@ -135,20 +142,22 @@
     solr_auth: "{{ solr_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'solr_security_authentication'].value | [0]"
+  when: solr_exists
 
 - set_fact:
     solr_auth: "{{ solr_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'solr_security_authentication' ].default | [0]"
-  when: solr_auth == ''
+  when: solr_exists and solr_auth == ''
 
 - set_fact:
     solr_kerberos: "{{ true if solr_auth == 'kerberos' else false }}"
+  when: solr_exists
 
 - name: DEBUG - solr_kerberos
   debug:
     msg: "{{ solr_kerberos }}"
-  when: debug | default(false)  
+  when: solr_exists and debug | default(false)
 
 
 # TLS
@@ -156,14 +165,15 @@
     solr_tls: "{{ solr_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'solr_use_ssl'].value | [0]"
+  when: solr_exists
 
 - set_fact:
     solr_tls: "{{ solr_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'solr_use_ssl'].default | [0]"
-  when: solr_tls == ''
+  when: solr_exists and solr_tls == ''
 
 - name: DEBUG - solr_tls
   debug:
     msg: "{{ solr_tls }}"
-  when: debug | default(false)  
+  when: solr_exists and debug | default(false)
