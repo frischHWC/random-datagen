@@ -238,7 +238,7 @@
                 "KUDU_SERVICE": "${dependency:KUDU}",
                 "OZONE_SERVICE": "${dependency:OZONE}",
                 "SCHEMAREGISTRY_SERVICE": "${dependency:SCHEMAREGISTRY}",
-                "SOLR_SERVICE": "${dependency:SOLR}",
+                "SOLR_SERVICE": "${dependency:SOLR}"
             }
           }
         },
