@@ -64,8 +64,13 @@ public class HiveSink implements SinkInterface {
                     properties.get(ApplicationConfigs.HIVE_AUTH_KERBEROS_KEYTAB), new Configuration());
             }
 
-            System.setProperty("javax.net.ssl.trustStore", properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_LOCATION));
-            System.setProperty("javax.net.ssl.trustStorePassword", properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_PASSWORD));
+            if(properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_LOCATION)!=null && properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_PASSWORD)!=null) {
+                System.setProperty("javax.net.ssl.trustStore", properties.get(
+                    ApplicationConfigs.HIVE_TRUSTSTORE_LOCATION));
+                System.setProperty("javax.net.ssl.trustStorePassword",
+                    properties.get(
+                        ApplicationConfigs.HIVE_TRUSTSTORE_PASSWORD));
+            }
 
             java.util.Properties propertiesForHive = new Properties();
             propertiesForHive.put("tez.queue.name", queue);

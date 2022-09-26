@@ -26,11 +26,11 @@ kerberos.keytab=${CONF_DIR}/datagen.keytab
 
 # TLS Config
 tls.enabled={{ globals['tls_enabled'] }}
-truststore.location={{ globals['ssl_client_truststore_location'] }}
-truststore.password={{ globals['ssl_client_truststore_password'] }}
-keystore.location={{ globals['ssl_server_keystore_location'] }}
-keystore.password={{ globals['ssl_server_keystore_password'] }}
-keystore.keypassword={{ globals['ssl_server_keystore_keypassword'] }}
+truststore.location={{ globals['truststore_location'] }}
+truststore.password={{ globals['truststore_password'] }}
+keystore.location={{ globals['keystore_file'] }}
+keystore.password={{ globals['keystore_password'] }}
+keystore.keypassword={{ globals['keystore_key_password'] }}
 
 # These are default config file's path in a CDP cluster
 # In case below settings are not set, these files are used to extrapolate them
