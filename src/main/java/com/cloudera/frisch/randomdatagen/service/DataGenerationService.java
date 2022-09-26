@@ -112,7 +112,7 @@ public class DataGenerationService {
 
 
     // Launch Generation of data
-    for(long i = 0; i < batches; i++) {
+    for(long i = 1; i <= batches; i++) {
       log.info("Start to process batch {}/{} of {} rows", i, batches, rows);
 
       List<Row> randomDataList = model.generateRandomRows(rows, threads);
