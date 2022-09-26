@@ -1,0 +1,76 @@
+{
+  "name": "datagen policy",
+  "policyType": 0,
+  "policyPriority": 0,
+  "description": "DATAGEN's policy for default generation",
+  "policyLabels": [
+
+  ],
+  "isAuditEnabled": true,
+  "resources": {
+    "schema-group": {
+      "values": [
+        "datagen*"
+      ],
+      "isRecursive": false,
+      "isExcludes": false
+    },
+    "schema-metadata": {
+      "values": [
+        "*"
+      ],
+      "isRecursive": false,
+      "isExcludes": false
+    },
+    "schema-branch": {
+      "values": [
+        "*"
+      ],
+      "isRecursive": false,
+      "isExcludes": false
+    },
+    "schema-version": {
+      "values": [
+        "*"
+      ],
+      "isRecursive": false,
+      "isExcludes": false
+    }
+  },
+  "isDenyAllElse": false,
+  "policyItems": [
+    {
+      "users": [
+        "datagen"
+      ],
+      "accesses": [
+        {
+          "type": "create",
+          "isAllowed": true
+        },
+        {
+          "type": "read",
+          "isAllowed": true
+        },
+        {
+          "type": "update",
+          "isAllowed": true
+        },
+        {
+          "type": "delete",
+          "isAllowed": true
+        }
+      ]
+    }
+  ],
+  "allowExceptions": [
+
+  ],
+  "denyPolicyItems": [
+
+  ],
+  "denyExceptions": [
+
+  ],
+  "service": "cm_schema-registry"
+}

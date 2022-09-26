@@ -61,6 +61,10 @@
                                 {
                                     "name" : "threads",
                                     "value" : 4
+                                },
+                                {
+                                    "name" : "ranger_url",
+                                    "value" : "{{ ranger_url }}"
                                 }
                             ]
                         }

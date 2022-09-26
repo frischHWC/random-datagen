@@ -41,10 +41,21 @@
     "preStartSteps": [
       {
         "commandName": "CreateUserHdfsHomeDirCommand"
+      },
+      {
+        "commandName": "InitServiceCommand"
       }
     ]
   },
   "commands": [
+    {
+      "name": "InitServiceCommand",
+      "label": "Initialize the service dirs and policies",
+      "description": "Initialize Service by creating local dirs and ranger required policies",
+      "roleCommand": "init_service",
+      "roleName": "DATAGEN_SERVER",
+      "runMode": "single"
+    },
     {
       "name": "gen_customer",
       "label": "Generates Customer Data in HDFS (Parquet) & Hive",
@@ -202,6 +213,36 @@
       },
       "commands": [
         {
+          "name": "init_service",
+          "label": "Init service",
+          "description": "Initializes the service by creating required dirs and Ranger policies",
+          "expectedExitCodes": [
+            0
+          ],
+          "requiredRoleState": "stopped",
+          "commandRunner": {
+            "program": "scripts/init.sh",
+            "args": [
+              "init"
+            ],
+            "environmentVariables": {
+                "DATAGEN_USER": "${user}",
+                "RANGER_SERVICE_NAME": "${dependency:RANGER}",
+                "RANGER_URL": "${ranger_url}",
+                "RANGER_ADMIN_USER": "${ranger_user}",
+                "RANGER_ADMIN_PASSWORD": "${ranger_password}",
+                "HBASE_SERVICE": "${dependency:HBASE}",
+                "HDFS_SERVICE": "${dependency:HDFS}",
+                "HIVE_SERVICE": "${dependency:HIVE}",
+                "KAFKA_SERVICE": "${dependency:KAFKA}",
+                "KUDU_SERVICE": "${dependency:KUDU}",
+                "OZONE_SERVICE": "${dependency:OZONE}",
+                "SCHEMAREGISTRY_SERVICE": "${dependency:SCHEMAREGISTRY}",
+                "SOLR_SERVICE": "${dependency:SOLR}",
+            }
+          }
+        },
+        {
           "name": "gen_customer_hdfs_hive",
           "label": "Generate Customer Data",
           "description": "Generates Customer Data to HDFS in Parquet & Hive",
@@ -342,6 +383,35 @@
           "min": 1,
           "type": "long"
         },
+        {
+          "name": "ranger_url",
+          "label": "Ranger URL",
+          "description": "Ranger URM, used to push policies to Ranger (needed only once at startup) in this format: http://<RANGER_HOST>:<RANGER_PORT>. if this is not set, it is required to create your own policies in Ranger. Default push policies are on 'datagen*' and does not include specific paths that custom model may required",
+          "required": true,
+          "configurableInWizard": true,
+          "default": "https://localhost:6182",
+          "type": "string"
+        },
+        {
+          "name": "ranger_user",
+          "label": "Ranger admin user",
+          "description": "Ranger user, used to push policies to Ranger (needed only once at startup). if this is not set, it is required to create your own policies in Ranger. Default push policies are on 'datagen*' and does not include specific paths that custom model may required",
+          "required": true,
+          "configurableInWizard": true,
+          "default": "admin",
+          "type": "string"
+        },
+        {
+          "name": "ranger_password",
+          "label": "Ranger Password of provided user",
+          "description": "Ranger user's password, used to push policies to Ranger (needed only once at startup). if this is not set, it is required to create your own policies in Ranger. Default push policies are on 'datagen*' and does not include specific paths that custom model may required",
+          "required": true,
+          "configurableInWizard": true,
+          "default": "admin",
+          "type": "password"
+        },
+
+
         {
           "name": "hdfs_uri",
           "label": "HDFS URI",
