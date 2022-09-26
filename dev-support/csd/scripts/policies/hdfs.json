@@ -12,7 +12,8 @@
   "resources": {
     "path": {
       "values": [
-        "datagen*"
+        "/user/datagen/*",
+        "/tmp/datagen/*"
       ],
       "isExcludes": false,
       "isRecursive": true

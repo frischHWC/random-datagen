@@ -12,7 +12,7 @@
   "resources": {
     "topic": {
       "values": [
-        "datagen*"
+        "datagen_*"
       ],
       "isExcludes": false,
       "isRecursive": false

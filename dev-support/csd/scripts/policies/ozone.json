@@ -12,7 +12,7 @@
   "resources": {
     "volume": {
       "values": [
-        "datagen*"
+        "datagen"
       ],
       "isExcludes": false
     },
