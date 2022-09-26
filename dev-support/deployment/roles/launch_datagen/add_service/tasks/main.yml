@@ -58,6 +58,35 @@
   pause:
     seconds: 10
 
+- name: Initialize hdfs dir for Datagen service
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/datagen/commands/CreateUserHdfsHomeDirCommand"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: POST
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+
+- name: Wait for HDFS dir creation to finish
+  pause:
+    seconds: 15
+
+- name: Initialize Ranger Policies for Datagen service
+  uri:
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/datagen/commands/InitServiceCommand"
+    user: "{{ cloudera_manager_user }}"
+    password: "{{ cloudera_manager_password }}"
+    method: POST
+    force_basic_auth: yes
+    status_code: 200
+    return_content: yes
+    validate_certs: no
+
+- name: Wait for Ranger policies to be updated
+  pause:
+    seconds: 30
 
 - name: Start Datagen Service
   uri:

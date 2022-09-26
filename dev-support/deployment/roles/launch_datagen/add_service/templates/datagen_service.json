@@ -65,6 +65,10 @@
                                 {
                                     "name" : "ranger_url",
                                     "value" : "{{ ranger_url }}"
+                                },
+                                {
+                                    "name" : "ranger_password",
+                                    "value" : "{{ ranger_password }}"
                                 }
                             ]
                         }

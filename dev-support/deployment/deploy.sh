@@ -19,6 +19,9 @@ export CM_HOST=""
 export CM_USER="admin"
 export CM_PASSWORD="admin"
 
+# Ranger related
+export RANGER_PASSWORD="admin"
+
 # Version of RD to create (to inject datagen-env.sh)
 export CDP_VERSION="7.1.7.1000"
 export DATAGEN_VERSION="0.1.5"
@@ -55,6 +58,8 @@ function usage()
     echo "  --cm-host=$CM_HOST : Cloudera Manger Host  (Default) "
     echo "  --cm-user=$CM_USER : Cloudera Manger User (Default) $CM_USER "
     echo "  --cm-password=$CM_PASSWORD : Cloudera Manger Password (associated to the above user) (Default) $CM_PASSWORD "
+    echo ""
+    echo "  --ranger-password=$RANGER_PASSWORD : Ranger Password (associated to the admin user) (Default) $RANGER_PASSWORD "
     echo ""
     echo "  --cdp-version=$CDP_VERSION : Version of CDP on which Datagen is deployed (Default) $CDP_VERSION "
     echo "  --datagen-version=$DATAGEN_VERSION : Version of Datagen that will be set for this deployment  (Default) $DATAGEN_VERSION"
@@ -100,6 +105,9 @@ while [ "$1" != "" ]; do
             ;;
         --cm-password)
             CM_PASSWORD=$VALUE
+            ;;
+        --ranger-password)
+            RANGER_PASSWORD=$VALUE
             ;;
         --cdp-version)
             CDP_VERSION=$VALUE

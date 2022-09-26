@@ -7,6 +7,9 @@ cloudera_manager_host: ${CM_HOST}
 cloudera_manager_user: ${CM_USER} 
 cloudera_manager_password: ${CM_PASSWORD}
 
+# Ranger info require
+ranger_password: ${RANGER_PASSWORD}
+
 # Versioning
 cdp_version: ${CDP_VERSION}
 datagen_version: ${DATAGEN_VERSION}
