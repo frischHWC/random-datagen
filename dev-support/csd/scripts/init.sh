@@ -2,14 +2,6 @@
 
 echo "STARTING INIT OF DATAGEN"
 
-echo "Create local directory: /tmp/${DATAGEN_USER}"
-
-mkdir -p /tmp/${DATAGEN_USER}/
-sudo chown datagen:datagen /tmp/${DATAGEN_USER}/
-sudo chmod 755 /tmp/${DATAGEN_USER}/
-
-echo "Finished to create local directory"
-
 echo "RANGER_SERVICE: ${RANGER_SERVICE_NAME}"
 echo "RANGER_URL: ${RANGER_URL}"
 echo "RANGER_ADMIN_USER: ${RANGER_ADMIN_USER}"

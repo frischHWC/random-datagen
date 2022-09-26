@@ -53,9 +53,9 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/tmp/datagen/hdfs/customer/"},
+    {"HDFS_FILE_PATH": "/user/datagen/hdfs/customer/"},
     {"HDFS_FILE_NAME": "customer-in"},
-    {"HIVE_HDFS_FILE_PATH": "/tmp/datagen/hive/customer/"},
+    {"HIVE_HDFS_FILE_PATH": "/user/datagen/hive/customer/"},
     {"HBASE_TABLE_NAME": "customer"},
     {"HBASE_NAMESPACE": "datagen"},
     {"KAFKA_TOPIC": "datagen_customer"},
@@ -64,7 +64,7 @@
     {"HIVE_DATABASE": "datagen"},
     {"HIVE_TABLE_NAME":  "customer"},
     {"KUDU_TABLE_NAME":  "datagen.customer"},
-    {"LOCAL_FILE_PATH":  "/tmp/datagen/customer/"},
+    {"LOCAL_FILE_PATH":  "/home/datagen/customer/"},
     {"LOCAL_FILE_NAME":  "customer-in"},
     {"AVRO_NAME":  "datagencustomer"}
   ],

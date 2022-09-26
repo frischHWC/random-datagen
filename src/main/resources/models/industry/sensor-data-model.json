@@ -16,9 +16,9 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/tmp/datagen/hdfs/sensor/"},
+    {"HDFS_FILE_PATH": "/user/datagen/hdfs/sensor/"},
     {"HDFS_FILE_NAME": "sensor"},
-    {"HIVE_HDFS_FILE_PATH": "/tmp/datagen/hive/sensor/"},
+    {"HIVE_HDFS_FILE_PATH": "/user/datagen/hive/sensor/"},
     {"HBASE_TABLE_NAME": "sensor"},
     {"HBASE_NAMESPACE": "datagen"},
     {"KAFKA_TOPIC": "sensor"},
@@ -27,7 +27,7 @@
     {"HIVE_DATABASE": "datagen"},
     {"HIVE_TABLE_NAME":  "sensor"},
     {"KUDU_TABLE_NAME":  "datagen.sensor"},
-    {"LOCAL_FILE_PATH":  "/tmp/datagen/sensor/"},
+    {"LOCAL_FILE_PATH":  "/home/datagen/sensor/"},
     {"LOCAL_FILE_NAME":  "sensor"},
     {"AVRO_NAME":  "sensor"}
   ],

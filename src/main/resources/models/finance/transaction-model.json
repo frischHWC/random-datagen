@@ -29,9 +29,9 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/tmp/datagen/hdfs/transaction/"},
+    {"HDFS_FILE_PATH": "/user/datagen/hdfs/transaction/"},
     {"HDFS_FILE_NAME": "transaction"},
-    {"HIVE_HDFS_FILE_PATH": "/tmp/datagen/hive/transaction/"},
+    {"HIVE_HDFS_FILE_PATH": "/user/datagen/hive/transaction/"},
     {"HBASE_TABLE_NAME": "transaction"},
     {"HBASE_NAMESPACE": "datagen"},
     {"KAFKA_TOPIC": "transaction"},
@@ -40,7 +40,7 @@
     {"HIVE_DATABASE": "datagen"},
     {"HIVE_TABLE_NAME":  "transaction"},
     {"KUDU_TABLE_NAME":  "datagen.transaction"},
-    {"LOCAL_FILE_PATH":  "/tmp/datagen/transaction/"},
+    {"LOCAL_FILE_PATH":  "/home/datagen/transaction/"},
     {"LOCAL_FILE_NAME":  "transaction"},
     {"AVRO_NAME":  "transaction"}
   ],

@@ -199,9 +199,9 @@
     }
   ],
   "Table_Names": [
-    {"HDFS_FILE_PATH": "/tmp/datagen/hdfs/full/"},
+    {"HDFS_FILE_PATH": "/user/datagen/hdfs/full/"},
     {"HDFS_FILE_NAME": "full"},
-    {"HIVE_HDFS_FILE_PATH": "/tmp/datagen/hive/full/"},
+    {"HIVE_HDFS_FILE_PATH": "/user/datagen/hive/full/"},
     {"HBASE_TABLE_NAME": "full"},
     {"HBASE_NAMESPACE": "datagen"},
     {"KAFKA_TOPIC": "datagen_full"},
@@ -211,7 +211,7 @@
     {"HIVE_TABLE_NAME":  "full"},
     {"HIVE_TEMPORARY_TABLE_NAME":  "full_tmp"},
     {"KUDU_TABLE_NAME":  "datagen.full"},
-    {"LOCAL_FILE_PATH":  "/tmp/datagen/full/"},
+    {"LOCAL_FILE_PATH":  "/home/datagen/full/"},
     {"LOCAL_FILE_NAME":  "datagen-full"},
     {"AVRO_NAME":  "datagenfull"}
   ],
