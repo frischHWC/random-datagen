@@ -146,9 +146,9 @@
           "SERVER_PORT": "${app_port}",
           "PRINCIPAL": "${principal}/${host}",
           "USER": "${user}",
-          "TRUSTSTORE_PASSWORD": "${truststore_password}",
-          "KEYSTORE_PASSWORD": "${keystore_password}",
-          "KEYSTORE_KEYPASSWORD": "${keystore_key_password}"
+          "TRUSTSTORE_PASSWORD": "${ssl_client_truststore_password}",
+          "KEYSTORE_PASSWORD": "${ssl_server_keystore_password}",
+          "KEYSTORE_KEYPASSWORD": "${ssl_server_keystore_keypassword}"
         }
       },
       "configWriter": {
