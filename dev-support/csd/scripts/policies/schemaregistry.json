@@ -10,7 +10,7 @@
   "resources": {
     "schema-group": {
       "values": [
-        "datagen"
+        "datagen*"
       ],
       "isRecursive": false,
       "isExcludes": false

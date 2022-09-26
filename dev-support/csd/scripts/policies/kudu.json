@@ -12,7 +12,7 @@
   "resources": {
     "database": {
       "values": [
-        "datagen"
+        "datagen*"
       ],
       "isExcludes": false,
       "isRecursive": false
