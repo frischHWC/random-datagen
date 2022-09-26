@@ -136,11 +136,16 @@ public class Model<T extends Field> {
         List<Row> rows = new ArrayList<>();
 
         long numberPerThread = number / threads;
+        long restOfRowsToCreate = number % threads;
         LinkedList<RowGeneratorThread> threadsStarted = new LinkedList<>();
 
         for (int i = 0; i < threads; i++){
+            long numberOfRowsToGenerate = numberPerThread;
+            if(i==0) {
+                numberOfRowsToGenerate += restOfRowsToCreate;
+            }
             RowGeneratorThread threadToStart =
-                new RowGeneratorThread<>(numberPerThread, this, fieldsRandomName, fieldsComputedName, fields);
+                new RowGeneratorThread<>(numberOfRowsToGenerate, this, fieldsRandomName, fieldsComputedName, fields);
             threadToStart.start();
             threadsStarted.add(threadToStart);
             log.info("Started 1 thread to generate: " + numberPerThread + " rows ");
