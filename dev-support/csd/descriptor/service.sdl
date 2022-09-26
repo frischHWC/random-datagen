@@ -144,7 +144,11 @@
         "environmentVariables": {
           "MAX_HEAP_SIZE": "${max_heap_size}",
           "SERVER_PORT": "${app_port}",
-          "PRINCIPAL": "${principal}/${host}"
+          "PRINCIPAL": "${principal}/${host}",
+          "USER": "${user}",
+          "TRUSTSTORE_PASSWORD": "${truststore_password}",
+          "KEYSTORE_PASSWORD": "${keystore_password}",
+          "KEYSTORE_KEYPASSWORD": "${keystore_key_password}"
         }
       },
       "configWriter": {

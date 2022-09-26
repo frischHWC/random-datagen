@@ -8,8 +8,8 @@ spring.profiles.active=cdp
 # General conf 
 app.name="Data Generator"
 server.port={{ globals['app_port'] }}
-hadoop.user=datagen
-hadoop.home=/user/datagen
+hadoop.user=${USER}
+hadoop.home=/user/${USER}
 
 # General default Conf
 threads={{ globals['threads'] }}
@@ -22,15 +22,15 @@ custom.data.model={{ globals['custom_model_path'] }}
 # Kerberos Config
 kerberos.enabled={{ globals['kerberos_enabled'] }}
 kerberos.user=${PRINCIPAL}
-kerberos.keytab=${CONF_DIR}/datagen.keytab
+kerberos.keytab=${CONF_DIR}/${USER}.keytab
 
 # TLS Config
 tls.enabled={{ globals['tls_enabled'] }}
 truststore.location={{ globals['truststore_location'] }}
-truststore.password={{ globals['truststore_password'] }}
+truststore.password=${TRUSTSTORE_PASSWORD}
 keystore.location={{ globals['keystore_file'] }}
-keystore.password={{ globals['keystore_password'] }}
-keystore.keypassword={{ globals['keystore_key_password'] }}
+keystore.password=${KEYSTORE_PASSWORD}
+keystore.keypassword=${KEYSTORE_KEYPASSWORD}
 
 # These are default config file's path in a CDP cluster
 # In case below settings are not set, these files are used to extrapolate them
