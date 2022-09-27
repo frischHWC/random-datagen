@@ -9,7 +9,7 @@
       "name": "id",
       "type": "INCREMENT_INTEGER",
       "min": 0,
-      "max": 12000
+      "max": 120000
     },
     {
       "name": "birthdate",

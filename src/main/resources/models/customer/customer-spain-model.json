@@ -8,8 +8,8 @@
     {
       "name": "id",
       "type": "INCREMENT_INTEGER",
-      "min": 63001,
-      "max": 67000
+      "min": 630000,
+      "max": 670000
     },
     {
       "name": "birthdate",

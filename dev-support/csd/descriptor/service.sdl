@@ -249,7 +249,7 @@
         {
           "name": "gen_customer_hdfs_hive",
           "label": "Generate Customer Data",
-          "description": "Generates Customer Data to HDFS in Parquet & Hive",
+          "description": "Generates 1M Customers to HDFS and Hive",
           "expectedExitCodes": [
             0
           ],
@@ -265,7 +265,7 @@
         {
           "name": "gen_transaction_hbase",
           "label": "Generate Transaction Data",
-          "description": "Generates Transaction Data to HBase",
+          "description": "Generates 1M Transactions to HBase",
           "expectedExitCodes": [
             0
           ],
@@ -281,7 +281,7 @@
         {
           "name": "gen_sensor_hive",
           "label": "Generate Sensor Data",
-          "description": "Generates Sensor Data to Hive",
+          "description": "Generates 10M Sensors Data to Hive",
           "expectedExitCodes": [
             0
           ],

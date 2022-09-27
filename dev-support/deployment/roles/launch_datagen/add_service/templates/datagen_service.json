@@ -20,7 +20,7 @@
                             [
                                 {
                                     "name" : "threads",
-                                    "value" : 4
+                                    "value" : 10
                                 },
                                 {
                                     "name" : "ranger_url",

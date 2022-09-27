@@ -4,7 +4,7 @@
       "name": "sensor_id",
       "type": "INTEGER",
       "min": 0,
-      "max": 10000
+      "max": 100000
     },
     {
       "name": "timestamp",

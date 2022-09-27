@@ -148,7 +148,7 @@ public class Model<T extends Field> {
                 new RowGeneratorThread<>(numberOfRowsToGenerate, this, fieldsRandomName, fieldsComputedName, fields);
             threadToStart.start();
             threadsStarted.add(threadToStart);
-            log.info("Started 1 thread to generate: " + numberPerThread + " rows ");
+            log.info("Started 1 thread to generate: " + numberOfRowsToGenerate + " rows ");
         }
 
         threadsStarted.forEach(t -> {

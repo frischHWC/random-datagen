@@ -4,7 +4,7 @@
       "name": "plant_id",
       "type": "INCREMENT_INTEGER",
       "min": 0,
-      "max": 100
+      "max": 1000
     },
     {
       "name": "city",
@@ -58,6 +58,7 @@
     {"KUDU_RANGE_KEYS":  "country"}
   ],
   "Options": [
-    {"HBASE_COLUMN_FAMILIES_MAPPING": "technical:plant_id;location:country,city,lat,long"}
+    {"HBASE_COLUMN_FAMILIES_MAPPING": "technical:plant_id;location:country,city,lat,long"},
+    {"DELETE_PREVIOUS":  "true"}
   ]
 }

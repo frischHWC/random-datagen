@@ -4,7 +4,7 @@
       "name": "sensor_id",
       "type": "INCREMENT_INTEGER",
       "min": 0,
-      "max": 10000
+      "max": 100000
     },
     {
       "name": "sensor_type",
@@ -15,7 +15,7 @@
       "name": "plant_id",
       "type": "INTEGER",
       "min": 0,
-      "max": 100
+      "max": 1000
     }
   ],
   "Table_Names": [
@@ -43,6 +43,7 @@
     {"KUDU_HASH_KEYS":  "sensor_id"}
   ],
   "Options": [
-    {"HBASE_COLUMN_FAMILIES_MAPPING": "parties:sender_id,receiver_id;details:amount,execution_date,currency"}
+    {"HBASE_COLUMN_FAMILIES_MAPPING": "parties:sender_id,receiver_id;details:amount,execution_date,currency"},
+    {"DELETE_PREVIOUS":  "true"}
   ]
 }
