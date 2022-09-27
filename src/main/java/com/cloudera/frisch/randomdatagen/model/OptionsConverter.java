@@ -122,6 +122,7 @@ public class OptionsConverter {
         KUDU_BUFFER,
         KUDU_FLUSH,
         OZONE_REPLICATION_FACTOR,
+        OZONE_LOCAL_FILE_PATH,
         HDFS_REPLICATION_FACTOR
     }
 
@@ -169,6 +170,8 @@ public class OptionsConverter {
                 return Options.KUDU_FLUSH;
             case "OZONE_REPLICATION_FACTOR":
                 return Options.OZONE_REPLICATION_FACTOR;
+            case "OZONE_LOCAL_FILE_PATH":
+                return Options.OZONE_LOCAL_FILE_PATH;
             case "HDFS_REPLICATION_FACTOR":
                 return Options.HDFS_REPLICATION_FACTOR;
             default:

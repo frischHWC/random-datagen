@@ -4,10 +4,8 @@ import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.SinkParser;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,19 +28,19 @@ public class SinkSender {
         sinks.forEach(sink -> {
             SinkInterface sinkToInitAndStart = null;
             switch (sink) {
-                case HDFSCSV:
+                case HDFS_CSV:
                     sinkToInitAndStart = new HdfsCsvSink(model, properties);
                     break;
-                case HDFSJSON:
+                case HDFS_JSON:
                     sinkToInitAndStart = new HdfsJsonSink(model, properties);
                     break;
-                case HDFSAVRO:
+                case HDFS_AVRO:
                     sinkToInitAndStart = new HdfsAvroSink(model, properties);
                     break;
-                case HDFSORC:
+                case HDFS_ORC:
                     sinkToInitAndStart = new HdfsOrcSink(model, properties);
                     break;
-                case HDFSPARQUET:
+                case HDFS_PARQUET:
                     sinkToInitAndStart = new HdfsParquetSink(model, properties);
                     break;
                 case HBASE:
@@ -56,6 +54,18 @@ public class SinkSender {
                     break;
                 case OZONE_PARQUET:
                     sinkToInitAndStart = new OzoneParquetSink(model, properties);
+                    break;
+                case OZONE_AVRO:
+                    sinkToInitAndStart = new OzoneAvroSink(model, properties);
+                    break;
+                case OZONE_CSV:
+                    sinkToInitAndStart = new OzoneCSVSink(model, properties);
+                    break;
+                case OZONE_JSON:
+                    sinkToInitAndStart = new OzoneJsonSink(model, properties);
+                    break;
+                case OZONE_ORC:
+                    sinkToInitAndStart = new OzoneOrcSink(model, properties);
                     break;
                 case SOLR:
                     sinkToInitAndStart = new SolRSink(model, properties);

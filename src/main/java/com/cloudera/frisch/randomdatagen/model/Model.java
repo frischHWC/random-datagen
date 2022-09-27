@@ -291,6 +291,9 @@ public class Model<T extends Field> {
             case KUDU_FLUSH:
                 optionResult = "MANUAL_FLUSH";
                 break;
+            case OZONE_LOCAL_FILE_PATH:
+                optionResult = "/home/datagen/tempdir/";
+                break;
 
             default: break;
             }

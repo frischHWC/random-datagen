@@ -7,16 +7,20 @@ public class SinkParser {
 
     public static sinks stringToSink(String sink) {
         switch (sink.toUpperCase()) {
-            case "HDFS-CSV": return sinks.HDFSCSV;
-            case "HDFS-JSON": return sinks.HDFSJSON;
-            case "HDFS-PARQUET": return sinks.HDFSPARQUET;
-            case "HDFS-ORC": return sinks.HDFSORC;
-            case "HDFS-AVRO": return sinks.HDFSAVRO;
+            case "HDFS-CSV": return sinks.HDFS_CSV;
+            case "HDFS-JSON": return sinks.HDFS_JSON;
+            case "HDFS-PARQUET": return sinks.HDFS_PARQUET;
+            case "HDFS-ORC": return sinks.HDFS_ORC;
+            case "HDFS-AVRO": return sinks.HDFS_AVRO;
             case "HBASE": return sinks.HBASE;
             case "HIVE": return sinks.HIVE;
             case "KAFKA": return sinks.KAFKA;
             case "OZONE": return sinks.OZONE;
             case "OZONE-PARQUET": return sinks.OZONE_PARQUET;
+            case "OZONE-CSV": return sinks.OZONE_CSV;
+            case "OZONE-JSON": return sinks.OZONE_JSON;
+            case "OZONE-ORC": return sinks.OZONE_ORC;
+            case "OZONE-AVRO": return sinks.OZONE_AVRO;
             case "SOLR": return sinks.SOLR;
             case "KUDU": return sinks.KUDU;
             case "CSV": return sinks.CSV;
@@ -29,16 +33,20 @@ public class SinkParser {
     }
 
     public enum sinks {
-        HDFSCSV,
-        HDFSJSON,
-        HDFSPARQUET,
-        HDFSORC,
-        HDFSAVRO,
+        HDFS_CSV,
+        HDFS_JSON,
+        HDFS_PARQUET,
+        HDFS_ORC,
+        HDFS_AVRO,
         HBASE,
         HIVE,
         KAFKA,
         OZONE,
         OZONE_PARQUET,
+        OZONE_CSV,
+        OZONE_AVRO,
+        OZONE_JSON,
+        OZONE_ORC,
         SOLR,
         KUDU,
         CSV,

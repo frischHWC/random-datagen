@@ -3,7 +3,6 @@ package com.cloudera.frisch.randomdatagen;
 
 import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.config.SinkParser;
-import com.cloudera.frisch.randomdatagen.config.PropertiesLoader;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +12,6 @@ import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.security.UserGroupInformation;
-import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -347,60 +345,135 @@ public class Utils {
 
         sinks.forEach(sink -> {
             switch (sink) {
-            case HDFSCSV:
-                log.info("   - HDFS as CSV files of " + rowPerBatch + " rows, from : ");
-                log.info("       " +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-0000000000.csv");
-                log.info("       to : ");
-                log.info("       " +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" +
-                    String.format("%010d", numberOfBatches-1) + ".csv");
+            case HDFS_CSV:
+                log.info("   - HDFS as CSV files of " + rowPerBatch + " rows : ");
+                if((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
+                    log.info("       From: " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        "-0000000000.csv");
+                    log.info("       to : ");
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        "-" +
+                        String.format("%010d", numberOfBatches - 1) + ".csv");
+                } else {
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        ".csv");
+                }
                 break;
-            case HDFSJSON:
-                log.info("   - HDFS as JSON files of " + rowPerBatch + " rows, from : ");
-                log.info("       " +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-0000000000.json");
-                log.info("       to : ");
-                log.info("       " +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" +
-                    String.format("%010d", numberOfBatches-1) + ".json");
+            case HDFS_JSON:
+                log.info("   - HDFS as JSON files of " + rowPerBatch + " rows : ");
+                if((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
+                    log.info("       From: " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        "-0000000000.json");
+                    log.info("       to : ");
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        "-" +
+                        String.format("%010d", numberOfBatches - 1) + ".json");
+                } else {
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        ".json");
+                }
                 break;
-            case HDFSAVRO:
-                log.info("   - HDFS as Avro files of " + rowPerBatch + " rows, from : ");
-                log.info("       " +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-0000000000.avro");
-                log.info("       to : ");
-                log.info("       " +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" +
-                    String.format("%010d", numberOfBatches-1) + ".avro");
+            case HDFS_AVRO:
+                log.info("   - HDFS as Avro files of " + rowPerBatch + " rows : ");
+                if((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
+                    log.info("       From: " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        "-0000000000.avro");
+                    log.info("       to : ");
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        "-" +
+                        String.format("%010d", numberOfBatches - 1) + ".avro");
+                } else {
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        ".avro");
+                }
                 break;
-            case HDFSORC:
-                log.info("   - HDFS as ORC files of " + rowPerBatch + " rows, from : ");
-                log.info("       " +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-0000000000.orc");
-                log.info("       to : ");
-                log.info("       " +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" +
-                    String.format("%010d", numberOfBatches-1) + ".orc");
+            case HDFS_ORC:
+                log.info("   - HDFS as ORC files of " + rowPerBatch + " rows : ");
+                if((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
+                    log.info("       From: " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        "-0000000000.orc");
+                    log.info("       to : ");
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        "-" +
+                        String.format("%010d", numberOfBatches - 1) + ".orc");
+                } else {
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        ".orc");
+                }
                 break;
-            case HDFSPARQUET:
-                log.info("   - HDFS as Parquet files of " + rowPerBatch + " rows, from : ");
-                log.info("       " +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-0000000000.parquet");
-                log.info("        to : ");
-                log.info("       " +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
-                    model.getTableNames().get(OptionsConverter.TableNames.HDFS_FILE_NAME) + "-" +
-                    String.format("%010d", numberOfBatches-1) + ".parquet");
+            case HDFS_PARQUET:
+                log.info("   - HDFS as Parquet files of " + rowPerBatch + " rows : ");
+                if((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
+                    log.info("       From: " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        "-0000000000.parquet");
+                    log.info("       to : ");
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        "-" +
+                        String.format("%010d", numberOfBatches - 1) + ".parquet");
+                } else {
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
+                        ".parquet");
+                }
                 break;
             case HBASE:
                 log.info("   - HBase in namespace " + model.getTableNames().get(OptionsConverter.TableNames.HBASE_NAMESPACE) +
@@ -422,14 +495,114 @@ public class Utils {
                 log.info("   - Ozone in volume " + model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME));
                 break;
             case OZONE_PARQUET:
-                log.info("   - Ozone as Parquet files of " + rowPerBatch + " rows, in volume {} and bucket {} from : ",
+                log.info("   - Ozone as Parquet files of " + rowPerBatch + " rows, in volume {} and bucket {} : ",
                     model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME),
                     model.getTableNames().get(OptionsConverter.TableNames.OZONE_BUCKET));
-                log.info("       " + model.getTableNames().get(OptionsConverter.TableNames.OZONE_KEY_NAME) + "-0000000000.parquet");
-                log.info("        to : ");
-                log.info("       " +
-                    model.getTableNames().get(OptionsConverter.TableNames.OZONE_KEY_NAME) + "-" +
-                    String.format("%010d", numberOfBatches-1) + ".parquet");
+                if((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
+                    log.info("        From :" + model.getTableNames()
+                        .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        "-0000000000.parquet");
+                    log.info("        to : ");
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        "-" +
+                        String.format("%010d", numberOfBatches - 1) +
+                        ".parquet");
+                } else {
+                    log.info("       In One file: " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        ".parquet");
+                }
+                break;
+            case OZONE_ORC:
+                log.info("   - Ozone as ORC files of " + rowPerBatch + " rows, in volume {} and bucket {} : ",
+                    model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME),
+                    model.getTableNames().get(OptionsConverter.TableNames.OZONE_BUCKET));
+                if((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
+                    log.info("        From :" + model.getTableNames()
+                        .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        "-0000000000.orc");
+                    log.info("        to : ");
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        "-" +
+                        String.format("%010d", numberOfBatches - 1) +
+                        ".orc");
+                } else {
+                    log.info("       In One file: " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        ".orc");
+                }
+                break;
+            case OZONE_AVRO:
+                log.info("   - Ozone as Avro files of " + rowPerBatch + " rows, in volume {} and bucket {} : ",
+                    model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME),
+                    model.getTableNames().get(OptionsConverter.TableNames.OZONE_BUCKET));
+                if((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
+                    log.info("        From :" + model.getTableNames()
+                        .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        "-0000000000.avro");
+                    log.info("        to : ");
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        "-" +
+                        String.format("%010d", numberOfBatches - 1) +
+                        ".avro");
+                } else {
+                    log.info("       In One file: " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        ".avro");
+                }
+                break;
+            case OZONE_CSV:
+                log.info("   - Ozone as CSV files of " + rowPerBatch + " rows, in volume {} and bucket {} : ",
+                    model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME),
+                    model.getTableNames().get(OptionsConverter.TableNames.OZONE_BUCKET));
+                if((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
+                    log.info("        From :" + model.getTableNames()
+                        .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        "-0000000000.csv");
+                    log.info("        to : ");
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        "-" +
+                        String.format("%010d", numberOfBatches - 1) +
+                        ".csv");
+                } else {
+                    log.info("       In One file: " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        ".csv");
+                }
+                break;
+            case OZONE_JSON:
+                log.info("   - Ozone as Json files of " + rowPerBatch + " rows, in volume {} and bucket {} : ",
+                    model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME),
+                    model.getTableNames().get(OptionsConverter.TableNames.OZONE_BUCKET));
+                if((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION)) {
+                    log.info("        From :" + model.getTableNames()
+                        .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        "-0000000000.json");
+                    log.info("        to : ");
+                    log.info("       " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        "-" +
+                        String.format("%010d", numberOfBatches - 1) +
+                        ".json");
+                } else {
+                    log.info("       In One file: " +
+                        model.getTableNames()
+                            .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
+                        ".json");
+                }
                 break;
             case SOLR:
                 log.info("   - SolR in collection " + model.getTableNames().get(OptionsConverter.TableNames.SOLR_COLLECTION));

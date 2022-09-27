@@ -32,23 +32,23 @@ public class MetricsService {
       allMetrics.put(Metrics.GENERATIONS_MADE, allMetrics.get(Metrics.GENERATIONS_MADE)+1);
 
       switch (sink) {
-      case HDFSCSV:
+      case HDFS_CSV:
         allMetrics.put(Metrics.HDFS_CSV_FILES_GENERATED, allMetrics.get(Metrics.HDFS_CSV_FILES_GENERATED) + numberOfBatches);
         allMetrics.put(Metrics.HDFS_CSV_ROWS_GENERATED, allMetrics.get(Metrics.HDFS_CSV_FILES_GENERATED) + (numberOfBatches*rowPerBatch));
         break;
-      case HDFSAVRO:
+      case HDFS_AVRO:
         allMetrics.put(Metrics.HDFS_AVRO_FILES_GENERATED, allMetrics.get(Metrics.HDFS_AVRO_FILES_GENERATED) + numberOfBatches);
         allMetrics.put(Metrics.HDFS_AVRO_ROWS_GENERATED, allMetrics.get(Metrics.HDFS_AVRO_ROWS_GENERATED) + (numberOfBatches*rowPerBatch));
         break;
-      case HDFSJSON:
+      case HDFS_JSON:
         allMetrics.put(Metrics.HDFS_JSON_FILES_GENERATED, allMetrics.get(Metrics.HDFS_JSON_FILES_GENERATED) + numberOfBatches);
         allMetrics.put(Metrics.HDFS_JSON_ROWS_GENERATED, allMetrics.get(Metrics.HDFS_JSON_ROWS_GENERATED) + (numberOfBatches*rowPerBatch));
         break;
-      case HDFSORC:
+      case HDFS_ORC:
         allMetrics.put(Metrics.HDFS_ORC_FILES_GENERATED, allMetrics.get(Metrics.HDFS_ORC_FILES_GENERATED) + numberOfBatches);
         allMetrics.put(Metrics.HDFS_ORC_ROWS_GENERATED, allMetrics.get(Metrics.HDFS_ORC_ROWS_GENERATED) + (numberOfBatches*rowPerBatch));
         break;
-      case HDFSPARQUET:
+      case HDFS_PARQUET:
         allMetrics.put(Metrics.HDFS_PARQUET_FILES_GENERATED, allMetrics.get(Metrics.HDFS_PARQUET_FILES_GENERATED) + numberOfBatches);
         allMetrics.put(Metrics.HDFS_PARQUET_ROWS_GENERATED, allMetrics.get(Metrics.HDFS_PARQUET_ROWS_GENERATED) + (numberOfBatches*rowPerBatch));
         break;
@@ -73,6 +73,22 @@ public class MetricsService {
         allMetrics.put(Metrics.SOLR_ROWS_GENERATED, allMetrics.get(Metrics.SOLR_ROWS_GENERATED) + (numberOfBatches*rowPerBatch));
         break;
 
+      case OZONE_CSV:
+        allMetrics.put(Metrics.OZONE_CSV_FILES_GENERATED, allMetrics.get(Metrics.OZONE_CSV_FILES_GENERATED) + numberOfBatches);
+        allMetrics.put(Metrics.OZONE_CSV_ROWS_GENERATED, allMetrics.get(Metrics.OZONE_CSV_ROWS_GENERATED) + (numberOfBatches*rowPerBatch));
+        break;
+      case OZONE_AVRO:
+        allMetrics.put(Metrics.OZONE_AVRO_FILES_GENERATED, allMetrics.get(Metrics.OZONE_AVRO_FILES_GENERATED) + numberOfBatches);
+        allMetrics.put(Metrics.OZONE_AVRO_ROWS_GENERATED, allMetrics.get(Metrics.OZONE_AVRO_ROWS_GENERATED) + (numberOfBatches*rowPerBatch));
+        break;
+      case OZONE_JSON:
+        allMetrics.put(Metrics.OZONE_JSON_FILES_GENERATED, allMetrics.get(Metrics.OZONE_JSON_FILES_GENERATED) + numberOfBatches);
+        allMetrics.put(Metrics.OZONE_JSON_ROWS_GENERATED, allMetrics.get(Metrics.OZONE_JSON_ROWS_GENERATED) + (numberOfBatches*rowPerBatch));
+        break;
+      case OZONE_ORC:
+        allMetrics.put(Metrics.OZONE_ORC_FILES_GENERATED, allMetrics.get(Metrics.OZONE_ORC_FILES_GENERATED) + numberOfBatches);
+        allMetrics.put(Metrics.OZONE_ORC_ROWS_GENERATED, allMetrics.get(Metrics.OZONE_ORC_ROWS_GENERATED) + (numberOfBatches*rowPerBatch));
+        break;
       case OZONE_PARQUET:
         allMetrics.put(Metrics.OZONE_PARQUET_FILES_GENERATED, allMetrics.get(Metrics.OZONE_PARQUET_FILES_GENERATED) + numberOfBatches);
         allMetrics.put(Metrics.OZONE_PARQUET_ROWS_GENERATED, allMetrics.get(Metrics.OZONE_PARQUET_ROWS_GENERATED) + (numberOfBatches*rowPerBatch));
