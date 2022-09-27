@@ -46,6 +46,8 @@ public class OptionsConverter {
         HBASE_NAMESPACE,
         KAFKA_TOPIC,
         OZONE_VOLUME,
+        OZONE_BUCKET,
+        OZONE_KEY_NAME,
         SOLR_COLLECTION,
         HIVE_DATABASE,
         HIVE_TABLE_NAME,
@@ -72,6 +74,10 @@ public class OptionsConverter {
                 return TableNames.KAFKA_TOPIC;
             case "OZONE_VOLUME":
                 return TableNames.OZONE_VOLUME;
+            case "OZONE_BUCKET":
+                return TableNames.OZONE_BUCKET;
+            case "OZONE_KEY_NAME":
+                return TableNames.OZONE_KEY_NAME;
             case "SOLR_COLLECTION":
                 return TableNames.SOLR_COLLECTION;
             case "HIVE_DATABASE":

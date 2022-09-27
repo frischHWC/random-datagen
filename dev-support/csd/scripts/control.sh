@@ -11,23 +11,23 @@ case $CMD in
  (gen_customer_hdfs_hive)
     SERVER_PORT=$2
      echo "Starting to Generate Customer data to HDFS in Parquet & Hive"
-     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-china-model.json&rows=10000&batches=12"
+     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&sinks=ozone-parquet&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-china-model.json&rows=10000&batches=12"
      sleep 30
-     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-france-model.json&rows=10000&batches=9"
+     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&sinks=ozone-parquet&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-france-model.json&rows=10000&batches=9"
      sleep 30
-     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-germany-model.json&rows=10000&batches=9"
+     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&sinks=ozone-parquet&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-germany-model.json&rows=10000&batches=9"
      sleep 30
-     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-india-model.json&rows=10000&batches=19"
+     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&sinks=ozone-parquet&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-india-model.json&rows=10000&batches=19"
      sleep 30
-     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-italy-model.json&rows=10000&batches=3"
+     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&sinks=ozone-parquet&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-italy-model.json&rows=10000&batches=3"
      sleep 30
-     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-japan-model.json&rows=10000&batches=11"
+     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&sinks=ozone-parquet&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-japan-model.json&rows=10000&batches=11"
      sleep 30
-     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-spain-model.json&rows=10000&batches=4"
+     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&sinks=ozone-parquet&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-spain-model.json&rows=10000&batches=4"
      sleep 30
-     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-turkey-model.json&rows=10000&batches=12"
+     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&sinks=ozone-parquet&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-turkey-model.json&rows=10000&batches=12"
      sleep 30
-     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-usa-model.json&rows=10000&batches=21"
+     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&sinks=ozone-parquet&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-usa-model.json&rows=10000&batches=21"
      echo "Finished to Generate Customer data to HDFS in Parquet & Hive"
      exit 0
      ;;

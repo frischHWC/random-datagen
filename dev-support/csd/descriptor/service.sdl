@@ -58,24 +58,24 @@
     },
     {
       "name": "gen_customer",
-      "label": "Generates Customer Data in HDFS (Parquet) & Hive",
-      "description": "Generates Customer Data",
-      "roleCommand": "gen_customer_hdfs_hive",
+      "label": "Generates 1M Customers to HDFS, Ozone and Hive",
+      "description": "Generates 1M Customers to HDFS and Hive",
+      "roleCommand": "gen_customer_hdfs_ozone_hive",
       "roleName": "DATAGEN_SERVER",
       "runMode": "single"
     },
     {
       "name": "gen_transaction",
-      "label": "Generates Transaction Data in HBase",
-      "description": "Generates Transaction Data",
+      "label": "Generates 1M Transactions to HBase",
+      "description": "Generates 1M Transactions to HBase",
       "roleCommand": "gen_transaction_hbase",
       "roleName": "DATAGEN_SERVER",
       "runMode": "single"
     },
     {
       "name": "gen_sensor",
-      "label": "Generates Sensor Data to Hive",
-      "description": "Generates Sensor Data",
+      "label": "Generates 10M Sensors Data to Hive",
+      "description": "Generates 10M Sensors Data to Hive",
       "roleCommand": "gen_sensor_hive",
       "roleName": "DATAGEN_SERVER",
       "runMode": "single"
@@ -247,7 +247,7 @@
           }
         },
         {
-          "name": "gen_customer_hdfs_hive",
+          "name": "gen_customer_hdfs_ozone_hive",
           "label": "Generate Customer Data",
           "description": "Generates 1M Customers to HDFS and Hive",
           "expectedExitCodes": [
@@ -257,7 +257,7 @@
           "commandRunner": {
             "program": "scripts/control.sh",
             "args": [
-              "gen_customer_hdfs_hive",
+              "gen_customer_hdfs_ozone_hive",
               "${app_port}"
             ]
           }

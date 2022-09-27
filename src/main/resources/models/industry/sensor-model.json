@@ -25,7 +25,9 @@
     {"HBASE_TABLE_NAME": "sensor"},
     {"HBASE_NAMESPACE": "datagen-industry"},
     {"KAFKA_TOPIC": "industry_sensor"},
-    {"OZONE_VOLUME": "datagen-industry-sensor"},
+    {"OZONE_VOLUME": "datagen-industry"},
+    {"OZONE_BUCKET":  "sensor"},
+    {"OZONE_KEY_NAME":  "sensor"},
     {"SOLR_COLLECTION": "datagen-industry-sensor"},
     {"HIVE_DATABASE": "datagen_industry"},
     {"HIVE_TABLE_NAME":  "sensor"},
@@ -37,8 +39,6 @@
   "Primary_Keys": [
     {"KAFKA_MSG_KEY": "sensor_id"},
     {"HBASE_PRIMARY_KEY":  "sensor_id"},
-    {"OZONE_BUCKET":  "sensor_type"},
-    {"OZONE_KEY":  "sensor_id"},
     {"KUDU_PRIMARY_KEYS":  "sensor_id"},
     {"KUDU_HASH_KEYS":  "sensor_id"}
   ],
