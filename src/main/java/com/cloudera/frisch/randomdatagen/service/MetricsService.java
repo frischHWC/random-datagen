@@ -73,6 +73,11 @@ public class MetricsService {
         allMetrics.put(Metrics.SOLR_ROWS_GENERATED, allMetrics.get(Metrics.SOLR_ROWS_GENERATED) + (numberOfBatches*rowPerBatch));
         break;
 
+      case OZONE_PARQUET:
+        allMetrics.put(Metrics.OZONE_PARQUET_FILES_GENERATED, allMetrics.get(Metrics.OZONE_PARQUET_FILES_GENERATED) + numberOfBatches);
+        allMetrics.put(Metrics.OZONE_PARQUET_ROWS_GENERATED, allMetrics.get(Metrics.OZONE_PARQUET_ROWS_GENERATED) + (numberOfBatches*rowPerBatch));
+        break;
+
       case CSV:
         allMetrics.put(Metrics.CSV_FILES_GENERATED, allMetrics.get(Metrics.CSV_FILES_GENERATED) + numberOfBatches);
         allMetrics.put(Metrics.CSV_ROWS_GENERATED, allMetrics.get(Metrics.CSV_FILES_GENERATED) + (numberOfBatches*rowPerBatch));

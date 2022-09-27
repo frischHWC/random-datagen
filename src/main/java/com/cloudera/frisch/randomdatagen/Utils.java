@@ -421,6 +421,16 @@ public class Utils {
             case OZONE:
                 log.info("   - Ozone in volume " + model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME));
                 break;
+            case OZONE_PARQUET:
+                log.info("   - Ozone as Parquet files of " + rowPerBatch + " rows, in volume {} and bucket {} from : ",
+                    model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME),
+                    model.getTableNames().get(OptionsConverter.TableNames.OZONE_BUCKET));
+                log.info("       " + model.getTableNames().get(OptionsConverter.TableNames.OZONE_KEY_NAME) + "-0000000000.parquet");
+                log.info("        to : ");
+                log.info("       " +
+                    model.getTableNames().get(OptionsConverter.TableNames.OZONE_KEY_NAME) + "-" +
+                    String.format("%010d", numberOfBatches-1) + ".parquet");
+                break;
             case SOLR:
                 log.info("   - SolR in collection " + model.getTableNames().get(OptionsConverter.TableNames.SOLR_COLLECTION));
                 break;

@@ -54,6 +54,9 @@ public class SinkSender {
                 case OZONE:
                     sinkToInitAndStart = new OzoneSink(model, properties);
                     break;
+                case OZONE_PARQUET:
+                    sinkToInitAndStart = new OzoneParquetSink(model, properties);
+                    break;
                 case SOLR:
                     sinkToInitAndStart = new SolRSink(model, properties);
                     break;

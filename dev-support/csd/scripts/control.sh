@@ -8,7 +8,7 @@ case $CMD in
     mv "${CONF_DIR}/service.properties.tmp" "${CONF_DIR}/service.properties"
     exec ${JAVA_HOME}/bin/java -jar -Dspring.profiles.active=cdp -Dserver.port=${SERVER_PORT} -Xmx${MAX_HEAP_SIZE}G ${DATAGEN_JAR_PATH} --spring.config.location=file:${CONF_DIR}/service.properties
     ;;
- (gen_customer_hdfs_hive)
+ (gen_customer_hdfs_ozone_hive)
     SERVER_PORT=$2
      echo "Starting to Generate Customer data to HDFS in Parquet & Hive"
      curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/multiplesinks?sinks=hdfs-parquet&sinks=hive&sinks=ozone-parquet&model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Fcustomer%2Fcustomer-china-model.json&rows=10000&batches=12"

@@ -16,6 +16,7 @@ public class SinkParser {
             case "HIVE": return sinks.HIVE;
             case "KAFKA": return sinks.KAFKA;
             case "OZONE": return sinks.OZONE;
+            case "OZONE-PARQUET": return sinks.OZONE_PARQUET;
             case "SOLR": return sinks.SOLR;
             case "KUDU": return sinks.KUDU;
             case "CSV": return sinks.CSV;
@@ -37,6 +38,7 @@ public class SinkParser {
         HIVE,
         KAFKA,
         OZONE,
+        OZONE_PARQUET,
         SOLR,
         KUDU,
         CSV,
