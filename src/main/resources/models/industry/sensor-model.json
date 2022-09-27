@@ -28,6 +28,7 @@
     {"OZONE_VOLUME": "datagenindustry"},
     {"OZONE_BUCKET":  "sensor"},
     {"OZONE_KEY_NAME":  "sensor"},
+    {"OZONE_LOCAL_FILE_PATH":  "/home/datagen/temp/customer/"},
     {"SOLR_COLLECTION": "datagen-industry-sensor"},
     {"HIVE_DATABASE": "datagen_industry"},
     {"HIVE_TABLE_NAME":  "sensor"},

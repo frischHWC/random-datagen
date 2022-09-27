@@ -62,6 +62,7 @@
     {"OZONE_VOLUME": "datagen"},
     {"OZONE_BUCKET":  "customer"},
     {"OZONE_KEY_NAME":  "customer-in"},
+    {"OZONE_LOCAL_FILE_PATH":  "/home/datagen/temp/customer/"},
     {"SOLR_COLLECTION": "datagen_customer"},
     {"HIVE_DATABASE": "datagen"},
     {"HIVE_TABLE_NAME":  "customer"},

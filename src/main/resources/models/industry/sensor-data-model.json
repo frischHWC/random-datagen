@@ -25,6 +25,7 @@
     {"OZONE_VOLUME": "datagenindustry"},
     {"OZONE_BUCKET":  "sensordata"},
     {"OZONE_KEY_NAME":  "sensor-data"},
+    {"OZONE_LOCAL_FILE_PATH":  "/home/datagen/temp/customer/"},
     {"SOLR_COLLECTION": "datagen-industry-sensor-data"},
     {"HIVE_DATABASE": "datagen_industry"},
     {"HIVE_TABLE_NAME":  "sensor_data"},
@@ -36,8 +37,6 @@
   "Primary_Keys": [
     {"KAFKA_MSG_KEY": "sensor_id"},
     {"HBASE_PRIMARY_KEY":  "sensor_id,timestamp"},
-    {"OZONE_BUCKET":  "sensor_id"},
-    {"OZONE_KEY":  "timestamp"},
     {"KUDU_PRIMARY_KEYS":  "sensor_id,timestamp"},
     {"KUDU_HASH_KEYS":  "sensor_id"},
     {"KUDU_RANGE_KEYS":  "timestamp"}

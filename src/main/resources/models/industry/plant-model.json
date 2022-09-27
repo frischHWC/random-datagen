@@ -42,8 +42,9 @@
     {"OZONE_VOLUME": "datagenindustry"},
     {"OZONE_BUCKET":  "plant"},
     {"OZONE_KEY_NAME":  "plant"},
+    {"OZONE_LOCAL_FILE_PATH":  "/home/datagen/temp/customer/"},
     {"SOLR_COLLECTION": "datagen-industry-plant"},
-    {"HIVE_DATABASE": "datagen-industry"},
+    {"HIVE_DATABASE": "datagen_industry"},
     {"HIVE_TABLE_NAME":  "plant"},
     {"KUDU_TABLE_NAME":  "datagen.industry_plant"},
     {"LOCAL_FILE_PATH":  "/home/datagen/industry/plant/"},
@@ -53,8 +54,6 @@
   "Primary_Keys": [
     {"KAFKA_MSG_KEY": "country"},
     {"HBASE_PRIMARY_KEY":  "plant_id"},
-    {"OZONE_BUCKET":  "country"},
-    {"OZONE_KEY":  "plant_id"},
     {"KUDU_PRIMARY_KEYS":  "plant_id,country"},
     {"KUDU_HASH_KEYS":  "plant_id"},
     {"KUDU_RANGE_KEYS":  "country"}

@@ -38,6 +38,7 @@
     {"OZONE_VOLUME": "datagenfinance"},
     {"OZONE_BUCKET":  "transaction"},
     {"OZONE_KEY_NAME":  "transaction"},
+    {"OZONE_LOCAL_FILE_PATH":  "/home/datagen/temp/customer/"},
     {"SOLR_COLLECTION": "datagen-finance-transaction"},
     {"HIVE_DATABASE": "datagen_finance"},
     {"HIVE_TABLE_NAME":  "transaction"},

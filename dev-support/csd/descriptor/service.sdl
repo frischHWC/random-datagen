@@ -81,6 +81,22 @@
       "runMode": "single"
     },
     {
+      "name": "gen_sensor_kafka_kudu",
+      "label": "Generates 10M Sensors Data to Kafka and Kudu",
+      "description": "Generates 10M Sensors Data to Kafka and Kudu",
+      "roleCommand": "gen_sensor_kafka_kudu",
+      "roleName": "DATAGEN_SERVER",
+      "runMode": "single"
+    },
+    {
+      "name": "gen_solr",
+      "label": "Generates 1M Data to SolR",
+      "description": "Generates 1M Data to SolR",
+      "roleCommand": "gen_solr",
+      "roleName": "DATAGEN_SERVER",
+      "runMode": "single"
+    },
+    {
       "name": "gen_local",
       "label": "Generates Local Data as CSV & JSON",
       "description": "Generates Local Data",
@@ -290,6 +306,38 @@
             "program": "scripts/control.sh",
             "args": [
               "gen_sensor_hive",
+              "${app_port}"
+            ]
+          }
+        },
+        {
+          "name": "gen_sensor_kafka_kudu",
+          "label": "Generate Sensor Data to Kafka & Kudu",
+          "description": "Generates 10M Sensors Data to Kafka and Kudu",
+          "expectedExitCodes": [
+            0
+          ],
+          "requiredRoleState": "running",
+          "commandRunner": {
+            "program": "scripts/control.sh",
+            "args": [
+              "gen_sensor_kafka_kudu",
+              "${app_port}"
+            ]
+          }
+        },
+        {
+          "name": "gen_solr",
+          "label": "Generate 1M Data to SOLR",
+          "description": "Generate 1M Data to SOLR",
+          "expectedExitCodes": [
+            0
+          ],
+          "requiredRoleState": "running",
+          "commandRunner": {
+            "program": "scripts/control.sh",
+            "args": [
+              "gen_solr",
               "${app_port}"
             ]
           }

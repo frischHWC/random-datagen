@@ -47,6 +47,21 @@ case $CMD in
     curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/hive?model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Findustry%2Fsensor-data-model.json&rows=100000&batches=100"
     echo "Finished to Generate sensor Data into Hive"
     ;;
+  (gen_sensor_kafka_kudu)
+    SERVER_PORT=$2
+    echo "Starting to Generate sensor Data into Kafka & Kudu"
+    curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/kafka?model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Findustry%2Fsensor-data-model.json&rows=100000&batches=100"
+    echo "Finished to Generate sensor Data into Kafka"
+    sleep 30
+    echo "Starting to Generate sensor Data into Kudu"
+    curl -X POST -H  "accept: */*" "http://localhost:${SERVER_PORT}/datagen/kudu?model=%2Fopt%2Fcloudera%2Fparcels%2FDATAGEN%2Fmodels%2Findustry%2Fsensor-data-model.json&rows=100000&batches=100"
+    echo "Finished to Generate sensor Data into Kudu"
+    ;;
+  (gen_solr)
+    SERVER_PORT=$2
+    echo "Starting to Generate sensor Data into SolR"
+    echo "Finished to Generate sensor Data into SolR"
+    ;;
   (gen_local_data)
     SERVER_PORT=$2
     echo "Starting to Generate Local data for test purposes"
