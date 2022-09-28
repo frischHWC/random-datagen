@@ -44,6 +44,8 @@ public class CommandRunnerService {
     this.commands = new HashMap<>();
 
     readScheduledCommands();
+    // After reading scheduled values, file should be re-written
+    writeScheduledCommands();
   }
 
 
@@ -78,6 +80,7 @@ public class CommandRunnerService {
       synchronized (scheduledCommands) {
         scheduledCommands.remove(uuid);
       }
+      writeScheduledCommands();
       log.info("Remove command from scheduler: {}", uuid);
   }
 
@@ -85,7 +88,7 @@ public class CommandRunnerService {
     try {
       log.info("Starting to write all scheduled commands to scheduler file");
 
-      String scheduledCommandsFilepathTemp = scheduledCommandsFilePath+"tmp";
+      String scheduledCommandsFilepathTemp = scheduledCommandsFilePath+"_tmp";
 
       Utils.deleteLocalFile(scheduledCommandsFilepathTemp);
       File scheduledCommandTempFile = new File(scheduledCommandsFilepathTemp);
@@ -138,6 +141,15 @@ public class CommandRunnerService {
             wrongScheduledCommandsRead.add(c.getCommandUuid());
           }
           c.setModel(parser.renderModelFromFile());
+
+          // Previous Failed commands should not be taken
+          if(c.getStatus()== Command.CommandStatus.FAILED){
+            wrongScheduledCommandsRead.add(c.getCommandUuid());
+          }
+          // If commands were stopped in the middle, their status should be rest
+          if(c.getStatus() == Command.CommandStatus.QUEUED || c.getStatus() == Command.CommandStatus.STARTED) {
+            c.setStatus(Command.CommandStatus.FINISHED);
+          }
         });
 
         wrongScheduledCommandsRead.forEach(scheduledCommandsRead::remove);
@@ -148,6 +160,7 @@ public class CommandRunnerService {
 
         oi.close();
         fi.close();
+
       }
 
       log.info("Finished to read all scheduled commands to scheduler file");

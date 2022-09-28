@@ -41,7 +41,6 @@ public class Command implements Serializable {
 
 
   private void writeObject(ObjectOutputStream oos) throws IOException {
-    oos.defaultWriteObject();
     oos.writeObject(commandUuid);
     oos.writeObject(status);
     oos.writeObject(commandComment);
@@ -59,7 +58,6 @@ public class Command implements Serializable {
   }
 
   private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
-    ois.defaultReadObject();
     this.commandUuid = (UUID) ois.readObject();
     this.status = (CommandStatus) ois.readObject();
     this.commandComment = (String) ois.readObject();
