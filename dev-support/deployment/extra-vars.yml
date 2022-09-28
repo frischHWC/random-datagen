@@ -28,6 +28,7 @@ edge_host: ${EDGE_HOST}
 
 # Not required as they have default settings but can be overrided
 debug: ${DEBUG}
+launch_generation: ${LAUNCH_GENERATION}
 
 # Directory where Datagen will be cloned and compiled
 target_dir: ${TARGET_DIR}

@@ -42,7 +42,7 @@
     {"OZONE_VOLUME": "datagenindustry"},
     {"OZONE_BUCKET":  "plant"},
     {"OZONE_KEY_NAME":  "plant"},
-    {"OZONE_LOCAL_FILE_PATH":  "/home/datagen/temp/customer/"},
+    {"OZONE_LOCAL_FILE_PATH":  "/home/datagen/temp/plant/"},
     {"SOLR_COLLECTION": "datagen-industry-plant"},
     {"HIVE_DATABASE": "datagen_industry"},
     {"HIVE_TABLE_NAME":  "plant"},

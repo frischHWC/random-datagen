@@ -81,18 +81,18 @@
       "runMode": "single"
     },
     {
-      "name": "gen_sensor_kafka_kudu",
-      "label": "Generates 10M Sensors Data to Kafka and Kudu",
-      "description": "Generates 10M Sensors Data to Kafka and Kudu",
-      "roleCommand": "gen_sensor_kafka_kudu",
+      "name": "gen_ps_kafka_kudu",
+      "label": "Generates 1M Public Service Data to Kafka and Kudu",
+      "description": "Generates 1M Public Service Data to Kafka and Kudu",
+      "roleCommand": "gen_ps_kafka_kudu",
       "roleName": "DATAGEN_SERVER",
       "runMode": "single"
     },
     {
-      "name": "gen_solr",
-      "label": "Generates 1M Data to SolR",
-      "description": "Generates 1M Data to SolR",
-      "roleCommand": "gen_solr",
+      "name": "gen_weather_solr_kafka",
+      "label": "Generates 1M Weather Data to SolR & Kafka ",
+      "description": "Generates 1M Weather Data to SolR & Kafka",
+      "roleCommand": "gen_weather_solr_kafka",
       "roleName": "DATAGEN_SERVER",
       "runMode": "single"
     },
@@ -271,7 +271,7 @@
           ],
           "requiredRoleState": "running",
           "commandRunner": {
-            "program": "scripts/control.sh",
+            "program": "scripts/generate_data.sh",
             "args": [
               "gen_customer_hdfs_ozone_hive",
               "${app_port}"
@@ -287,7 +287,7 @@
           ],
           "requiredRoleState": "running",
           "commandRunner": {
-            "program": "scripts/control.sh",
+            "program": "scripts/generate_data.sh",
             "args": [
               "gen_transaction_hbase",
               "${app_port}"
@@ -303,7 +303,7 @@
           ],
           "requiredRoleState": "running",
           "commandRunner": {
-            "program": "scripts/control.sh",
+            "program": "scripts/generate_data.sh",
             "args": [
               "gen_sensor_hive",
               "${app_port}"
@@ -311,33 +311,33 @@
           }
         },
         {
-          "name": "gen_sensor_kafka_kudu",
-          "label": "Generate Sensor Data to Kafka & Kudu",
-          "description": "Generates 10M Sensors Data to Kafka and Kudu",
+          "name": "gen_ps_kafka_kudu",
+          "label": "Generate Public Service Data to Kafka & Kudu",
+          "description": "Generates 1M Public Service Data to Kafka and Kudu",
           "expectedExitCodes": [
             0
           ],
           "requiredRoleState": "running",
           "commandRunner": {
-            "program": "scripts/control.sh",
+            "program": "scripts/generate_data.sh",
             "args": [
-              "gen_sensor_kafka_kudu",
+              "gen_ps_kafka_kudu",
               "${app_port}"
             ]
           }
         },
         {
-          "name": "gen_solr",
-          "label": "Generate 1M Data to SOLR",
-          "description": "Generate 1M Data to SOLR",
+          "name": "gen_weather_solr_kafka",
+          "label": "Generate 1M Weather Data to SOLR",
+          "description": "Generate 1M Weather Data to SOLR",
           "expectedExitCodes": [
             0
           ],
           "requiredRoleState": "running",
           "commandRunner": {
-            "program": "scripts/control.sh",
+            "program": "scripts/generate_data.sh",
             "args": [
-              "gen_solr",
+              "gen_weather_solr_kafka",
               "${app_port}"
             ]
           }
@@ -351,7 +351,7 @@
           ],
           "requiredRoleState": "running",
           "commandRunner": {
-            "program": "scripts/control.sh",
+            "program": "scripts/generate_data.sh",
             "args": [
               "gen_local_data",
               "${app_port}"
@@ -413,7 +413,11 @@
             "finance/transaction-model.json",
             "industry/sensor-model.json",
             "industry/sensor-data-model.json",
-            "industry/plant-model.json"
+            "industry/plant-model.json",
+            "public_service/incident-model.json",
+            "public_service/intervention-team-model.json",
+            "public_service/weather-model.json",
+            "public_service/weather-sensor-model.json"
           ]
         },
         {

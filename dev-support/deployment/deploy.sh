@@ -35,6 +35,7 @@ export CLUSTER_NAME_STREAMING=""
 # DEBUG
 export DEBUG=true
 export LOG_DIR="/tmp/datagen-deploy-logs/"$(date +%m-%d-%Y-%H-%M-%S)
+export LAUNCH_GENERATION=true
 
 # Target Directory
 export TARGET_DIR="/tmp/datagen"
@@ -75,6 +76,7 @@ function usage()
     echo ""
     echo "  --debug=$DEBUG : To set DEBUG log-level (Default) $DEBUG "
     echo "  --log-dir=$LOG_DIR : Log directory (Default) $LOG_DIR "
+    echo "  --launch-generation=$LAUNCH_GENERATION : To launch API calls to generate data after installation (Default) $LAUNCH_GENERATION "
     echo ""
     echo "  --target-dir=$TARGET_DIR : Target directory on edge machine (Default) $TARGET_DIR "
     echo ""
@@ -140,6 +142,9 @@ while [ "$1" != "" ]; do
             ;;
         --log-dir)
             LOG_DIR=$VALUE
+            ;;
+        --launch-generation)
+            LAUNCH_GENERATION=$VALUE
             ;;
         --target-dir)
             TARGET_DIR=$VALUE

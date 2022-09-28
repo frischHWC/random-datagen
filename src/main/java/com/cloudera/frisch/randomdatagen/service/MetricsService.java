@@ -26,7 +26,7 @@ public class MetricsService {
     Arrays.stream(Metrics.values()).forEach(m -> allMetrics.put(m, 0L));
   }
 
-  public synchronized void updateMetrics(long numberOfBatches, long rowPerBatch, List<SinkParser.sinks> sinks) {
+  public synchronized void updateMetrics(long numberOfBatches, long rowPerBatch, List<SinkParser.Sink> sinks) {
     sinks.forEach(sink -> {
       allMetrics.put(Metrics.ALL_ROWS_GENERATED, allMetrics.get(Metrics.ALL_ROWS_GENERATED) + (numberOfBatches*rowPerBatch));
       allMetrics.put(Metrics.GENERATIONS_MADE, allMetrics.get(Metrics.GENERATIONS_MADE)+1);

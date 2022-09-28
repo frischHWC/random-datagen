@@ -22,7 +22,7 @@ public class SinkSender {
      * @return list of sinks initialized
      */
     @SuppressWarnings("unchecked")
-    public static List<SinkInterface> sinksInit(Model model, Map<ApplicationConfigs, String> properties, List<SinkParser.sinks> sinks) {
+    public static List<SinkInterface> sinksInit(Model model, Map<ApplicationConfigs, String> properties, List<SinkParser.Sink> sinks) {
         List<SinkInterface> sinkList = new ArrayList<>();
 
         sinks.forEach(sink -> {

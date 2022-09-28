@@ -121,6 +121,8 @@ public class Condition {
       break;
     }
 
+    log.debug("Evaluated condition between {} and {} using operator {} and result is {}", firstValue, secondValue, operator, result);
+
     return result;
   }
 

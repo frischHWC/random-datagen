@@ -162,9 +162,10 @@ public class ConditionsLine {
     } else {
       // To evaluate a condition assuming AND has precedence over OR, we should:
       // 1. Isolate groups of AND
-      // 2. Evaluate each AND group and return true if one is true, false else
-      List<Boolean> conditionsGroupEvaluationResult = new ArrayList<>();
+      // 2. Evaluate each AND group and return true if all are true, false else
+      Boolean isConditionSatisfied = false;
       boolean previousResult = listOfConditions.get(0).evaluateCondition(row);
+
       for(int i = 1; i<listOfConditions.size(); i++) {
 
         if(listOfConditionsOperators.get(i-1)==ConditionOperators.AND) {
@@ -172,16 +173,23 @@ public class ConditionsLine {
           if(previousResult){
             log.debug("Previous condition was true, need to evaluate this one");
             previousResult = listOfConditions.get(i).evaluateCondition(row);
+            isConditionSatisfied = previousResult;
           } else {
             log.debug("Previous condition was false, no need to evaluate this one");
+            break;
           }
         } else {
-          log.debug("The operator between previous condition and this one is OR, so keep previous result and start to evaluate new condition");
-          conditionsGroupEvaluationResult.add(previousResult);
-          previousResult = listOfConditions.get(i).evaluateCondition(row);
+          log.debug("The operator between previous condition and this one is OR, if previous result is true, escapes otherwise continue to evaluate conditions");
+          if(previousResult) {
+            isConditionSatisfied = true;
+            break;
+          } else {
+            previousResult = listOfConditions.get(i).evaluateCondition(row);
+          }
         }
       }
-      return conditionsGroupEvaluationResult.contains(true);
+
+      return isConditionSatisfied;
     }
 
   }

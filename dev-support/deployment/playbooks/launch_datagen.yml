@@ -14,4 +14,4 @@
     - auto_configure/kudu-config
     - auto_configure/schema-registry-config
     - launch_datagen/add_service
-    - launch_datagen/launch_command
+    - { role: launch_datagen/launch_command , when: launch_generation }

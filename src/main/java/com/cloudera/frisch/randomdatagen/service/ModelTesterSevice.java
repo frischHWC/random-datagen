@@ -51,7 +51,11 @@ public class ModelTesterSevice {
 
     // Parsing model
     log.info("Parsing of model file: {}", modelFile);
-    Parser parser = new JsonParser(modelFile);
+    JsonParser parser = new JsonParser(modelFile);
+    if(parser.getRoot()==null) {
+      log.warn("Error when parsing model file");
+      return "{ \"commandUuid\": \"\" , \"error\": \"Error with Model File - Verify its path and structure\" }";
+    }
     Model model = parser.renderModelFromFile();
 
     List<Row> randomDataList = model.generateRandomRows(1, 1);

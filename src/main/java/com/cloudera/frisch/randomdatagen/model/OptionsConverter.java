@@ -48,6 +48,7 @@ public class OptionsConverter {
         OZONE_VOLUME,
         OZONE_BUCKET,
         OZONE_KEY_NAME,
+        OZONE_LOCAL_FILE_PATH,
         SOLR_COLLECTION,
         HIVE_DATABASE,
         HIVE_TABLE_NAME,
@@ -78,6 +79,8 @@ public class OptionsConverter {
                 return TableNames.OZONE_BUCKET;
             case "OZONE_KEY_NAME":
                 return TableNames.OZONE_KEY_NAME;
+            case "OZONE_LOCAL_FILE_PATH":
+                return TableNames.OZONE_LOCAL_FILE_PATH;
             case "SOLR_COLLECTION":
                 return TableNames.SOLR_COLLECTION;
             case "HIVE_DATABASE":
@@ -122,7 +125,6 @@ public class OptionsConverter {
         KUDU_BUFFER,
         KUDU_FLUSH,
         OZONE_REPLICATION_FACTOR,
-        OZONE_LOCAL_FILE_PATH,
         HDFS_REPLICATION_FACTOR
     }
 
@@ -170,8 +172,6 @@ public class OptionsConverter {
                 return Options.KUDU_FLUSH;
             case "OZONE_REPLICATION_FACTOR":
                 return Options.OZONE_REPLICATION_FACTOR;
-            case "OZONE_LOCAL_FILE_PATH":
-                return Options.OZONE_LOCAL_FILE_PATH;
             case "HDFS_REPLICATION_FACTOR":
                 return Options.HDFS_REPLICATION_FACTOR;
             default:

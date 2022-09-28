@@ -5,6 +5,7 @@ import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.type.Field;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import java.util.*;
 @Slf4j
 public class JsonParser<T extends Field> implements Parser {
 
+    @Getter
     private JsonNode root;
 
     public JsonParser(String jsonFilePath) {
@@ -30,7 +32,6 @@ public class JsonParser<T extends Field> implements Parser {
             log.error("Could not read JSON file: {}, please verify its structure, error is : ", jsonFilePath, e);
         } catch (NullPointerException e) {
             log.error("Model file has not been found at : {} , please verify it exists, error is: ", jsonFilePath,  e);
-            System.exit(1);
         }
     }
 

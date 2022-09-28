@@ -339,7 +339,7 @@ public class Utils {
     /**
      * Log in the recap of what's been generated
      */
-    public static void recap(long numberOfBatches, long rowPerBatch, List<SinkParser.sinks> sinks, Model model) {
+    public static void recap(long numberOfBatches, long rowPerBatch, List<SinkParser.Sink> sinks, Model model) {
         log.info(" ************************* Recap of data generation ****************** ");
         log.info("Generated " + rowPerBatch*numberOfBatches + " rows into : ");
 

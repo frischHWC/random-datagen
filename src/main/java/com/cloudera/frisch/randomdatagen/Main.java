@@ -1,14 +1,15 @@
 package com.cloudera.frisch.randomdatagen;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Component;
 
 @SuppressWarnings("unchecked")
+@EnableScheduling
 @SpringBootApplication
 public class Main {
 
