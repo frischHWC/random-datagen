@@ -16,6 +16,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nullable;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -24,15 +25,27 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 @Slf4j
 public class CommandRunnerService {
 
-  @Autowired
   private PropertiesLoader propertiesLoader;
 
   @Autowired
   private MetricsService metricsService;
 
-  private final Map<UUID, Command> commands = new HashMap<>();
-  private final ConcurrentLinkedQueue<Command> commandsToProcess = new ConcurrentLinkedQueue<>();
-  private final List<Command> scheduledCommands = new ArrayList<>();
+  private final Map<UUID, Command> commands;
+  private final ConcurrentLinkedQueue<Command> commandsToProcess;
+  private final Map<UUID, Command> scheduledCommands;
+  private final String scheduledCommandsFilePath;
+
+  @Autowired
+  public CommandRunnerService(PropertiesLoader propertiesLoader) {
+    this.propertiesLoader = propertiesLoader;
+    this.scheduledCommandsFilePath = propertiesLoader.getPropertiesCopy().get(ApplicationConfigs.SCHEDULER_FILE_PATH);
+    this.commandsToProcess = new ConcurrentLinkedQueue<>();
+    this.scheduledCommands = new HashMap<>();
+    this.commands = new HashMap<>();
+
+    readScheduledCommands();
+  }
+
 
   public String getCommandAsString(UUID uuid) {
     Command command = commands.get(uuid) ;
@@ -57,27 +70,93 @@ public class CommandRunnerService {
 
   public List<String> getAllScheduledCommands() {
     List<String> commandsAsList = new ArrayList<>();
-    scheduledCommands.forEach(c -> commandsAsList.add(c.toString()));
+    scheduledCommands.forEach((u,c) -> commandsAsList.add(c.toString()));
     return commandsAsList;
   }
 
   public void removeScheduledCommands(UUID uuid) {
-    Command commandtoRemove = null;
-    for(Command command: scheduledCommands) {
-      if(command.getCommandUuid()==uuid) {
-        commandtoRemove = command;
-      }
-    }
-    if(commandtoRemove!=null) {
       synchronized (scheduledCommands) {
-        scheduledCommands.remove(commandtoRemove);
+        scheduledCommands.remove(uuid);
       }
+      log.info("Remove command from scheduler: {}", uuid);
+  }
+
+  public void writeScheduledCommands() {
+    try {
+      log.info("Starting to write all scheduled commands to scheduler file");
+
+      String scheduledCommandsFilepathTemp = scheduledCommandsFilePath+"tmp";
+
+      Utils.deleteLocalFile(scheduledCommandsFilepathTemp);
+      File scheduledCommandTempFile = new File(scheduledCommandsFilepathTemp);
+      scheduledCommandTempFile.getParentFile().mkdirs();
+      scheduledCommandTempFile.createNewFile();
+
+      FileOutputStream f = new FileOutputStream(scheduledCommandTempFile);
+      ObjectOutputStream o = new ObjectOutputStream(f);
+
+      synchronized (scheduledCommands) {
+        o.writeObject(scheduledCommands);
+
+        o.close();
+        f.close();
+
+        scheduledCommandTempFile.renameTo(new File(scheduledCommandsFilePath));
+      }
+
+      log.info("Finished to write all scheduled commands to scheduler file");
+
+      Utils.deleteLocalFile(scheduledCommandsFilepathTemp);
+
+    } catch (Exception e) {
+      log.error("Could not write scheduled commands to local file, error is: ", e);
     }
   }
 
-  // TODO: Read scheduled commands from a file
-  // TODO: Write scheduled commands to a file
+  public void readScheduledCommands() {
+    try {
+      log.info("Starting to read all scheduled commands to scheduler file");
 
+      File scheduledCommandsFile = new File(scheduledCommandsFilePath);
+      scheduledCommandsFile.getParentFile().mkdirs();
+      scheduledCommandsFile.createNewFile();
+
+      if(scheduledCommandsFile.length() > 0) {
+        FileInputStream fi = new FileInputStream(scheduledCommandsFile);
+        ObjectInputStream oi = new ObjectInputStream(fi);
+
+        Map<UUID, Command> scheduledCommandsRead =
+            (Map<UUID, Command>) oi.readObject();
+
+        // Each time we read commands again, we need to recompute the model as this one is not serialized
+        List<UUID> wrongScheduledCommandsRead = new ArrayList<>();
+        scheduledCommandsRead.values().stream().forEach(c -> {
+          JsonParser parser = new JsonParser(c.getModelFilePath());
+          if(parser.getRoot()==null) {
+            log.warn("Error when parsing model file");
+            c.setCommandComment("Model has not been found or is incorrect, correct it. This command has been removed from scheduler");
+            wrongScheduledCommandsRead.add(c.getCommandUuid());
+          }
+          c.setModel(parser.renderModelFromFile());
+        });
+
+        wrongScheduledCommandsRead.forEach(scheduledCommandsRead::remove);
+
+        synchronized (scheduledCommands) {
+          scheduledCommands.putAll(scheduledCommandsRead);
+        }
+
+        oi.close();
+        fi.close();
+      }
+
+      log.info("Finished to read all scheduled commands to scheduler file");
+
+    } catch (Exception e) {
+      log.error("Could not read scheduled commands to local file, error is: ", e);
+    }
+
+  }
 
   /**
    * Create a command by solving all properties, model and all empty vars and queue the command to be processed
@@ -152,7 +231,7 @@ public class CommandRunnerService {
 
     long delayBetweenExecutions = 0L;
     if(delayBetweenExecutionsReceived!=null) {
-      delayBetweenExecutions=delayBetweenExecutionsReceived;
+      delayBetweenExecutions = delayBetweenExecutionsReceived * 1000L;
     }
 
     // Parsing model
@@ -186,7 +265,8 @@ public class CommandRunnerService {
     commandsToProcess.add(command);
 
     if(scheduled) {
-      scheduledCommands.add(command);
+      scheduledCommands.put(command.getCommandUuid(), command);
+      writeScheduledCommands();
       log.info("Command {} found as scheduled with delay between two executions: {}", command.getCommandUuid(), command.getDelayBetweenExecutions());
     }
 
@@ -256,7 +336,7 @@ public class CommandRunnerService {
         command.setLastFinishedTimestamp(System.currentTimeMillis());
 
       } catch (Exception e) {
-        log.warn("An error occurred on command: {} => Mark this command as failed", command.getCommandUuid());
+        log.warn("An error occurred on command: {} => Mark this command as failed, error is: ", command.getCommandUuid(), e);
         command.setStatus(Command.CommandStatus.FAILED);
         command.setLastFinishedTimestamp(System.currentTimeMillis());
       }
@@ -270,8 +350,8 @@ public class CommandRunnerService {
 
   @Scheduled(fixedDelay = 1000, initialDelay = 15000)
   public void checkScheduledCommandsToProcess() {
-    for(Command c: scheduledCommands) {
-      if(c.getStatus()== Command.CommandStatus.FAILED) {
+    for(Command c: scheduledCommands.values()) {
+      if(c.getStatus() == Command.CommandStatus.FAILED) {
         log.info("Removing command {} from scheduled commands as last status is FAILED", c.getCommandUuid());
         c.setCommandComment("Command removed from scheduler as last state is failed, please correct it and add it again");
       } else if(c.getStatus()== Command.CommandStatus.FINISHED) {

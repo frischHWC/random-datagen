@@ -26,7 +26,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
       @RequestParam(required = false, name = "rows") Long rowsPerBatch,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions,
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions,
       @RequestParam(name = "sinks") List<String> sinks
   ) {
     StringBuffer sinkList = new StringBuffer();
@@ -42,7 +42,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
       @RequestParam(required = false, name = "rows") Long rowsPerBatch,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for CSV with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
     return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
@@ -56,7 +56,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
       @RequestParam(required = false, name = "rows") Long rowsPerBatch,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for JSON with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
     return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
@@ -70,7 +70,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
       @RequestParam(required = false, name = "rows") Long rowsPerBatch,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for Avro with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
     return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
@@ -84,7 +84,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
       @RequestParam(required = false, name = "rows") Long rowsPerBatch,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for Parquet with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
     return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
@@ -98,7 +98,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
       @RequestParam(required = false, name = "rows") Long rowsPerBatch,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for ORC with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
     return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
@@ -120,7 +120,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HDFS-CSV with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -160,7 +160,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HDFS-AVRO with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -200,7 +200,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HDFS-JSON with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -240,7 +240,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HDFS-PARQUET with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -280,7 +280,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HDFS-ORC with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -321,7 +321,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HBASE with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -366,7 +366,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HIVE with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -411,7 +411,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for OZONE with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -453,7 +453,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for KAFKA with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -510,7 +510,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for SOLR with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -556,7 +556,7 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
       @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
       @RequestParam(required = false, name = "scheduled") Boolean scheduled,
-      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
   ) {
     log.debug("Received request for KUDU with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 

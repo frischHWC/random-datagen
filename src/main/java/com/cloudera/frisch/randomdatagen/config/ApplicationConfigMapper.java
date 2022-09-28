@@ -33,6 +33,8 @@ public class ApplicationConfigMapper {
       return ApplicationConfigs.DATA_MODEL_DEFAULT;
     case "custom.data.model":
       return ApplicationConfigs.CUSTOM_DATA_MODEL_DEFAULT;
+    case "scheduler.file.path":
+      return ApplicationConfigs.SCHEDULER_FILE_PATH;
     case "kerberos.enabled":
       return ApplicationConfigs.KERBEROS_ENABLED;
     case "kerberos.user":

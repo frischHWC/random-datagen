@@ -7,6 +7,10 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -15,7 +19,9 @@ import java.util.UUID;
 @Setter
 @Getter
 @Slf4j
-public class Command {
+public class Command implements Serializable {
+
+  private static final long serialVersionUID = 1L;
 
   private UUID commandUuid;
   private CommandStatus status;
@@ -32,6 +38,43 @@ public class Command {
   private Long durationSeconds;
   private Long lastFinishedTimestamp;
   private double progress;
+
+
+  private void writeObject(ObjectOutputStream oos) throws IOException {
+    oos.defaultWriteObject();
+    oos.writeObject(commandUuid);
+    oos.writeObject(status);
+    oos.writeObject(commandComment);
+    oos.writeObject(modelFilePath);
+    oos.writeObject(numberOfThreads);
+    oos.writeObject(numberOfBatches);
+    oos.writeObject(rowsPerBatch);
+    oos.writeObject(scheduled);
+    oos.writeObject(delayBetweenExecutions);
+    oos.writeObject(sinksListAsString);
+    oos.writeObject(properties);
+    oos.writeObject(durationSeconds);
+    oos.writeObject(lastFinishedTimestamp);
+    oos.writeObject(progress);
+  }
+
+  private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+    ois.defaultReadObject();
+    this.commandUuid = (UUID) ois.readObject();
+    this.status = (CommandStatus) ois.readObject();
+    this.commandComment = (String) ois.readObject();
+    this.modelFilePath = (String) ois.readObject();
+    this.numberOfThreads = (Integer) ois.readObject();
+    this.numberOfBatches = (Long) ois.readObject();
+    this.rowsPerBatch = (Long) ois.readObject();
+    this.scheduled = (Boolean) ois.readObject();
+    this.delayBetweenExecutions = (Long) ois.readObject();
+    this.sinksListAsString = (List<SinkParser.Sink>) ois.readObject();
+    this.properties = (Map<ApplicationConfigs, String>) ois.readObject();
+    this.durationSeconds = (Long) ois.readObject();
+    this.lastFinishedTimestamp = (Long) ois.readObject();
+    this.progress = (double) ois.readObject();
+  }
 
   @Override
   public String toString() {

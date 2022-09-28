@@ -682,6 +682,15 @@
           "type": "path",
           "pathType": "serviceSpecific",
           "mode": "0755"
+        },
+        {
+          "name": "scheduler_file_path",
+          "label": "Scheduler File path",
+          "description": "Where to store the internal scheduler file that lists all commands scheduled. It is used in case of restart of the application",
+          "default": "/home/datagen/scheduler/commands.txt",
+          "type": "path",
+          "pathType": "serviceSpecific",
+          "mode": "0700"
         }
       ]
     }
