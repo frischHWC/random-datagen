@@ -41,7 +41,6 @@ def main(server_port, model_file_path, rows, batches, timeout, sinks):
     status = ""
     while (time.time() - start_time) < float(timeout):
         api_status_request = requests.post("http://localhost:" + server_port + "/command/get?commandUuid=" + command_uuid, headers=headers)
-        print(api_status_request.text)
         status = api_status_request.json().get("status")
         print("Status is " + status)
         if status == "FINISHED" or status == "FAILED":

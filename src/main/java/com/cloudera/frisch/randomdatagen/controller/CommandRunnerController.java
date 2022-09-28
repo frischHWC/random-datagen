@@ -40,4 +40,15 @@ public class CommandRunnerController {
     return commandRunnerService.getAllCommands();
   }
 
+  @PostMapping(value = "/getAllScheduled")
+  public List<String> getAllScheduledCommands() {
+    return commandRunnerService.getAllScheduledCommands();
+  }
+
+  @PostMapping(value = "/removeScheduled")
+  public void removeScheduledCommands(
+      @RequestParam(name = "commandUuid") UUID commandUUID
+  ) {
+    commandRunnerService.removeScheduledCommands(commandUUID);
+  }
 }

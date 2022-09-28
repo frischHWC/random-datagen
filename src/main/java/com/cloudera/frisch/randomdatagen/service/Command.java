@@ -30,6 +30,7 @@ public class Command {
   private List<SinkParser.Sink> sinksListAsString;
   private Map<ApplicationConfigs, String> properties;
   private Long durationSeconds;
+  private Long lastFinishedTimestamp;
   private double progress;
 
   @Override
@@ -57,6 +58,7 @@ public class Command {
         " , \"rows_per_batch\": \"" + rowsPerBatch + "\"" +
         " , \"scheduled\": \"" + scheduled + "\"" +
         " , \"delay_between_executions\": \"" + delayBetweenExecutions + "\"" +
+        " , \"last_finished_timestamp\": \"" + lastFinishedTimestamp + "\"" +
         " , \"sinks\": \"" + sinkList + "\"" +
         " , \"extra_properties\": \"" + propertiesAsString + "\"" +
         " }";
@@ -81,6 +83,7 @@ public class Command {
     this.rowsPerBatch = rowsPerBatch;
     this.scheduled = scheduled;
     this.delayBetweenExecutions = delayBewtweenExecutions;
+    this.lastFinishedTimestamp = 0L;
     this.sinksListAsString = sinksListAsString;
     this.properties = properties;
     this.durationSeconds = 0L;

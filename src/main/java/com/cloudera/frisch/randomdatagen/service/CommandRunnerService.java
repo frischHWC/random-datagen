@@ -8,7 +8,6 @@ import com.cloudera.frisch.randomdatagen.config.SinkParser;
 import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.Row;
 import com.cloudera.frisch.randomdatagen.parsers.JsonParser;
-import com.cloudera.frisch.randomdatagen.parsers.Parser;
 import com.cloudera.frisch.randomdatagen.sink.SinkInterface;
 import com.cloudera.frisch.randomdatagen.sink.SinkSender;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +32,7 @@ public class CommandRunnerService {
 
   private final Map<UUID, Command> commands = new HashMap<>();
   private final ConcurrentLinkedQueue<Command> commandsToProcess = new ConcurrentLinkedQueue<>();
+  private final List<Command> scheduledCommands = new ArrayList<>();
 
   public String getCommandAsString(UUID uuid) {
     Command command = commands.get(uuid) ;
@@ -55,6 +55,29 @@ public class CommandRunnerService {
     return commandsAsList;
   }
 
+  public List<String> getAllScheduledCommands() {
+    List<String> commandsAsList = new ArrayList<>();
+    scheduledCommands.forEach(c -> commandsAsList.add(c.toString()));
+    return commandsAsList;
+  }
+
+  public void removeScheduledCommands(UUID uuid) {
+    Command commandtoRemove = null;
+    for(Command command: scheduledCommands) {
+      if(command.getCommandUuid()==uuid) {
+        commandtoRemove = command;
+      }
+    }
+    if(commandtoRemove!=null) {
+      synchronized (scheduledCommands) {
+        scheduledCommands.remove(commandtoRemove);
+      }
+    }
+  }
+
+  // TODO: Read scheduled commands from a file
+  // TODO: Write scheduled commands to a file
+
 
   /**
    * Create a command by solving all properties, model and all empty vars and queue the command to be processed
@@ -69,8 +92,8 @@ public class CommandRunnerService {
                            @Nullable Integer numberOfThreads,
                            @Nullable Long numberOfBatches,
                            @Nullable Long rowsPerBatch,
-                           @Nullable Boolean scheduled,
-                           @Nullable Long delayBetweenExecutions,
+                           @Nullable Boolean scheduledReceived,
+                           @Nullable Long delayBetweenExecutionsReceived,
                            List<String> sinksListAsString,
                            @Nullable Map<ApplicationConfigs, String> extraProperties) {
 
@@ -122,6 +145,16 @@ public class CommandRunnerService {
       modelFile = properties.get(ApplicationConfigs.DATA_MODEL_PATH_DEFAULT) + modelFilePath;
     }
 
+    Boolean scheduled = false;
+    if(scheduledReceived!=null) {
+      scheduled=scheduledReceived;
+    }
+
+    long delayBetweenExecutions = 0L;
+    if(delayBetweenExecutionsReceived!=null) {
+      delayBetweenExecutions=delayBetweenExecutionsReceived;
+    }
+
     // Parsing model
     log.info("Parsing of model file: {}", modelFile);
     JsonParser parser = new JsonParser(modelFile);
@@ -151,6 +184,11 @@ public class CommandRunnerService {
     Command command = new Command(modelFile, model, threads, batches, rows, scheduled, delayBetweenExecutions, sinksList, properties);
     commands.put(command.getCommandUuid(), command);
     commandsToProcess.add(command);
+
+    if(scheduled) {
+      scheduledCommands.add(command);
+      log.info("Command {} found as scheduled with delay between two executions: {}", command.getCommandUuid(), command.getDelayBetweenExecutions());
+    }
 
     log.info("Command: {} has been queued to be processed", command.getCommandUuid());
 
@@ -215,15 +253,33 @@ public class CommandRunnerService {
         // Recap of what has been generated
         Utils.recap(command.getNumberOfBatches(), command.getRowsPerBatch(), command.getSinksListAsString(), command.getModel());
         command.setStatus(Command.CommandStatus.FINISHED);
+        command.setLastFinishedTimestamp(System.currentTimeMillis());
 
       } catch (Exception e) {
         log.warn("An error occurred on command: {} => Mark this command as failed", command.getCommandUuid());
         command.setStatus(Command.CommandStatus.FAILED);
+        command.setLastFinishedTimestamp(System.currentTimeMillis());
       }
 
       // Compute and print time taken
       log.info("Generation Finished");
       log.info("Data Generation for command: {} took : {} to run", command.getCommandUuid(), Utils.formatTimetaken(System.currentTimeMillis()-start));
+    }
+  }
+
+
+  @Scheduled(fixedDelay = 1000, initialDelay = 15000)
+  public void checkScheduledCommandsToProcess() {
+    for(Command c: scheduledCommands) {
+      if(c.getStatus()== Command.CommandStatus.FAILED) {
+        log.info("Removing command {} from scheduled commands as last status is FAILED", c.getCommandUuid());
+        c.setCommandComment("Command removed from scheduler as last state is failed, please correct it and add it again");
+      } else if(c.getStatus()== Command.CommandStatus.FINISHED) {
+        if((System.currentTimeMillis()-c.getLastFinishedTimestamp())>c.getDelayBetweenExecutions()){
+          commandsToProcess.add(c);
+          log.info("Command {} set to queue of process as it its delay between executions has passed and last status is FINISHED", c.getCommandUuid());
+        }
+      }
     }
   }
 
