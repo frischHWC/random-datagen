@@ -27,6 +27,10 @@ server.ssl.key-store-type=JKS
 server.ssl.key-alias=${HOST}
 server.ssl.key-password=${KEYSTORE_KEYPASSWORD}
 
+# Auth config
+admin.user={{ globals['admin_user'] }}
+admin.password=${ADMIN_PASSWORD}
+
 # Kerberos Config
 kerberos.enabled={{ globals['kerberos_enabled'] }}
 kerberos.user=${PRINCIPAL}

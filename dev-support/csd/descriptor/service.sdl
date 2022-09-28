@@ -189,7 +189,7 @@
           "httpSource": {
             "httpUrl": "http://${host}:${app_port}/metrics/all",
             "httpsUrl": "https://${host}:${app_port}/metrics/all",
-            "sslEnabled": "false",
+            "sslEnabled": "${ssl_enabled}",
             "mtlsEnabled": "false",
             "kerberosEnabled": "false",
             "kerberosPrincipal": "${principal}"
@@ -223,7 +223,8 @@
       "externalLink": {
         "name": "datagen_swagger",
         "label": "Datagen Swagger Web UI",
-        "url": "http://${host}:${app_port}/swagger-ui.html"
+        "url": "http://${host}:${app_port}/swagger-ui.html",
+        "secureUrl": "https://${host}:${app_port}/swagger-ui.html"
       },
       "topology": {
         "minInstances": "0",
@@ -252,6 +253,7 @@
                 "RANGER_URL": "${ranger_url}",
                 "RANGER_ADMIN_USER": "${ranger_user}",
                 "RANGER_ADMIN_PASSWORD": "${ranger_password}",
+                "ADMIN_PASSWORD": "${admin_password}",
                 "HBASE_SERVICE": "${dependency:HBASE}",
                 "HDFS_SERVICE": "${dependency:HDFS}",
                 "HIVE_SERVICE": "${dependency:HIVE}",
@@ -275,7 +277,10 @@
             "program": "scripts/generate_data.sh",
             "args": [
               "gen_customer_hdfs_ozone_hive",
-              "${app_port}"
+              "${app_port}",
+              "${ssl_enabled}",
+              "${admin_user}",
+              "${admin_password}"
             ]
           }
         },
@@ -291,7 +296,10 @@
             "program": "scripts/generate_data.sh",
             "args": [
               "gen_transaction_hbase",
-              "${app_port}"
+              "${app_port}",
+              "${ssl_enabled}",
+              "${admin_user}",
+              "${admin_password}"
             ]
           }
         },
@@ -307,7 +315,10 @@
             "program": "scripts/generate_data.sh",
             "args": [
               "gen_sensor_hive",
-              "${app_port}"
+              "${app_port}",
+              "${ssl_enabled}",
+              "${admin_user}",
+              "${admin_password}"
             ]
           }
         },
@@ -323,7 +334,10 @@
             "program": "scripts/generate_data.sh",
             "args": [
               "gen_ps_kafka_kudu",
-              "${app_port}"
+              "${app_port}",
+              "${ssl_enabled}",
+              "${admin_user}",
+              "${admin_password}"
             ]
           }
         },
@@ -339,7 +353,10 @@
             "program": "scripts/generate_data.sh",
             "args": [
               "gen_weather_solr_kafka",
-              "${app_port}"
+              "${app_port}",
+              "${ssl_enabled}",
+              "${admin_user}",
+              "${admin_password}"
             ]
           }
         },
@@ -355,7 +372,10 @@
             "program": "scripts/generate_data.sh",
             "args": [
               "gen_local_data",
-              "${app_port}"
+              "${app_port}",
+              "${ssl_enabled}",
+              "${admin_user}",
+              "${admin_password}"
             ]
           }
         }
@@ -462,6 +482,24 @@
           "name": "ranger_password",
           "label": "Ranger Password of provided user",
           "description": "Ranger user's password, used to push policies to Ranger (needed only once at startup). if this is not set, it is required to create your own policies in Ranger. Default push policies are on 'datagen*' and does not include specific paths that custom model may required",
+          "required": true,
+          "configurableInWizard": true,
+          "default": "admin",
+          "type": "password"
+        },
+        {
+          "name": "admin_user",
+          "label": "Datagen admin user",
+          "description": "The user to connect to Datagen Web Server",
+          "required": true,
+          "configurableInWizard": true,
+          "default": "admin",
+          "type": "string"
+        },
+        {
+          "name": "admin_password",
+          "label": "Datagen Admin Password",
+          "description": "The password of the user to connect to Datagen Web Server",
           "required": true,
           "configurableInWizard": true,
           "default": "admin",

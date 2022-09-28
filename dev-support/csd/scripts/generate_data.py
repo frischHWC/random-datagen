@@ -4,20 +4,23 @@ import sys
 import time
 
 
-def main(server_port, model_file_path, rows, batches, timeout, sinks):
-    model_file_path_url_fromatted = model_file_path.replace("/", "%2F")
+def main(server_port, model_file_path, rows, batches, timeout, tls_enabled, admin_user, admin_password, sinks):
 
+    model_file_path_url_fromatted = model_file_path.replace("/", "%2F")
     headers = {"Accept":"*/*"}
+    protocol = "http"
+    if tls_enabled:
+        protocol = "https"
 
     if len(sinks)==1:
-        api_url = "http://localhost:" + server_port + "/datagen/" + sinks[0] + \
+        api_url = protocol + "://localhost:" + server_port + "/datagen/" + sinks[0] + \
             "?model=" + model_file_path_url_fromatted + "&rows=" + rows + \
             "&batches=" + batches
     else:
         sinks_string = ""
         for sink in range(len(sinks)):
             sinks_string += "sinks=" + sinks[sink] + "&"
-        api_url = "http://localhost:" + server_port + "/datagen/multiplesinks?" + sinks_string + \
+        api_url = protocol + "://localhost:" + server_port + "/datagen/multiplesinks?" + sinks_string + \
                   "model=" + model_file_path_url_fromatted + "&rows=" + rows + \
                   "&batches=" + batches
 
@@ -65,9 +68,12 @@ if __name__ == '__main__':
         rows = sys.argv[3]
         batches = sys.argv[4]
         timeout = sys.argv[5]
+        tls_enabled = sys.argv[6]
+        admin_user = sys.argv[7]
+        admin_password = sys.argv[8]
         sinks = []
-        for i in range(6, len(sys.argv)):
+        for i in range(9, len(sys.argv)):
             sinks.append(sys.argv[i])
-        main(server_port, model_file_path, rows, batches, timeout, sinks)
+        main(server_port, model_file_path, rows, batches, timeout, tls_enabled, admin_user, admin_password, sinks)
     else:
         print("Missing arguments - please check call made")
