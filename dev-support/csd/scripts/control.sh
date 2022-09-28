@@ -6,6 +6,7 @@ case $CMD in
     echo "Starting DATAGEN"
     envsubst < "${CONF_DIR}/service.properties" > "${CONF_DIR}/service.properties.tmp"
     mv "${CONF_DIR}/service.properties.tmp" "${CONF_DIR}/service.properties"
+    chmod 700 "${CONF_DIR}/service.properties"
     exec ${JAVA_HOME}/bin/java -jar -Dspring.profiles.active=cdp -Dserver.port=${SERVER_PORT} -Xmx${MAX_HEAP_SIZE}G ${DATAGEN_JAR_PATH} --spring.config.location=file:${CONF_DIR}/service.properties
     ;;
  (gen_customer_hdfs_ozone_hive)
