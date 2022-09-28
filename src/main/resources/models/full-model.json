@@ -208,6 +208,7 @@
     {"OZONE_VOLUME": "datagen"},
     {"OZONE_BUCKET":  "full"},
     {"OZONE_KEY_NAME":  "full"},
+    {"OZONE_LOCAL_FILE_PATH":  "/home/datagen/temp/full/"},
     {"SOLR_COLLECTION": "datagen_full"},
     {"HIVE_DATABASE": "datagen"},
     {"HIVE_TABLE_NAME":  "full"},

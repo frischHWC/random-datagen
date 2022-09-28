@@ -206,6 +206,9 @@
     {"HBASE_NAMESPACE": "datagen"},
     {"KAFKA_TOPIC": "datagen"},
     {"OZONE_VOLUME": "datagen"},
+    {"OZONE_BUCKET":  "full"},
+    {"OZONE_KEY_NAME":  "full"},
+    {"OZONE_LOCAL_FILE_PATH":  "/tmp/datagen/temp/full/"},
     {"SOLR_COLLECTION": "datagen_full"},
     {"HIVE_DATABASE": "datagen"},
     {"HIVE_TABLE_NAME":  "full"},
@@ -218,8 +221,6 @@
   "Primary_Keys": [
     {"KAFKA_MSG_KEY": "bigSize"},
     {"HBASE_PRIMARY_KEY":  "bool,progression"},
-    {"OZONE_BUCKET":  "abbreviation"},
-    {"OZONE_KEY":  "randomName"},
     {"KUDU_PRIMARY_KEYS":  "size,category,department"},
     {"KUDU_HASH_KEYS":  "size,department"},
     {"KUDU_RANGE_KEYS":  "category"}

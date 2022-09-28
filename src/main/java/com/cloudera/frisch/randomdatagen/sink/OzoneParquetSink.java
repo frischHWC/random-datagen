@@ -59,7 +59,7 @@ public class OzoneParquetSink implements SinkInterface {
         this.bucketName = (String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_BUCKET);
         this.keyNamePrefix = (String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_KEY_NAME);
         this.replicationFactor = ReplicationFactor.valueOf((int) model.getOptionsOrDefault(OptionsConverter.Options.OZONE_REPLICATION_FACTOR));
-        this.localFileTempDir = (String) model.getOptionsOrDefault(OptionsConverter.Options.OZONE_REPLICATION_FACTOR);
+        this.localFileTempDir = (String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_LOCAL_FILE_PATH);
         this.oneFilePerIteration = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION);
         this.model = model;
         this.counter = 0;

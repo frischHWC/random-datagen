@@ -59,7 +59,7 @@ public class OzoneCSVSink implements SinkInterface {
         this.volumeName = (String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_VOLUME);
         this.bucketName = (String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_BUCKET);
         this.keyNamePrefix = (String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_KEY_NAME);
-        this.localFileTempDir = (String) model.getOptionsOrDefault(OptionsConverter.Options.OZONE_REPLICATION_FACTOR);
+        this.localFileTempDir = (String) model.getTableNames().get(OptionsConverter.TableNames.OZONE_LOCAL_FILE_PATH);
         this.replicationFactor = ReplicationFactor.valueOf((int) model.getOptionsOrDefault(OptionsConverter.Options.OZONE_REPLICATION_FACTOR));
         this.oneFilePerIteration = (Boolean) model.getOptionsOrDefault(OptionsConverter.Options.ONE_FILE_PER_ITERATION);
         this.model = model;
