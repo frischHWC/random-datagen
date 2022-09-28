@@ -69,6 +69,8 @@ public class CommandRunnerService {
                            @Nullable Integer numberOfThreads,
                            @Nullable Long numberOfBatches,
                            @Nullable Long rowsPerBatch,
+                           @Nullable Boolean scheduled,
+                           @Nullable Long delayBetweenExecutions,
                            List<String> sinksListAsString,
                            @Nullable Map<ApplicationConfigs, String> extraProperties) {
 
@@ -146,7 +148,7 @@ public class CommandRunnerService {
     }
 
     // Creation of command and queued to be processed
-    Command command = new Command(modelFile, model, threads, batches, rows, sinksList, properties);
+    Command command = new Command(modelFile, model, threads, batches, rows, scheduled, delayBetweenExecutions, sinksList, properties);
     commands.put(command.getCommandUuid(), command);
     commandsToProcess.add(command);
 

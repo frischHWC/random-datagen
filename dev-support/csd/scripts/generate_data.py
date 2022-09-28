@@ -10,7 +10,7 @@ def main(server_port, model_file_path, rows, batches, timeout, sinks):
     headers = {"Accept":"*/*"}
 
     if len(sinks)==1:
-        api_url = "http://localhost:" + server_port + "/datagen/" + sinks + \
+        api_url = "http://localhost:" + server_port + "/datagen/" + sinks[0] + \
             "?model=" + model_file_path_url_fromatted + "&rows=" + rows + \
             "&batches=" + batches
     else:

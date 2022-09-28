@@ -25,6 +25,8 @@ public class Command {
   private Integer numberOfThreads;
   private Long numberOfBatches;
   private Long rowsPerBatch;
+  private Boolean scheduled;
+  private Long delayBetweenExecutions;
   private List<SinkParser.Sink> sinksListAsString;
   private Map<ApplicationConfigs, String> properties;
   private Long durationSeconds;
@@ -53,6 +55,8 @@ public class Command {
         " , \"model_file\": \"" + modelFilePath + "\"" +
         " , \"number_of_batches\": \"" + numberOfBatches + "\"" +
         " , \"rows_per_batch\": \"" + rowsPerBatch + "\"" +
+        " , \"scheduled\": \"" + scheduled + "\"" +
+        " , \"delay_between_executions\": \"" + delayBetweenExecutions + "\"" +
         " , \"sinks\": \"" + sinkList + "\"" +
         " , \"extra_properties\": \"" + propertiesAsString + "\"" +
         " }";
@@ -63,6 +67,8 @@ public class Command {
                  Integer numberOfThreads,
                  Long numberOfBatches,
                  Long rowsPerBatch,
+                 Boolean scheduled,
+                 Long delayBewtweenExecutions,
                  List<SinkParser.Sink> sinksListAsString,
                  Map<ApplicationConfigs, String> properties) {
     this.commandUuid = UUID.randomUUID();
@@ -73,6 +79,8 @@ public class Command {
     this.numberOfThreads = numberOfThreads;
     this.numberOfBatches = numberOfBatches;
     this.rowsPerBatch = rowsPerBatch;
+    this.scheduled = scheduled;
+    this.delayBetweenExecutions = delayBewtweenExecutions;
     this.sinksListAsString = sinksListAsString;
     this.properties = properties;
     this.durationSeconds = 0L;

@@ -25,12 +25,14 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "threads") Integer threads,
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
       @RequestParam(required = false, name = "rows") Long rowsPerBatch,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions,
       @RequestParam(name = "sinks") List<String> sinks
   ) {
     StringBuffer sinkList = new StringBuffer();
     sinks.forEach(s -> {sinkList.append(s) ; sinkList.append(" ; ");});
     log.debug("Received request with model: {} , threads: {} , batches: {}, rows: {}, to sinks: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch, sinkList);
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches, rowsPerBatch, sinks, null);
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches, rowsPerBatch, scheduled, delayBetweenExecutions, sinks, null);
   }
 
   @PostMapping(value = "/csv")
@@ -38,10 +40,12 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
-      @RequestParam(required = false, name = "rows") Long rowsPerBatch
+      @RequestParam(required = false, name = "rows") Long rowsPerBatch,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for CSV with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("CSV"), null);
   }
 
@@ -50,10 +54,12 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
-      @RequestParam(required = false, name = "rows") Long rowsPerBatch
+      @RequestParam(required = false, name = "rows") Long rowsPerBatch,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for JSON with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("JSON"), null);
   }
 
@@ -62,10 +68,12 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
-      @RequestParam(required = false, name = "rows") Long rowsPerBatch
+      @RequestParam(required = false, name = "rows") Long rowsPerBatch,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for Avro with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("AVRO"), null);
   }
 
@@ -74,10 +82,12 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
-      @RequestParam(required = false, name = "rows") Long rowsPerBatch
+      @RequestParam(required = false, name = "rows") Long rowsPerBatch,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for Parquet with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("PARQUET"), null);
   }
 
@@ -86,10 +96,12 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
-      @RequestParam(required = false, name = "rows") Long rowsPerBatch
+      @RequestParam(required = false, name = "rows") Long rowsPerBatch,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for ORC with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("ORC"), null);
   }
 
@@ -106,7 +118,9 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "hdfs_uri") String hdfsUri,
       @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
-      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HDFS-CSV with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -129,7 +143,7 @@ public class DataGenerationController {
     if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
       extraProperties.put(ApplicationConfigs.HDFS_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
     }
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches, rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("HDFS-CSV"), extraProperties);
   }
 
@@ -144,7 +158,9 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "hdfs_uri") String hdfsUri,
       @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
-      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HDFS-AVRO with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -167,7 +183,7 @@ public class DataGenerationController {
     if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
       extraProperties.put(ApplicationConfigs.HDFS_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
     }
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("HDFS-AVRO"), extraProperties);
   }
 
@@ -182,7 +198,9 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "hdfs_uri") String hdfsUri,
       @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
-      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HDFS-JSON with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -205,7 +223,7 @@ public class DataGenerationController {
     if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
       extraProperties.put(ApplicationConfigs.HDFS_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
     }
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("HDFS-JSON"), extraProperties);
   }
 
@@ -220,7 +238,9 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "hdfs_uri") String hdfsUri,
       @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
-      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HDFS-PARQUET with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -243,7 +263,7 @@ public class DataGenerationController {
     if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
       extraProperties.put(ApplicationConfigs.HDFS_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
     }
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("HDFS-PARQUET"), extraProperties);
   }
 
@@ -258,7 +278,9 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "hdfs_uri") String hdfsUri,
       @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
-      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HDFS-ORC with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -281,7 +303,7 @@ public class DataGenerationController {
     if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
       extraProperties.put(ApplicationConfigs.HDFS_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
     }
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("HDFS-ORC"), extraProperties);
   }
 
@@ -297,7 +319,9 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "hbase_zk_znode") String hbaseZkZnode,
       @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
-      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HBASE with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -323,7 +347,7 @@ public class DataGenerationController {
     if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
       extraProperties.put(ApplicationConfigs.HBASE_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
     }
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("HBASE"), extraProperties);
   }
 
@@ -340,7 +364,9 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "truststore_password") String trustorePassword,
       @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
-      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for HIVE with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -369,7 +395,7 @@ public class DataGenerationController {
     if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
       extraProperties.put(ApplicationConfigs.HIVE_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
     }
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("HIVE"), extraProperties);
   }
 
@@ -383,7 +409,9 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "ozone_service_id") String ozoneServiceId,
       @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
-      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for OZONE with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -403,7 +431,7 @@ public class DataGenerationController {
     if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
       extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
     }
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("OZONE"), extraProperties);
   }
 
@@ -423,7 +451,9 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "truststore_location") String trustoreLocation,
       @RequestParam(required = false, name = "truststore_password") String trustorePassword,
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
-      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for KAFKA with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -461,7 +491,7 @@ public class DataGenerationController {
     if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
       extraProperties.put(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
     }
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("KAFKA"), extraProperties);
   }
 
@@ -478,7 +508,9 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "truststore_password") String trustorePassword,
       @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
-      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for SOLR with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -507,7 +539,7 @@ public class DataGenerationController {
     if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
       extraProperties.put(ApplicationConfigs.SOLR_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
     }
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("SOLR"), extraProperties);
   }
 
@@ -522,7 +554,9 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "truststore_password") String trustorePassword,
       @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
       @RequestParam(required = false, name = "kerb_user") String kerberosUser,
-      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions") Long delayBetweenExecutions
   ) {
     log.debug("Received request for KUDU with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
@@ -545,7 +579,7 @@ public class DataGenerationController {
     if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
       extraProperties.put(ApplicationConfigs.KUDU_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
     }
-    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch,
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
         Collections.singletonList("KUDU"), extraProperties);
   }
 
