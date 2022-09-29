@@ -46,7 +46,7 @@ def main(server_port, model_file_path, rows, batches, timeout, tls_enabled, admi
 
     status = ""
     while (time.time() - start_time) < float(timeout):
-        api_status_request = requests.post("http://localhost:" + server_port + "/command/get?commandUuid=" + command_uuid,
+        api_status_request = requests.post(protocol + "://localhost:" + server_port + "/command/get?commandUuid=" + command_uuid,
                                            headers=headers, verify=False, auth=(admin_user, admin_password))
         status = api_status_request.json().get("status")
         print("Status is " + status)
