@@ -28,7 +28,7 @@ def main(server_port, model_file_path, rows, batches, timeout, tls_enabled, admi
 
     start_time = time.time()
 
-    response = requests.post(api_url, headers=headers, verify=False)
+    response = requests.post(api_url, headers=headers, verify=False, auth=(admin_user, admin_password))
 
     if response.status_code != 200:
         print("Answer from API call is not 200")
@@ -43,7 +43,8 @@ def main(server_port, model_file_path, rows, batches, timeout, tls_enabled, admi
 
     status = ""
     while (time.time() - start_time) < float(timeout):
-        api_status_request = requests.post("http://localhost:" + server_port + "/command/get?commandUuid=" + command_uuid, headers=headers, verify=False)
+        api_status_request = requests.post("http://localhost:" + server_port + "/command/get?commandUuid=" + command_uuid,
+                                           headers=headers, verify=False, auth=(admin_user, admin_password))
         status = api_status_request.json().get("status")
         print("Status is " + status)
         if status == "FINISHED" or status == "FAILED":

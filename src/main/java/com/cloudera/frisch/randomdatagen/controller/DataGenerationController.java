@@ -5,6 +5,8 @@ import com.cloudera.frisch.randomdatagen.config.ApplicationConfigs;
 import com.cloudera.frisch.randomdatagen.service.CommandRunnerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -20,6 +22,7 @@ public class DataGenerationController {
 
 
   @PostMapping(value = "/multiplesinks")
+  @ResponseBody
   public String generateIntoMultipleSinks(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -36,6 +39,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/csv")
+  @ResponseBody
   public String generateIntoCsv(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -50,6 +54,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/json")
+  @ResponseBody
   public String generateIntoJson(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -64,6 +69,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/avro")
+  @ResponseBody
   public String generateIntoAvro(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -78,6 +84,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/parquet")
+  @ResponseBody
   public String generateIntoParquet(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -92,6 +99,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/orc")
+  @ResponseBody
   public String generateIntoOrc(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -108,6 +116,7 @@ public class DataGenerationController {
   // TODO: Add extra properties optional for below sinks
 
   @PostMapping(value = "/hdfs-csv")
+  @ResponseBody
   public String generateIntoHdfsCsv(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -148,6 +157,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/hdfs-avro")
+  @ResponseBody
   public String generateIntoHdfsAvro(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -188,6 +198,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/hdfs-json")
+  @ResponseBody
   public String generateIntoHdfsJson(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -228,6 +239,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/hdfs-parquet")
+  @ResponseBody
   public String generateIntoHdfsParquet(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -268,6 +280,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/hdfs-orc")
+  @ResponseBody
   public String generateIntoHdfsOrc(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -308,6 +321,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/hbase")
+  @ResponseBody
   public String generateIntoHbase(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -352,6 +366,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/hive")
+  @ResponseBody
   public String generateIntoHive(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -400,6 +415,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/ozone")
+  @ResponseBody
   public String generateIntoOzone(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -435,7 +451,193 @@ public class DataGenerationController {
         Collections.singletonList("OZONE"), extraProperties);
   }
 
+  @PostMapping(value = "/ozone-csv")
+  @ResponseBody
+  public String generateIntoOzoneCsv(
+      @RequestParam(required = false, name = "model") String modelFilePath,
+      @RequestParam(required = false, name = "threads") Integer threads,
+      @RequestParam(required = false, name = "batches") Long numberOfBatches,
+      @RequestParam(required = false, name = "rows") Long rowsPerBatch,
+      @RequestParam(required = false, name = "ozone_site_path") String ozoneSitePath,
+      @RequestParam(required = false, name = "ozone_service_id") String ozoneServiceId,
+      @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
+      @RequestParam(required = false, name = "kerb_user") String kerberosUser,
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
+  ) {
+    log.debug("Received request for OZONE-CSV with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
+    Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
+    if(ozoneSitePath!=null && !ozoneSitePath.isEmpty()){
+      extraProperties.put(ApplicationConfigs.HADOOP_OZONE_SITE_PATH, ozoneSitePath);
+    }
+    if(ozoneSitePath!=null && !ozoneSitePath.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_SERVICE_ID, ozoneServiceId);
+    }
+    if(kerberosEnabled!=null && !kerberosEnabled.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS, kerberosEnabled);
+    }
+    if(kerberosUser!=null && !kerberosUser.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS_USER, kerberosUser);
+    }
+    if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
+    }
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
+        Collections.singletonList("OZONE-CSV"), extraProperties);
+  }
+
+  @PostMapping(value = "/ozone-json")
+  @ResponseBody
+  public String generateIntoOzoneJson(
+      @RequestParam(required = false, name = "model") String modelFilePath,
+      @RequestParam(required = false, name = "threads") Integer threads,
+      @RequestParam(required = false, name = "batches") Long numberOfBatches,
+      @RequestParam(required = false, name = "rows") Long rowsPerBatch,
+      @RequestParam(required = false, name = "ozone_site_path") String ozoneSitePath,
+      @RequestParam(required = false, name = "ozone_service_id") String ozoneServiceId,
+      @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
+      @RequestParam(required = false, name = "kerb_user") String kerberosUser,
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
+  ) {
+    log.debug("Received request for OZONE-JSON with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
+    Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
+    if(ozoneSitePath!=null && !ozoneSitePath.isEmpty()){
+      extraProperties.put(ApplicationConfigs.HADOOP_OZONE_SITE_PATH, ozoneSitePath);
+    }
+    if(ozoneSitePath!=null && !ozoneSitePath.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_SERVICE_ID, ozoneServiceId);
+    }
+    if(kerberosEnabled!=null && !kerberosEnabled.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS, kerberosEnabled);
+    }
+    if(kerberosUser!=null && !kerberosUser.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS_USER, kerberosUser);
+    }
+    if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
+    }
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
+        Collections.singletonList("OZONE-JSON"), extraProperties);
+  }
+
+  @PostMapping(value = "/ozone-avro")
+  @ResponseBody
+  public String generateIntoOzoneAvro(
+      @RequestParam(required = false, name = "model") String modelFilePath,
+      @RequestParam(required = false, name = "threads") Integer threads,
+      @RequestParam(required = false, name = "batches") Long numberOfBatches,
+      @RequestParam(required = false, name = "rows") Long rowsPerBatch,
+      @RequestParam(required = false, name = "ozone_site_path") String ozoneSitePath,
+      @RequestParam(required = false, name = "ozone_service_id") String ozoneServiceId,
+      @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
+      @RequestParam(required = false, name = "kerb_user") String kerberosUser,
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
+  ) {
+    log.debug("Received request for OZONE-AVRO with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
+    Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
+    if(ozoneSitePath!=null && !ozoneSitePath.isEmpty()){
+      extraProperties.put(ApplicationConfigs.HADOOP_OZONE_SITE_PATH, ozoneSitePath);
+    }
+    if(ozoneSitePath!=null && !ozoneSitePath.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_SERVICE_ID, ozoneServiceId);
+    }
+    if(kerberosEnabled!=null && !kerberosEnabled.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS, kerberosEnabled);
+    }
+    if(kerberosUser!=null && !kerberosUser.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS_USER, kerberosUser);
+    }
+    if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
+    }
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
+        Collections.singletonList("OZONE-AVRO"), extraProperties);
+  }
+
+  @PostMapping(value = "/ozone-parquet")
+  @ResponseBody
+  public String generateIntoOzoneParquet(
+      @RequestParam(required = false, name = "model") String modelFilePath,
+      @RequestParam(required = false, name = "threads") Integer threads,
+      @RequestParam(required = false, name = "batches") Long numberOfBatches,
+      @RequestParam(required = false, name = "rows") Long rowsPerBatch,
+      @RequestParam(required = false, name = "ozone_site_path") String ozoneSitePath,
+      @RequestParam(required = false, name = "ozone_service_id") String ozoneServiceId,
+      @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
+      @RequestParam(required = false, name = "kerb_user") String kerberosUser,
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
+  ) {
+    log.debug("Received request for OZONE-PARQUET with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
+    Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
+    if(ozoneSitePath!=null && !ozoneSitePath.isEmpty()){
+      extraProperties.put(ApplicationConfigs.HADOOP_OZONE_SITE_PATH, ozoneSitePath);
+    }
+    if(ozoneSitePath!=null && !ozoneSitePath.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_SERVICE_ID, ozoneServiceId);
+    }
+    if(kerberosEnabled!=null && !kerberosEnabled.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS, kerberosEnabled);
+    }
+    if(kerberosUser!=null && !kerberosUser.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS_USER, kerberosUser);
+    }
+    if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
+    }
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
+        Collections.singletonList("OZONE-PARQUET"), extraProperties);
+  }
+
+  @PostMapping(value = "/ozone-orc")
+  @ResponseBody
+  public String generateIntoOzoneOrc(
+      @RequestParam(required = false, name = "model") String modelFilePath,
+      @RequestParam(required = false, name = "threads") Integer threads,
+      @RequestParam(required = false, name = "batches") Long numberOfBatches,
+      @RequestParam(required = false, name = "rows") Long rowsPerBatch,
+      @RequestParam(required = false, name = "ozone_site_path") String ozoneSitePath,
+      @RequestParam(required = false, name = "ozone_service_id") String ozoneServiceId,
+      @RequestParam(required = false, name = "kerb_auth") String kerberosEnabled,
+      @RequestParam(required = false, name = "kerb_user") String kerberosUser,
+      @RequestParam(required = false, name = "kerb_keytab") String kerberosKeytab,
+      @RequestParam(required = false, name = "scheduled") Boolean scheduled,
+      @RequestParam(required = false, name = "delay_between_executions_seconds") Long delayBetweenExecutions
+  ) {
+    log.debug("Received request for OZONE-ORC with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
+
+    Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
+    if(ozoneSitePath!=null && !ozoneSitePath.isEmpty()){
+      extraProperties.put(ApplicationConfigs.HADOOP_OZONE_SITE_PATH, ozoneSitePath);
+    }
+    if(ozoneSitePath!=null && !ozoneSitePath.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_SERVICE_ID, ozoneServiceId);
+    }
+    if(kerberosEnabled!=null && !kerberosEnabled.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS, kerberosEnabled);
+    }
+    if(kerberosUser!=null && !kerberosUser.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS_USER, kerberosUser);
+    }
+    if(kerberosKeytab!=null && !kerberosKeytab.isEmpty()){
+      extraProperties.put(ApplicationConfigs.OZONE_AUTH_KERBEROS_KEYTAB, kerberosKeytab);
+    }
+    return commandRunnerService.generateData(modelFilePath, threads, numberOfBatches,rowsPerBatch, scheduled, delayBetweenExecutions,
+        Collections.singletonList("OZONE-ORC"), extraProperties);
+  }
+
   @PostMapping(value = "/kafka")
+  @ResponseBody
   public String generateIntoKafka(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -496,6 +698,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/solr")
+  @ResponseBody
   public String generateIntoSolR(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,
@@ -544,6 +747,7 @@ public class DataGenerationController {
   }
 
   @PostMapping(value = "/kudu")
+  @ResponseBody
   public String generateIntoKudu(
       @RequestParam(required = false, name = "model") String modelFilePath,
       @RequestParam(required = false, name = "threads") Integer threads,

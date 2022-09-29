@@ -53,6 +53,10 @@ public class ApplicationConfigMapper {
       return ApplicationConfigs.KEYSTORE_PASSWORD;
     case "keystore.keypassword":
       return ApplicationConfigs.KEYSTORE_KEYPASSWORD;
+    case "admin.user":
+      return ApplicationConfigs.ADMIN_USER;
+    case "admin.password":
+      return ApplicationConfigs.ADMIN_PASSWORD;
     case "hadoop.core.site.path":
       return ApplicationConfigs.HADOOP_CORE_SITE_PATH;
     case "hadoop.hdfs.site.path":
