@@ -80,13 +80,14 @@ public class KafkaSink implements SinkInterface {
 
         //Kerberos config
         if (securityProtocol.equalsIgnoreCase("SASL_PLAINTEXT") || securityProtocol.equalsIgnoreCase("SASL_SSL")) {
-            Utils.createJaasConfigFile("kafka-jaas-randomdatagen.config", "KafkaClient",
+            String jaasFilePath = (String) model.getOptionsOrDefault(OptionsConverter.Options.KAFKA_JAAS_FILE_PATH);
+            Utils.createJaasConfigFile(jaasFilePath, "KafkaClient",
                 properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB), properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_USER),
                     true, false, false);
-            Utils.createJaasConfigFile("kafka-jaas-randomdatagen.config", "RegistryClient",
+            Utils.createJaasConfigFile(jaasFilePath, "RegistryClient",
                 properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB), properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_USER),
                     true, false, true);
-            System.setProperty("java.security.auth.login.config", "kafka-jaas-randomdatagen.config");
+            System.setProperty("java.security.auth.login.config", jaasFilePath);
 
             props.put(SaslConfigs.SASL_MECHANISM, properties.get(ApplicationConfigs.KAFKA_SASL_MECHANISM));
             props.put(SaslConfigs.SASL_KERBEROS_SERVICE_NAME, properties.get(ApplicationConfigs.KAFKA_SASL_KERBEROS_SERVICE_NAME));

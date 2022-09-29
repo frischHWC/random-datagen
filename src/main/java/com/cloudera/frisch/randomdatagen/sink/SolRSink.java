@@ -44,6 +44,9 @@ public class SolRSink implements SinkInterface {
             System.setProperty("javax.net.ssl.trustStore", properties.get(ApplicationConfigs.SOLR_TRUSTSTORE_LOCATION));
             System.setProperty("javax.net.ssl.trustStorePassword", properties.get(ApplicationConfigs.SOLR_TRUSTSTORE_PASSWORD));
 
+            // Test to remove peer verification
+            System.setProperty("solr.ssl.checkPeerName", "false");
+
             protocol = "https";
         }
 
@@ -54,11 +57,12 @@ public class SolRSink implements SinkInterface {
                 .withSocketTimeout(60000);
 
         if (Boolean.parseBoolean(properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS))) {
-            Utils.createJaasConfigFile("solr-jaas-randomdatagen.config", "SolrJClient",
+            String jaasFilePath = (String) model.getOptionsOrDefault(OptionsConverter.Options.SOLR_JAAS_FILE_PATH);
+            Utils.createJaasConfigFile(jaasFilePath, "SolrJClient",
                     properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_KEYTAB),
                     properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_USER),
                     true, null, false);
-            System.setProperty("java.security.auth.login.config", "solr-jaas-randomdatagen.config");
+            System.setProperty("java.security.auth.login.config", jaasFilePath);
             System.setProperty("solr.kerberos.jaas.appname", "SolrJClient");
 
             try(Krb5HttpClientBuilder krb5HttpClientBuilder = new Krb5HttpClientBuilder()) {

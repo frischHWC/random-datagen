@@ -65,6 +65,22 @@
       "runMode": "single"
     },
     {
+      "name": "gen_customer_hdfs",
+      "label": "Generates 1M Customers to HDFS",
+      "description": "Generates 1M Customers to HDFS",
+      "roleCommand": "gen_customer_hdfs",
+      "roleName": "DATAGEN_SERVER",
+      "runMode": "single"
+    },
+    {
+      "name": "gen_customer_ozone",
+      "label": "Generates 1M Customers to Ozone",
+      "description": "Generates 1M Customers to Ozone",
+      "roleCommand": "gen_customer_ozone",
+      "roleName": "DATAGEN_SERVER",
+      "runMode": "single"
+    },
+    {
       "name": "gen_transaction",
       "label": "Generates 1M Transactions to HBase",
       "description": "Generates 1M Transactions to HBase",
@@ -81,25 +97,41 @@
       "runMode": "single"
     },
     {
-      "name": "gen_ps_kafka_kudu",
-      "label": "Generates 1M Public Service Data to Kafka and Kudu",
-      "description": "Generates 1M Public Service Data to Kafka and Kudu",
-      "roleCommand": "gen_ps_kafka_kudu",
+      "name": "gen_public_service_kudu",
+      "label": "Generates 1M Public Service Data to Kudu",
+      "description": "Generates 1M Public Service Data to Kudu",
+      "roleCommand": "gen_public_service_kudu",
       "roleName": "DATAGEN_SERVER",
       "runMode": "single"
     },
     {
-      "name": "gen_weather_solr_kafka",
-      "label": "Generates 1M Weather Data to SolR & Kafka ",
-      "description": "Generates 1M Weather Data to SolR & Kafka",
-      "roleCommand": "gen_weather_solr_kafka",
+      "name": "gen_public_service_kafka",
+      "label": "Generates 1M Public Service Data to Kafka",
+      "description": "Generates 1M Public Service Data to Kafka",
+      "roleCommand": "gen_public_service_kafka",
+      "roleName": "DATAGEN_SERVER",
+      "runMode": "single"
+    },
+    {
+      "name": "gen_weather_solr",
+      "label": "Generates 1M Weather Data to SolR ",
+      "description": "Generates 1M Weather Data to SolR",
+      "roleCommand": "gen_weather_solr",
+      "roleName": "DATAGEN_SERVER",
+      "runMode": "single"
+    },
+    {
+      "name": "gen_weather_kafka",
+      "label": "Generates 1M Weather Data to Kafka ",
+      "description": "Generates 1M Weather Data to Kafka",
+      "roleCommand": "gen_weather_kafka",
       "roleName": "DATAGEN_SERVER",
       "runMode": "single"
     },
     {
       "name": "gen_local",
-      "label": "Generates Local Data as CSV & JSON",
-      "description": "Generates Local Data",
+      "label": "Generates Local Data as CSV, JSON, AVRO, ORC, PARQUET",
+      "description": "Generates Local Data as CSV, JSON, AVRO, ORC, PARQUET",
       "roleCommand": "gen_local_data",
       "roleName": "DATAGEN_SERVER",
       "runMode": "single"
@@ -268,8 +300,8 @@
         },
         {
           "name": "gen_customer_hdfs_ozone_hive",
-          "label": "Generate Customer Data",
-          "description": "Generates 1M Customers to HDFS and Hive",
+          "label": "Generates 1M Customers to HDFS and Hive and Ozone",
+          "description": "Generates 1M Customers to HDFS and Hive and Ozone",
           "expectedExitCodes": [
             0
           ],
@@ -278,6 +310,44 @@
             "program": "scripts/generate_data.sh",
             "args": [
               "gen_customer_hdfs_ozone_hive",
+              "${app_port}",
+              "${ssl_enabled}",
+              "${admin_user}",
+              "${admin_password}"
+            ]
+          }
+        },
+       {
+          "name": "gen_customer_hdfs",
+          "label": "Generates 1M Customer Data to HDFS in Parquet",
+          "description": "Generates 1M Customer Data to HDFS in Parquet",
+          "expectedExitCodes": [
+            0
+          ],
+          "requiredRoleState": "running",
+          "commandRunner": {
+            "program": "scripts/generate_data.sh",
+            "args": [
+              "gen_customer_hdfs",
+              "${app_port}",
+              "${ssl_enabled}",
+              "${admin_user}",
+              "${admin_password}"
+            ]
+          }
+        },
+        {
+          "name": "gen_customer_ozone",
+          "label": "Generates 1M Customer Data to Ozone in Parquet",
+          "description": "Generates 1M Customer Data to Ozone in Parquet",
+          "expectedExitCodes": [
+            0
+          ],
+          "requiredRoleState": "running",
+          "commandRunner": {
+            "program": "scripts/generate_data.sh",
+            "args": [
+              "gen_customer_hdfs",
               "${app_port}",
               "${ssl_enabled}",
               "${admin_user}",
@@ -324,9 +394,9 @@
           }
         },
         {
-          "name": "gen_ps_kafka_kudu",
-          "label": "Generate Public Service Data to Kafka & Kudu",
-          "description": "Generates 1M Public Service Data to Kafka and Kudu",
+          "name": "gen_public_service_kafka",
+          "label": "Generate Public Service Data to Kafka",
+          "description": "Generates 1M Public Service Data to Kafka",
           "expectedExitCodes": [
             0
           ],
@@ -334,7 +404,7 @@
           "commandRunner": {
             "program": "scripts/generate_data.sh",
             "args": [
-              "gen_ps_kafka_kudu",
+              "gen_public_service_kafka",
               "${app_port}",
               "${ssl_enabled}",
               "${admin_user}",
@@ -343,7 +413,26 @@
           }
         },
         {
-          "name": "gen_weather_solr_kafka",
+          "name": "gen_public_service_kudu",
+          "label": "Generate Public Service Data to Kudu",
+          "description": "Generates 1M Public Service Data to Kudu",
+          "expectedExitCodes": [
+            0
+          ],
+          "requiredRoleState": "running",
+          "commandRunner": {
+            "program": "scripts/generate_data.sh",
+            "args": [
+              "gen_public_service_kudu",
+              "${app_port}",
+              "${ssl_enabled}",
+              "${admin_user}",
+              "${admin_password}"
+            ]
+          }
+        },
+        {
+          "name": "gen_weather_solr",
           "label": "Generate 1M Weather Data to SOLR",
           "description": "Generate 1M Weather Data to SOLR",
           "expectedExitCodes": [
@@ -353,7 +442,26 @@
           "commandRunner": {
             "program": "scripts/generate_data.sh",
             "args": [
-              "gen_weather_solr_kafka",
+              "gen_weather_solr",
+              "${app_port}",
+              "${ssl_enabled}",
+              "${admin_user}",
+              "${admin_password}"
+            ]
+          }
+        },
+        {
+          "name": "gen_weather_kafka",
+          "label": "Generate 1M Weather Data to Kafka",
+          "description": "Generate 1M Weather Data to Kafka",
+          "expectedExitCodes": [
+            0
+          ],
+          "requiredRoleState": "running",
+          "commandRunner": {
+            "program": "scripts/generate_data.sh",
+            "args": [
+              "gen_weather_kafka",
               "${app_port}",
               "${ssl_enabled}",
               "${admin_user}",
@@ -363,8 +471,8 @@
         },
         {
           "name": "gen_local_data",
-          "label": "Generate All Local Data",
-          "description": "Generates Local Data from different models locally as csv or json",
+          "label": "Generates Local Data as CSV, JSON, AVRO, ORC, PARQUET",
+          "description": "Generates Local Data as CSV, JSON, AVRO, ORC, PARQUET",
           "expectedExitCodes": [
             0
           ],

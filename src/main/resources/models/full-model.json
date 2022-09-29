@@ -232,6 +232,8 @@
     {"KUDU_REPLICAS":  1},
     {"ONE_FILE_PER_ITERATION":  true},
     {"KAFKA_MESSAGE_TYPE":  "json"},
+    {"KAFKA_JAAS_FILE_PATH":  "/tmp/kafka.jaas"},
+    {"SOLR_JAAS_FILE_PATH":  "/tmp/solr.jaas"},
     {"HIVE_THREAD_NUMBER":  1},
     {"HIVE_ON_HDFS":  true},
     {"HIVE_TEZ_QUEUE_NAME":  "root.default"},

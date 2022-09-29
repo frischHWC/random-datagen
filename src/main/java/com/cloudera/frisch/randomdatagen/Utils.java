@@ -230,6 +230,20 @@ public class Utils {
     }
 
     /**
+     * Create a file locally
+     * @param path
+     */
+    public static void createLocalFile(String path) {
+        try {
+            new File(path).getParentFile().mkdirs();
+            new File(path).createNewFile();
+            log.debug("Successfully delete local file : " + path);
+        } catch (Exception e) {
+            log.error("Tried to delete file : " + path + " with no success :", e);
+        }
+    }
+
+    /**
      * Delete an HDFS file
      * @param fileSystem
      * @param path
@@ -255,6 +269,11 @@ public class Utils {
      * @param storeKey true/false or null if must not be set in the JAAS file
      */
     public static void createJaasConfigFile(String fileName, String clientName, String keytabPath, String principal, Boolean useKeytab, Boolean storeKey, Boolean appendToFile) {
+        new File(fileName).getParentFile().mkdirs();
+        if(!appendToFile) {
+            // Destroy previous file if existing
+            deleteLocalFile(fileName);
+        }
         try(Writer fileWriter = new FileWriter(fileName, appendToFile)) {
             if(Boolean.TRUE.equals(appendToFile)) { fileWriter.append(System.getProperty("line.separator")); }
             fileWriter.append(clientName);

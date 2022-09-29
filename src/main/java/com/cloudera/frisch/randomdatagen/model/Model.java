@@ -262,6 +262,12 @@ public class Model<T extends Field> {
             case KAFKA_MESSAGE_TYPE:
                 optionResult = "json";
                 break;
+            case KAFKA_JAAS_FILE_PATH:
+                optionResult = "/home/datagen/jaas/kafka.jaas";
+                break;
+            case SOLR_JAAS_FILE_PATH:
+                optionResult = "/home/datagen/jaas/solr.jaas";
+                break;
             case HIVE_TEZ_QUEUE_NAME:
                 optionResult = "root.default";
                 break;
