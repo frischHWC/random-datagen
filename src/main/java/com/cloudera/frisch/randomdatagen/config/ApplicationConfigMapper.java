@@ -135,6 +135,10 @@ public class ApplicationConfigMapper {
       return ApplicationConfigs.SOLR_TRUSTSTORE_LOCATION;
     case "solr.truststore.password":
       return ApplicationConfigs.SOLR_TRUSTSTORE_PASSWORD;
+    case "solr.keystore.location":
+      return ApplicationConfigs.SOLR_KEYSTORE_LOCATION;
+    case "solr.keystore.password":
+      return ApplicationConfigs.SOLR_KEYSTORE_PASSWORD;
     case "kafka.brokers":
       return ApplicationConfigs.KAFKA_BROKERS;
     case "kafka.security.protocol":

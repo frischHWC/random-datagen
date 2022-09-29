@@ -39,6 +39,8 @@ public class SolRSink implements SinkInterface {
         String protocol = "http";
 
         if(Boolean.parseBoolean(properties.get(ApplicationConfigs.SOLR_TLS_ENABLED))) {
+            System.setProperty("javax.net.ssl.keyStore", properties.get(ApplicationConfigs.SOLR_KEYSTORE_LOCATION));
+            System.setProperty("javax.net.ssl.keyStorePassword", properties.get(ApplicationConfigs.SOLR_KEYSTORE_PASSWORD));
             System.setProperty("javax.net.ssl.trustStore", properties.get(ApplicationConfigs.SOLR_TRUSTSTORE_LOCATION));
             System.setProperty("javax.net.ssl.trustStorePassword", properties.get(ApplicationConfigs.SOLR_TRUSTSTORE_PASSWORD));
 

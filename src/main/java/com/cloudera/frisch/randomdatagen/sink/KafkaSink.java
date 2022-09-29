@@ -38,7 +38,7 @@ public class KafkaSink implements SinkInterface {
     KafkaSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.topic =  (String) model.getTableNames().get(OptionsConverter.TableNames.KAFKA_TOPIC);
         this.schema = model.getAvroSchema();
-        this.messagetype = convertStringToMessageType((String) model.getOptions().get(OptionsConverter.Options.KAFKA_MESSAGE_TYPE));
+        this.messagetype = convertStringToMessageType((String) model.getOptionsOrDefault(OptionsConverter.Options.KAFKA_MESSAGE_TYPE));
 
         Properties props = new Properties();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.get(ApplicationConfigs.KAFKA_BROKERS));
@@ -180,10 +180,10 @@ public class KafkaSink implements SinkInterface {
 
     private MessageType convertStringToMessageType(String messageType) {
         switch (messageType.toUpperCase()) {
-        case "AVRO": return MessageType.AVRO;
-        case "CSV": return MessageType.CSV;
-        case "JSON":
-        default: return MessageType.JSON;
+            case "AVRO": return MessageType.AVRO;
+            case "CSV": return MessageType.CSV;
+            case "JSON":
+            default: return MessageType.JSON;
         }
     }
 }

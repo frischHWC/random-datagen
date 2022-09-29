@@ -7,7 +7,7 @@
       "max": 100000
     },
     {
-      "name": "timestamp",
+      "name": "timestamp_of_production",
       "type": "TIMESTAMP"
     },
     {

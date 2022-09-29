@@ -83,7 +83,7 @@ case $CMD in
 
   (gen_transaction_hbase)
     echo "Starting to Generate Transaction Data into HBase"
-    ${PYTHON_COMMAND_INVOKER} ${CONF_DIR}/scripts/generate_data.py ${SERVER_PORT} /opt/cloudera/parcels/DATAGEN/models/transaction/transaction-model.json 10000 100 3600 ${TLS_ENABLED} ${ADMIN_USER} ${ADMIN_PASSWORD} hbase
+    ${PYTHON_COMMAND_INVOKER} ${CONF_DIR}/scripts/generate_data.py ${SERVER_PORT} /opt/cloudera/parcels/DATAGEN/models/finance/transaction-model.json 10000 100 3600 ${TLS_ENABLED} ${ADMIN_USER} ${ADMIN_PASSWORD} hbase
      ret=$?
      if [ $ret -ne 0 ]; then
        echo " Unable to generate data for transaction-model.json"

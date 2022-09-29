@@ -49,7 +49,7 @@ def main(server_port, model_file_path, rows, batches, timeout, tls_enabled, admi
         api_status_request = requests.post(protocol + "://localhost:" + server_port + "/command/get?commandUuid=" + command_uuid,
                                            headers=headers, verify=False, auth=(admin_user, admin_password))
         status = api_status_request.json().get("status")
-        print("Status is " + status)
+        print("Command is " + status)
         if status == "FINISHED" or status == "FAILED":
             break
         time.sleep(5)
