@@ -6,6 +6,9 @@ import time
 
 def main(server_port, model_file_path, rows, batches, timeout, tls_enabled, admin_user, admin_password, sinks):
 
+    import urllib3
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
     model_file_path_url_fromatted = model_file_path.replace("/", "%2F")
     headers = {"Accept":"*/*"}
     protocol = "http"

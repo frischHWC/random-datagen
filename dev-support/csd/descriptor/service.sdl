@@ -165,7 +165,8 @@
           "HOST": "${host}",
           "TRUSTSTORE_PASSWORD": "${ssl_client_truststore_password}",
           "KEYSTORE_PASSWORD": "${ssl_server_keystore_password}",
-          "KEYSTORE_KEYPASSWORD": "${ssl_server_keystore_keypassword}"
+          "KEYSTORE_KEYPASSWORD": "${ssl_server_keystore_keypassword}",
+          "ADMIN_PASSWORD": "${admin_password}"
         }
       },
       "configWriter": {

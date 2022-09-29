@@ -45,7 +45,9 @@ public class PropertiesLoader {
 
         propertiesAsProperties.forEach((propertyKey, propertyValue) -> {
             // Keys starting with spring or server are considered as internal spring-boot used and should not be taken
-            if(!propertyKey.toString().startsWith("spring.") && !propertyKey.toString().startsWith("server.")) {
+            if(!propertyKey.toString().startsWith("spring.")
+                && !propertyKey.toString().startsWith("server.")
+                && !propertyKey.toString().startsWith("security.")) {
                 ApplicationConfigs propAsAppConfig =
                     ApplicationConfigMapper.getApplicationConfigFromProperty(
                         propertyKey.toString());
