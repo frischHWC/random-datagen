@@ -2,6 +2,7 @@
 import requests
 import sys
 import time
+import socket
 
 
 def main(server_port, model_file_path, rows, batches, timeout, tls_enabled, admin_user, admin_password, sinks):
@@ -39,7 +40,7 @@ def main(server_port, model_file_path, rows, batches, timeout, tls_enabled, admi
 
     command_uuid = response.json().get("commandUuid")
     print("Received UUID for command: " + command_uuid)
-    print("Follow command progression at: " + protocol + "://localhost:" + server_port + "/command/get?commandUuid=" + command_uuid)
+    print("Follow command progression at: " + protocol + "://" + socket.gethostname() + ":" + server_port + "/command/get?commandUuid=" + command_uuid)
 
     if command_uuid is None or command_uuid == "":
         print("UUID received for command is empty")

@@ -347,7 +347,7 @@
           "commandRunner": {
             "program": "scripts/generate_data.sh",
             "args": [
-              "gen_customer_hdfs",
+              "gen_customer_ozone",
               "${app_port}",
               "${ssl_enabled}",
               "${admin_user}",
