@@ -6,6 +6,16 @@
       "max": 100000
     },
     {
+      "name": "maximum_qualified_emergency",
+      "type": "STRING",
+      "possible_values": ["VERY URGENT", "URGENT", "VERY IMPORTANT", "IMPORTANT"]
+    },
+    {
+      "name": "qualified_type",
+      "type": "STRING",
+      "possible_values": ["CRIME", "ELECTRICAL", "WATER", "TRANSPORT"]
+    },
+    {
       "name": "city",
       "type": "CITY",
       "filters": ["France"]
@@ -41,16 +51,6 @@
       "name": "phone_number",
       "type": "PHONE",
       "filters": ["France"]
-    },
-    {
-      "name": "maximum_qualified_emergency",
-      "type": "STRING",
-      "possible_values": ["VERY URGENT", "URGENT", "VERY IMPORTANT", "IMPORTANT"]
-    },
-    {
-      "name": "qualified_type",
-      "type": "STRING",
-      "possible_values": ["CRIME", "ELECTRICAL", "WATER", "TRANSPORT"]
     }
   ],
   "Table_Names": [
@@ -74,7 +74,7 @@
   ],
   "Primary_Keys": [
     {"KAFKA_MSG_KEY": "city"},
-    {"KUDU_PRIMARY_KEYS":  "team_id,qualified_type,maximum_qualified_emergency"},
+    {"KUDU_PRIMARY_KEYS":  "team_id,maximum_qualified_emergency,qualified_type"},
     {"KUDU_HASH_KEYS":  "maximum_qualified_emergency"},
     {"KUDU_RANGE_KEYS":  "qualified_type"}
   ],

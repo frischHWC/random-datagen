@@ -6,6 +6,12 @@
       "filters": ["France"]
     },
     {
+      "name": "date",
+      "type": "BIRTHDATE",
+      "min": "1/1/2015",
+      "max": "1/1/2022"
+    },
+    {
       "name": "lat",
       "type": "LINK",
       "conditionals": {
@@ -18,12 +24,6 @@
       "conditionals": {
         "link": "$city.long"
       }
-    },
-    {
-      "name": "date",
-      "type": "BIRTHDATE",
-      "min": "1/1/2015",
-      "max": "1/1/2022"
     },
     {
       "name": "wind_provenance_9_am",

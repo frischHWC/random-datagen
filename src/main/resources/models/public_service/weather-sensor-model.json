@@ -6,6 +6,10 @@
       "filters": ["France"]
     },
     {
+      "name": "measure_time",
+      "type": "TIMESTAMP"
+    },
+    {
       "name": "lat",
       "type": "LINK",
       "conditionals": {
@@ -18,10 +22,6 @@
       "conditionals": {
         "link": "$city.long"
       }
-    },
-    {
-      "name": "measure_time",
-      "type": "TIMESTAMP"
     },
     {
       "name": "wind_provenance",
