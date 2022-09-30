@@ -34,7 +34,7 @@ import java.util.concurrent.CountDownLatch;
 public class HiveSink implements SinkInterface {
 
     private final int threads_number;
-    private String hiveUri;
+    private final String hiveUri;
     private Connection hiveConnection;
     private HdfsParquetSink hdfsSink;
     private final String database;
@@ -66,7 +66,6 @@ public class HiveSink implements SinkInterface {
                     properties.get(ApplicationConfigs.HIVE_AUTH_KERBEROS_KEYTAB), new Configuration());
             }
 
-            String sslExtraParams = "";
 
             if(properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_LOCATION)!=null && properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_PASSWORD)!=null) {
                 System.setProperty("javax.net.ssl.trustStore", properties.get(
@@ -74,9 +73,6 @@ public class HiveSink implements SinkInterface {
                 System.setProperty("javax.net.ssl.trustStorePassword",
                     properties.get(
                         ApplicationConfigs.HIVE_TRUSTSTORE_PASSWORD));
-                sslExtraParams = ";ssl=true;sslTrustStore=" + properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_LOCATION) +
-                    ";trustStorePassword=" + properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_PASSWORD) ;
-                this.hiveUri = this.hiveUri + sslExtraParams;
             }
 
             java.util.Properties propertiesForHive = new Properties();
@@ -85,7 +81,7 @@ public class HiveSink implements SinkInterface {
 
             String hiveUriWithNoDatabase = "jdbc:hive2://" + properties.get(ApplicationConfigs.HIVE_ZK_QUORUM) +
                 "/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" + properties.get(ApplicationConfigs.HIVE_ZK_ZNODE) +
-                "?tez.queue.name=" + queue + sslExtraParams;
+                "?tez.queue.name=" + queue ;
 
             this.hiveConnection = DriverManager.getConnection(hiveUriWithNoDatabase, propertiesForHive);
 
