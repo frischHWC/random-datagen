@@ -34,6 +34,12 @@ then
     curl -k -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "@scripts/policies/kafka.json" -u ${RANGER_ADMIN_USER}:${RANGER_ADMIN_PASSWORD}  ${RANGER_URL}/service/public/v2/api/policy
   fi
 
+  if [ "${KAFKA_SERVICE}" != "" ] && [ "${KAFKA_SERVICE}" != "none" ]
+  then
+    echo "Pushing policy to Kafka Stream"
+    curl -k -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "@scripts/policies/kafka-stream.json" -u ${RANGER_ADMIN_USER}:${RANGER_ADMIN_PASSWORD}  ${RANGER_URL}/service/public/v2/api/policy
+  fi
+
   if [ "${KUDU_SERVICE}" != "" ] && [ "${KUDU_SERVICE}" != "none" ]
   then
     echo "Pushing policy to Kudu"
@@ -50,6 +56,12 @@ then
   then
     echo "Pushing policy to Schema Registry"
     curl -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "@scripts/policies/schemaregistry.json" -u ${RANGER_ADMIN_USER}:${RANGER_ADMIN_PASSWORD}  ${RANGER_URL}/service/public/v2/api/policy
+  fi
+
+  if [ "${SCHEMAREGISTRY_SERVICE}" != "" ] && [ "${SCHEMAREGISTRY_SERVICE}" != "none" ]
+  then
+    echo "Pushing policy to Schema Registry Stream"
+    curl -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "@scripts/policies/schemaregistry-stream.json" -u ${RANGER_ADMIN_USER}:${RANGER_ADMIN_PASSWORD}  ${RANGER_URL}/service/public/v2/api/policy
   fi
 
   if [ "${SOLR_SERVICE}" != "" ] && [ "${SOLR_SERVICE}" != "none" ]
