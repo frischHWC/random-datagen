@@ -83,17 +83,19 @@ public class KafkaSink implements SinkInterface {
             String jaasFilePath = (String) model.getOptionsOrDefault(OptionsConverter.Options.KAFKA_JAAS_FILE_PATH);
             Utils.createJaasConfigFile(jaasFilePath, "KafkaClient",
                 properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB), properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_USER),
-                    true, false, false);
-            Utils.createJaasConfigFile(jaasFilePath, "Client",
-                properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB), properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_USER),
-                true, false, false);
+                    true, true, false);
             Utils.createJaasConfigFile(jaasFilePath, "RegistryClient",
                 properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB), properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_USER),
-                    true, false, true);
+                    true, true, true);
             System.setProperty("java.security.auth.login.config", jaasFilePath);
 
             props.put(SaslConfigs.SASL_MECHANISM, properties.get(ApplicationConfigs.KAFKA_SASL_MECHANISM));
             props.put(SaslConfigs.SASL_KERBEROS_SERVICE_NAME, properties.get(ApplicationConfigs.KAFKA_SASL_KERBEROS_SERVICE_NAME));
+            props.put(SaslConfigs.SASL_JAAS_CONFIG, "com.sun.security.auth.module.Krb5LoginModule required " +
+                "useKeyTab=true " +
+                "storeKey=true " +
+                "keyTab=\""+ properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB) + "\" " +
+                "principal=\"" + properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_USER) + "\";");
 
             Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_USER),
                 properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB), new Configuration());
