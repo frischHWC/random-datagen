@@ -21,8 +21,15 @@ public class CommandRunnerController {
   @Autowired
   private CommandRunnerService commandRunnerService;
 
-  @PostMapping(value = "/get")
+  @PostMapping(value = "/getCommandStatus")
   public String getStatusOfACommand(
+      @RequestParam(name = "commandUuid") UUID commandUUID
+  ) {
+    return commandRunnerService.getCommandAsString(commandUUID);
+  }
+
+  @PostMapping(value = "/get")
+  public String getACommand(
       @RequestParam(name = "commandUuid") UUID commandUUID
   ) {
     return commandRunnerService.getCommandAsString(commandUUID);

@@ -44,9 +44,6 @@ public class SolRSink implements SinkInterface {
             System.setProperty("javax.net.ssl.trustStore", properties.get(ApplicationConfigs.SOLR_TRUSTSTORE_LOCATION));
             System.setProperty("javax.net.ssl.trustStorePassword", properties.get(ApplicationConfigs.SOLR_TRUSTSTORE_PASSWORD));
 
-            // Test to remove peer verification
-            System.setProperty("solr.ssl.checkPeerName", "false");
-
             protocol = "https";
         }
 

@@ -48,10 +48,20 @@ public class CommandRunnerService {
     writeScheduledCommands();
   }
 
+  public String getCommandStatusAsString(UUID uuid) {
+    Command command = commands.get(uuid) ;
+    if(command != null) {
+      return "{ \"commandUuid\": \"" + uuid + "\" ," +
+          " \"status\": \"" + command.getStatus().toString() + "\" ," +
+          " \"comment\": \"" + command.getCommandComment() + "\" }";
+    } else {
+      return "Not Found";
+    }
+  }
 
   public String getCommandAsString(UUID uuid) {
     Command command = commands.get(uuid) ;
-    return command != null ? command.toString() : "null";
+    return command != null ? command.toString() : "Not Found";
   }
 
   public List<String> getAllCommands() {
