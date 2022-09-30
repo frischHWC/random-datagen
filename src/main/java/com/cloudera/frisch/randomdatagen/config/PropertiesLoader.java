@@ -62,13 +62,11 @@ public class PropertiesLoader {
                 }
             }
         });
-        
-        log.info("Printing all properties before auto-discovery: ");
+
         printAllProperties();
 
         autoDiscover();
 
-        log.info("Printing all properties after auto-discovery: ");
         printAllProperties();
     }
 
@@ -87,7 +85,8 @@ public class PropertiesLoader {
     }
     
     private void printAllProperties() {
-        properties.forEach((key, value) -> log.info("Key: {} and Value: {}", key.toString(), value));
+        log.info("Printing all properties:  ");
+        properties.forEach((key, value) -> log.info("{} = {}", key.toString(), value));
     }
 
 

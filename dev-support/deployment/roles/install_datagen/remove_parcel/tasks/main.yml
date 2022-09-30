@@ -13,11 +13,26 @@
     body_format: json
   register: cloudera_manager_all_parcels
 
-
 - set_fact:
-    datagen_parcel_exists: "{{ cloudera_manager_all_parcels.json | community.general.json_query(query) | length > 0 }}"
+    datagen_parcel_existing: "{{ cloudera_manager_all_parcels.json | community.general.json_query(query) }}"
   vars:
     query: "items[?product == 'DATAGEN'].version | [0]"
+
+- name: DEBUG - datagen_parcel_existing
+  debug:
+    msg: "{{ datagen_parcel_existing }}"
+  when: debug | default(false)
+
+- set_fact:
+    datagen_parcel_exists: "{{ datagen_parcel_existing | length > 0 }}"
+  vars:
+    query: "items[?product == 'DATAGEN'].version | [0]"
+  when: datagen_parcel_existing is defined and datagen_parcel_existing is not none
+
+- set_fact:
+    datagen_parcel_exists: false
+  when: datagen_parcel_exists is not defined
+
 
 - name: DEBUG - datagen_parcel_exists
   debug:

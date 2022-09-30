@@ -34,7 +34,7 @@ import java.util.concurrent.CountDownLatch;
 public class HiveSink implements SinkInterface {
 
     private final int threads_number;
-    private final String hiveUri;
+    private String hiveUri;
     private Connection hiveConnection;
     private HdfsParquetSink hdfsSink;
     private final String database;
@@ -56,7 +56,7 @@ public class HiveSink implements SinkInterface {
         String locationTemporaryTable = (String) model.getTableNames().get(OptionsConverter.TableNames.HIVE_HDFS_FILE_PATH);
         this.hiveUri = "jdbc:hive2://" + properties.get(ApplicationConfigs.HIVE_ZK_QUORUM) + "/" +
             database + ";serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" +
-            properties.get(ApplicationConfigs.HIVE_ZK_ZNODE) + "?tez.queue.name=" + queue;
+            properties.get(ApplicationConfigs.HIVE_ZK_ZNODE) + "?tez.queue.name=" + queue ;
 
         try {
             if (Boolean.parseBoolean(properties.get(ApplicationConfigs.HIVE_AUTH_KERBEROS))) {
@@ -64,20 +64,26 @@ public class HiveSink implements SinkInterface {
                     properties.get(ApplicationConfigs.HIVE_AUTH_KERBEROS_KEYTAB), new Configuration());
             }
 
+            String sslExtraParams = "";
+
             if(properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_LOCATION)!=null && properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_PASSWORD)!=null) {
                 System.setProperty("javax.net.ssl.trustStore", properties.get(
                     ApplicationConfigs.HIVE_TRUSTSTORE_LOCATION));
                 System.setProperty("javax.net.ssl.trustStorePassword",
                     properties.get(
                         ApplicationConfigs.HIVE_TRUSTSTORE_PASSWORD));
+                sslExtraParams = ";ssl=true;sslTrustStore=" + properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_LOCATION) +
+                    ";trustStorePassword=" + properties.get(ApplicationConfigs.HIVE_TRUSTSTORE_PASSWORD) ;
+                this.hiveUri = this.hiveUri + sslExtraParams;
             }
 
             java.util.Properties propertiesForHive = new Properties();
             propertiesForHive.put("tez.queue.name", queue);
 
+
             String hiveUriWithNoDatabase = "jdbc:hive2://" + properties.get(ApplicationConfigs.HIVE_ZK_QUORUM) +
                 "/;serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" + properties.get(ApplicationConfigs.HIVE_ZK_ZNODE) +
-                "?tez.queue.name=" + queue ;
+                "?tez.queue.name=" + queue + sslExtraParams;
 
             this.hiveConnection = DriverManager.getConnection(hiveUriWithNoDatabase, propertiesForHive);
 
