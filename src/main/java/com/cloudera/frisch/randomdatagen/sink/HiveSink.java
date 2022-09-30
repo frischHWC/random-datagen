@@ -58,6 +58,8 @@ public class HiveSink implements SinkInterface {
             database + ";serviceDiscoveryMode=zooKeeper;zooKeeperNamespace=" +
             properties.get(ApplicationConfigs.HIVE_ZK_ZNODE) + "?tez.queue.name=" + queue ;
 
+        Utils.setupHadoopEnv(new org.apache.hadoop.conf.Configuration(), properties);
+
         try {
             if (Boolean.parseBoolean(properties.get(ApplicationConfigs.HIVE_AUTH_KERBEROS))) {
                 Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.HIVE_AUTH_KERBEROS_USER),

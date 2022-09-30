@@ -33,7 +33,7 @@ export DISTRO_SUFFIX="el7"
 export CLUSTER_NAME_STREAMING=""
 
 # DEBUG
-export DEBUG=false
+export DEBUG=true
 export LOG_DIR="/tmp/datagen-deploy-logs/"$(date +%m-%d-%Y-%H-%M-%S)
 export LAUNCH_GENERATION=true
 
@@ -202,6 +202,7 @@ fi
 
 
 # Launch playbook to clone repo on edge host, mvn clean package, create the CSD, create the parcel
+echo "################### Creation of Datagen ###################"
 if [ "${DEBUG}" = "true" ]
 then
     echo " Command launched: ansible-playbook -i ${HOSTS_TEMP} -e @${EXTRA_VARS_TEMP} playbooks/create_datagen.yml  "
@@ -221,6 +222,7 @@ fi
 
 
 # Launch playbook to remove any parcel, csd if existing, install the parcel and the csd
+echo "################### Installation of Datagen ###################"
 if [ "${DEBUG}" = "true" ]
 then
     echo " Command launched: ansible-playbook -i ${HOSTS_TEMP} -e @${EXTRA_VARS_TEMP} playbooks/install_datagen.yml  "
@@ -240,6 +242,7 @@ fi
 
 
 # Launch playbook to install the service on edge host using CM apis and launch any required command
+echo "################### Launch of Datagen ###################"
 if [ "${DEBUG}" = "true" ]
 then
     echo " Command launched: ansible-playbook -i ${HOSTS_TEMP} -e @${EXTRA_VARS_TEMP} playbooks/launch_datagen.yml  "
