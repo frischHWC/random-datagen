@@ -53,7 +53,10 @@ public class CommandRunnerService {
     if(command != null) {
       return "{ \"commandUuid\": \"" + uuid + "\" ," +
           " \"status\": \"" + command.getStatus().toString() + "\" ," +
-          " \"comment\": \"" + command.getCommandComment() + "\" }";
+          " \"comment\": \"" + command.getCommandComment() + "\" , +" +
+          " \"progress\": \"" + command.getProgress() + "\" , " +
+          " \"duration\": \"" + Utils.formatTimetaken(command.getDurationSeconds()) + "\" " +
+          "}";
     } else {
       return "Not Found";
     }
@@ -74,7 +77,7 @@ public class CommandRunnerService {
     List<String> commandsAsList = new ArrayList<>();
     commands.forEach((u,c) -> {
       if(c.getStatus()==status) {
-        commandsAsList.add(c.toString());
+        commandsAsList.add(getCommandStatusAsString(c.getCommandUuid()));
       }
     });
     return commandsAsList;

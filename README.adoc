@@ -1,6 +1,12 @@
-= Random - Data Generation
+= Datagen - Data Generation
 
 Goal of this project is to generate Random data in order to insert them into different services of CDP platform.
+
+== Dependencies
+
+Datagen is made in Java 11 and requires maven > 2.5.
+
+Datagen is made as a Spring Boot project with dependencies on various services of the CDP platform.
 
 == Glossary
 
@@ -9,69 +15,115 @@ Model = Representation of data model use to generate random data
 
 == Possible sinks
 
-List of possible sinks working:
+List of possible sinks:
 
 - HDFS-AVRO : generates an AVRO file sent to HDFS
 - HDFS-CSV : generates a CSV file sent to HDFS
+- HDFS-JSON : generates a JSON file sent to HDFS
 - HDFS-ORC : generates an ORC file sent to HDFS
 - HDFS-PARQUET : generates a PARQUET file sent to HDFS
-- HBase
-- Kafka: Generates an avro and send it to Kafka
-- Kudu
-- Ozone
-- SolR
-- Hive
-- Parquet: Generates a parquet file locally
+- HBASE
+- KAFKA : Generates an avro or json or csv message and send it to Kafka
+- KUDU
+- OZONE
+- OZONE-AVRO : generates an AVRO file sent to OZONE
+- OZONE-JSON : generates a JSON file sent to OZONE
+- OZONE-CSV : generates a CSV file sent to OZONE
+- OZONE-ORC : generates an ORC file sent to OZONE
+- OZONE-PARQUET : generates a PARQUET file sent to OZONE
+- SOLR
+- HIVE
+- PARQUET: Generates a parquet file locally
 - ORC: Generates an ORC file locally
 - CSV: Generate a CSV file locally
-- Avro: Generates an Avro file locally
+- AVRO: Generates an Avro file locally
+- JSON: Generates a JSON file locally
 
 
-== How to run it ?
+== How to run it locally ?
 
 First, go to link:pom.xml[pom.xml] and change cdp version to yours, change also if required, individual versions of each component. +
 Then Package the program:
 
         mvn clean package
 
-Use the script link:src/main/resources/launchToPlatform.sh[src/main/resources/launchToPlatform.sh].
-(Adapt it to your needs by changing user & machine of the platform) +
-
-Launch the script with 4 arguments: +
-- Location of model file (by default one is pushed alongside the jar: model.json) +
-- Packet of rows (linked) generated before inserting them to external systems +
-- Number of times to generate this bunch of rows +
-- List of sinks separated by a space that must either be: HDFS-AVRO, HDFS-ORC, HDFS-PARQUET, HDFS-CSV, HBASE, HIVE, IMPALA, KAFKA, OZONE, SOLR, AVRO, ORC, PARQUET, CSV
 
 [source,bash]
-java -jar random-datagen.jar <PATH_TO_MODEL> <NUMBER_OF_ROW_PER_ITERATION> <NUMBER_OF_ITERATION> <SINK>
+java -Dnashorn.args=--no-deprecation-warning --add-opens java.base/jdk.internal.ref=ALL-UNNAMED -jar random-datagen.jar
 
 
-Launching script example:
+== How to deploy it on CDP ?
+
+This project can be bundled to offer a parcel and an associated CSD, so it can be managed easily Cloudera Manager.
+
+To create the parcel, the CSD and deploy it to a cloudera cluster, it can either be made manually or with provided ansible playbooks scripts.
+
+Best is to use the script link:dev-support/deployment/deploy.sh[deploy.sh].
+
+Here is an example on how to launch it:
 
 [source,bash]
-java -jar random-datagen.jar model.json 1000 1000 HBASE
+./deploy.sh --cluster-name=my-cluster \
+    --cm-host=my.cm.host \
+    --edge-host=my.edge.host.where.datagen.will.be.deployed \
+    --ranger-password=ranger_password \
+    --datagen-version="1.0.0"
+
+See the helper command of the script to get more details on what customization are possible:
+
+[source,bash]
+----
+This script launches full deployment of Datagen on a running CDP Cluster
+
+Usage is the following :
+
+./deploy.sh
+  -h --help
+
+  --cluster-name= The name of the cluster to interact with (Default)
+  --edge-host= : To create data generation from this node and install the service on it (Default)
+  --ssh-key= : To connect to clusters host or provide a password (Default)
+  --ssh-password= : To connect to clusters host or provide a ssh-key (Default)
+
+  --cm-host= : Cloudera Manger Host  (Default)
+  --cm-port=7183 : Cloudera Manger Host  (Default) 7183
+  --cm-protocol=https : Cloudera Manger Host  (Default) https
+  --cm-user=admin : Cloudera Manger User (Default) admin
+  --cm-password=admin : Cloudera Manger Password (associated to the above user) (Default) admin
+
+  --ranger-password=admin : Ranger Password (associated to the admin user) (Default) admin
+
+  --cdp-version=7.1.7.1000 : Version of CDP on which Datagen is deployed (Default) 7.1.7.1000
+  --datagen-version=0.1.5 : Version of Datagen that will be set for this deployment  (Default) 0.1.5
+  --distro-suffix=el7 : Version of OS to deploy datagen  (Default) el7
+
+  --cluster-name-streaming= The name of the streaming cluster to interact with (that contains Kafka) (Default)
+
+  --debug=true : To set DEBUG log-level (Default) true
+  --log-dir=/tmp/datagen-deploy-logs/09-30-2022-18-59-24 : Log directory (Default) /tmp/datagen-deploy-logs/09-30-2022-18-59-24
+  --launch-generation=true : To launch API calls to generate data after installation (Default) true
+
+  --target-dir=/tmp/datagen : Target directory on edge machine (Default) /tmp/datagen
+
+  --data-gen-git-url=https://github.infra.cloudera.com/frisch/datagen : Datagen Git URL to use (if different of official one) (Default) https://github.infra.cloudera.com/frisch/datagen
+  --data-gen-git-branch=spring : Datagen Git Branch to use (if different of official one) (Default) main
+
+----
+
+
+
+== NOT RECOMMENDED: How to run it on a cluster in a non-integrated way ?
+
+Use script link:src/main/resources/scripts/launchToPlatform.sh[src/main/resources/launchToPlatform.sh] by setting your hostname, ssh user and key
+
 
 It will create a directory on the platform and send all needed files there. +
-Then script link:src/main/resources/launch.sh[src/main/resources/launch.sh] will be launched on platform.
+Then script link:src/main/resources/scripts/launch.sh[src/main/resources/scripts/launch.sh] will be launched on platform.
 
-This script add required jars to classpath and launch jar with provided arguments in the script.
-
-
-Note that once every needed files are copied to the platform, program could be directly launched there
-using launch.sh script under random-datagen directory, by providing arguments at the command line.
+This script add required jars to classpath and launch jar.
 
 
-== Random data
-
-=== Data
-
-Launch with at least 4 parameters:  +
-- Location of model file (by default one is defined under resources/model.json) +
-- Packet of rows (linked) generated before inserting them to external systems +
-- Number of times to generate this bunch of rows +
-- List of sinks separated by a space that must either be: HDFS, HBASE, HIVE, KAFKA, OZONE, SOLR, CSV
-
+== Data
 
 === Data generated
 
@@ -336,6 +388,9 @@ An array of following properties self-describing: +
 - HBASE_NAMESPACE +
 - KAFKA_TOPIC +
 - OZONE_VOLUME +
+- OZONE_BUCKET +
+- OZONE_KEY_NAME +
+- OZONE_LOCAL_FILE_PATH +
 - SOLR_COLLECTION +
 - HIVE_DATABASE +
 - HIVE_HDFS_FILE_PATH +
@@ -370,6 +425,8 @@ This mapping must be in the form : "CF:col1,col2;CF2:col5" +
 - KUDU_REPLICAS +
 - ONE_FILE_PER_ITERATION +
 - KAFKA_MESSAGE_TYPE +
+- KAFKA_JAAS_FILE_PATH +
+- SOLR_JAAS_FILE_PATH +
 - HIVE_THREAD_NUMBER +
 - HIVE_ON_HDFS +
 - HIVE_TEZ_QUEUE_NAME +
@@ -411,25 +468,30 @@ The command used to launch the application with yarn-submit project was the foll
 
 === How does it work ?
 
-There is a main that orchestrates the whole program: Main.java. +
+This is a Spring Boot server, that will listen to requests to generate data.
 
-This main reads the command-line arguments to know which model to use, how much data it should generate per iteration
-, how much iteration to do, and to which output system it should write (HDFS, HBase, Hive etc..).
+API Call to the DataGenerationController will lead to a call to CommandRunnerService that will create an object Command.
+This object contains all properties required to run a data generation: Basic properties like number of batches, threads, rows etc...
+Properties regarding the sink: sink, database name, paths, truststore etc...
+And the model file parsed and set as an object.
 
-It parses the model file and create a model object based on it, this model contains a list of fields with their definition,
-also table names definitions, primary keys and other options passed through model.
+This command is queued to be launched and an UUID is returned by the controller. (This ID can be used to track progress of the command)
 
-It then uses the config file link:src/main/resources/application.properties[src/main/resources/config.properties] to get
-configuration of output systems (that are called sink). It initiates sinks by creating needed files or tables for all required sinks.
+Generation are made one after another one by the processCommands() scheduled function running every seconds to un-queue a command and run it.
+It contains the logic of setting up batches, creates threads and send rows to desired sinks.
 
-Finally, it launches batches of generation of data, that are then send to all sinks in parallel.
+When a command is scheduled, it is simply added to a List of scheduled commands, which are then periodically checked and added to the queue
+list of processing if needed.
+
+Other controllers allows to check status of the server, get metrics, check status of commands, get all commands, remove schedule commands.
+There is also a controller to just run a test on a model, returning a row as a JSON directly.
 
 === How to add a sink ?
 
 - Create a Sink under sink package that extends SinkInterface 
 - Implements required functions (to send one and multiple rows to the output system) and all other
 needed function in this class
-- Add the sink in the function "stringToSink" of ArgumentsParser under config package
+- Add the sink in the function "stringToSink" of SinkParser under config package
 - Add the sink initialization under the function "sinksInit" of SinkSender under sink package
 - Add a function to create required object for insertion under Field abstract class
 - If needed, add a specific function for some or all Fields extended class

@@ -20,10 +20,10 @@ scp ${SSH_KEY} src/main/resources/scripts/launch.sh ${USER}@${HOST}:${DEST_DIR}/
 ssh ${SSH_KEY} ${USER}@${HOST} "chmod +x ${DEST_DIR}/launch.sh"
 
 cd target/
-tar -cvzf random-datagen.tar.gz random-datagen-*.jar
+tar -cvzf datagen.tar.gz datagen-*.jar
 cd ../
-scp ${SSH_KEY} target/random-datagen.tar.gz ${USER}@${HOST}:${DEST_DIR}/random-datagen.tar.gz
-ssh ${SSH_KEY} ${USER}@${HOST} "tar -xvzf ${DEST_DIR}/ ${DEST_DIR}/random-datagen.tar.gz"
+scp ${SSH_KEY} target/datagen.tar.gz ${USER}@${HOST}:${DEST_DIR}/datagen.tar.gz
+ssh ${SSH_KEY} ${USER}@${HOST} "tar -xvzf ${DEST_DIR}/ ${DEST_DIR}/datagen.tar.gz"
 
 echo "Finished to send required files"
 

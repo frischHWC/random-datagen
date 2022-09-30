@@ -37,7 +37,7 @@
 - name: Find jar compiled
   find:
     paths: "{{ target_dir }}/git-repo/target/"
-    patterns: 'random-datagen*.jar'
+    patterns: 'datagen*.jar'
   register: jar_compiled
 
 - name: Get Jar from Compilation

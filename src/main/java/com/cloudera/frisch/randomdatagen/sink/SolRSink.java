@@ -47,28 +47,28 @@ public class SolRSink implements SinkInterface {
             protocol = "https";
         }
 
-        HttpSolrClient.Builder solrClientBuilder = new HttpSolrClient.Builder(protocol + "://" +
-                properties.get(ApplicationConfigs.SOLR_SERVER_HOST).trim() + ":" +
-                properties.get(ApplicationConfigs.SOLR_SERVER_PORT).trim() + "/solr")
-                .withConnectionTimeout(10000)
-                .withSocketTimeout(60000);
-
         if (Boolean.parseBoolean(properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS))) {
             String jaasFilePath = (String) model.getOptionsOrDefault(OptionsConverter.Options.SOLR_JAAS_FILE_PATH);
             Utils.createJaasConfigFile(jaasFilePath, "SolrJClient",
                     properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_KEYTAB),
                     properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_USER),
-                    true, null, false);
+                    true, true, false);
             System.setProperty("java.security.auth.login.config", jaasFilePath);
             System.setProperty("solr.kerberos.jaas.appname", "SolrJClient");
+            System.setProperty("javax.security.auth.useSubjectCredsOnly", "false");
 
             try(Krb5HttpClientBuilder krb5HttpClientBuilder = new Krb5HttpClientBuilder()) {
-                HttpClientUtil.setHttpClientBuilder(krb5HttpClientBuilder.getHttpClientBuilder(java.util.Optional.empty()));
+                HttpClientUtil.setHttpClientBuilder(krb5HttpClientBuilder.getBuilder());
             } catch (Exception e) {
-                log.warn("Could set Kerberos for HTTP client due to error:", e);
+                log.warn("Could not set Kerberos for HTTP client due to error:", e);
             }
-
         }
+
+        HttpSolrClient.Builder solrClientBuilder = new HttpSolrClient.Builder(protocol + "://" +
+            properties.get(ApplicationConfigs.SOLR_SERVER_HOST).trim() + ":" +
+            properties.get(ApplicationConfigs.SOLR_SERVER_PORT).trim() + "/solr")
+            .withConnectionTimeout(10000)
+            .withSocketTimeout(60000);
 
         this.httpSolrClient = solrClientBuilder.build();
 
