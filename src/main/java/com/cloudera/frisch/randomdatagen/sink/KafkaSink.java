@@ -84,6 +84,9 @@ public class KafkaSink implements SinkInterface {
             Utils.createJaasConfigFile(jaasFilePath, "KafkaClient",
                 properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB), properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_USER),
                     true, false, false);
+            Utils.createJaasConfigFile(jaasFilePath, "Client",
+                properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB), properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_USER),
+                true, false, false);
             Utils.createJaasConfigFile(jaasFilePath, "RegistryClient",
                 properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_KEYTAB), properties.get(ApplicationConfigs.KAFKA_AUTH_KERBEROS_USER),
                     true, false, true);

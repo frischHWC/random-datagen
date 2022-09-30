@@ -261,7 +261,7 @@ case $CMD in
 
   (gen_public_service_kudu)
     echo "Starting to Generate public service Data into Kudu"
-    ${PYTHON_COMMAND_INVOKER} ${CONF_DIR}/scripts/generate_data.py ${SERVER_PORT} /opt/cloudera/parcels/DATAGEN/models/public_service/sensor-data-model.json 50000 20 3600 ${TLS_ENABLED} ${ADMIN_USER} ${ADMIN_PASSWORD} kudu
+    ${PYTHON_COMMAND_INVOKER} ${CONF_DIR}/scripts/generate_data.py ${SERVER_PORT} /opt/cloudera/parcels/DATAGEN/models/public_service/intervention-team-model.json 50000 20 3600 ${TLS_ENABLED} ${ADMIN_USER} ${ADMIN_PASSWORD} kudu
      ret=$?
      if [ $ret -ne 0 ]; then
        echo " Unable to generate data for intervention-team-model.json"

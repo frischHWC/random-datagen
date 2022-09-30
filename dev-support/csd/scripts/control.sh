@@ -9,12 +9,12 @@ case $CMD in
     chmod 700 "${CONF_DIR}/service.properties"
 
     TRUSTSTORE_CONFIG=""
-    if [ -z "${TRUSTSTORE_LOCATION}" ]
+    if [ -n "${TRUSTSTORE_LOCATION}" ]
     then
       TRUSTSTORE_CONFIG="-Djavax.net.ssl.trustStore=${TRUSTSTORE_LOCATION} "
     fi
 
-    if [ -z "${TRUSTSTORE_PASSWORD}" ]
+    if [ -n "${TRUSTSTORE_PASSWORD}" ]
     then
       TRUSTSTORE_CONFIG="${TRUSTSTORE_CONFIG} -Djavax.net.ssl.trustStorePassword=${TRUSTSTORE_PASSWORD} "
     fi
