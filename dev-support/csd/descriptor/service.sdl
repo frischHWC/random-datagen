@@ -195,7 +195,7 @@
           "PRINCIPAL": "${principal}/${host}",
           "USER": "${user}",
           "HOST": "${host}",
-          "TRUSTSTORE_LOCATION": "${ssl_client_truststore_location}"
+          "TRUSTSTORE_LOCATION": "${ssl_client_truststore_location}",
           "TRUSTSTORE_PASSWORD": "${ssl_client_truststore_password}",
           "KEYSTORE_PASSWORD": "${ssl_server_keystore_password}",
           "KEYSTORE_KEYPASSWORD": "${ssl_server_keystore_keypassword}",
