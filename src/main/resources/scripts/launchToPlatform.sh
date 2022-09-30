@@ -5,7 +5,7 @@
 # export SSH_KEY="-i <SSH_KEY>"
 
 export USER=root
-export DEST_DIR="/root/random-datagen"
+export DEST_DIR="/home/datagen/deploy/"
 
 echo "Create needed directory on platform and send required files there"
 
@@ -23,7 +23,7 @@ cd target/
 tar -cvzf random-datagen.tar.gz random-datagen-*.jar
 cd ../
 scp ${SSH_KEY} target/random-datagen.tar.gz ${USER}@${HOST}:${DEST_DIR}/random-datagen.tar.gz
-ssh ${SSH_KEY} ${USER}@${HOST} "tar -xvzf ${DEST_DIR}/random-datagen.tar.gz ${DEST_DIR}/"
+ssh ${SSH_KEY} ${USER}@${HOST} "tar -xvzf ${DEST_DIR}/ ${DEST_DIR}/random-datagen.tar.gz"
 
 echo "Finished to send required files"
 

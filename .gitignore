@@ -9,6 +9,7 @@ logs/
 logs/*
 src/main/resources/scripts/overall_launch.sh
 src/main/resources/scripts/create_release.sh
+src/main/resources/application-test.properties
 dev-support/parcel/install_parcel.sh
 dev-support/parcel/overall_launch.sh
 dev-support/csd/install_csd.sh
