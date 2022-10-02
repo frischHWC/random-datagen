@@ -33,13 +33,13 @@ then
     curl -k -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "@scripts/policies/ozone.json" -u ${RANGER_ADMIN_USER}:${RANGER_ADMIN_PASSWORD}  ${RANGER_URL}/service/public/v2/api/policy
 
     echo "Pushing policy to Schema Registry"
-    curl -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "@scripts/policies/schemaregistry.json" -u ${RANGER_ADMIN_USER}:${RANGER_ADMIN_PASSWORD}  ${RANGER_URL}/service/public/v2/api/policy
+    curl -k -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "@scripts/policies/schemaregistry.json" -u ${RANGER_ADMIN_USER}:${RANGER_ADMIN_PASSWORD}  ${RANGER_URL}/service/public/v2/api/policy
 
     echo "Pushing policy to Schema Registry Service"
-    curl -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "@scripts/policies/schemaregistry_service.json" -u ${RANGER_ADMIN_USER}:${RANGER_ADMIN_PASSWORD}  ${RANGER_URL}/service/public/v2/api/policy
+    curl -k -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "@scripts/policies/schemaregistry_service.json" -u ${RANGER_ADMIN_USER}:${RANGER_ADMIN_PASSWORD}  ${RANGER_URL}/service/public/v2/api/policy
 
     echo "Pushing policy to Schema Registry Serde"
-    curl -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "@scripts/policies/schemaregistry_serde.json" -u ${RANGER_ADMIN_USER}:${RANGER_ADMIN_PASSWORD}  ${RANGER_URL}/service/public/v2/api/policy
+    curl -k -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "@scripts/policies/schemaregistry_serde.json" -u ${RANGER_ADMIN_USER}:${RANGER_ADMIN_PASSWORD}  ${RANGER_URL}/service/public/v2/api/policy
 
     echo "Pushing policy to SolR"
     curl -k -X POST -H "Content-Type: application/json" -H "Accept: application/json" -d "@scripts/policies/solr.json" -u ${RANGER_ADMIN_USER}:${RANGER_ADMIN_PASSWORD}  ${RANGER_URL}/service/public/v2/api/policy
