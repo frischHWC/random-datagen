@@ -180,7 +180,7 @@
 
 - name: Get ZK Server full config
   uri:
-    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ solr_zk_name }}/roleConfigGroups/{{ zk_service_name }}-SERVER-BASE/config?view=full"
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/{{ solr_zk_name }}/roleConfigGroups/{{ solr_zk_name }}-SERVER-BASE/config?view=full"
     user: "{{ cloudera_manager_user }}"
     password: "{{ cloudera_manager_password }}"
     method: GET

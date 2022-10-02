@@ -78,7 +78,7 @@ public class SolRSink implements SinkInterface {
                             return new CloudSolrClient.Builder(zkHosts, Optional.of(znode)).build();
                         }
                     });
-            }catch (Exception e) {
+            } catch (Exception e) {
                 log.error("Could not connect to Solr due to error: ", e);
             }
 
