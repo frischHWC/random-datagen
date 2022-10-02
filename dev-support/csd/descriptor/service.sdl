@@ -677,8 +677,8 @@
           "name": "solr_znode",
           "label": "Solr Zookeeper Znode",
           "description": "SolR Zookeeper znode as: /<ZNODE>",
-          "default": "solr",
-          "type": "port"
+          "default": "/solr",
+          "type": "string"
         },
         {
           "name": "solr_tls_enabled",
