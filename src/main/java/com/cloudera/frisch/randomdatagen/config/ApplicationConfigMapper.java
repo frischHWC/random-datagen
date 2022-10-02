@@ -119,10 +119,10 @@ public class ApplicationConfigMapper {
       return ApplicationConfigs.HIVE_TRUSTSTORE_LOCATION;
     case "hive.truststore.password":
       return ApplicationConfigs.HIVE_TRUSTSTORE_PASSWORD;
-    case "solr.server.host":
-      return ApplicationConfigs.SOLR_SERVER_HOST;
-    case "solr.server.port":
-      return ApplicationConfigs.SOLR_SERVER_PORT;
+    case "solr.zookeeper.quorum":
+      return ApplicationConfigs.SOLR_ZK_QUORUM;
+    case "solr.zookeeper.znode":
+      return ApplicationConfigs.SOLR_ZK_NODE;
     case "solr.tls.enabled":
       return ApplicationConfigs.SOLR_TLS_ENABLED;
     case "solr.auth.kerberos":

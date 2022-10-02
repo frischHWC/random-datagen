@@ -2,7 +2,7 @@
   "name": "Datagen policy for schema registry service",
   "service": "cm_schema-registry",
   "policyType": 0,
-  "policyPriority": 0,
+  "policyPriority": 1,
   "description": "DATAGEN's policy for default generation",
   "policyLabels": [
 
@@ -12,8 +12,7 @@
   "resources": {
     "registry-service": {
       "values": [
-        "*",
-        "datagen*"
+        "*"
       ],
       "isRecursive": false,
       "isExcludes": false

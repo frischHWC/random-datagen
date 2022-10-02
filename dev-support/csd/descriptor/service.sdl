@@ -667,17 +667,17 @@
           "type": "string"
         },
         {
-          "name": "solr_host",
-          "label": "Solr Host",
-          "description": "SolR Host as: <SOLR_SERVER>",
+          "name": "solr_zk_quorum",
+          "label": "Solr Zookeepers",
+          "description": "SolR Zookeepers as: <ZK_SERVER_1>:<ZK_PORT>,<ZK_SERVER_2>:<ZK_PORT>",
           "default": "",
           "type": "string"
         },
         {
-          "name": "solr_port",
-          "label": "Solr Port",
-          "description": "SolR Port as: <SOLR_PORT>",
-          "default": "",
+          "name": "solr_znode",
+          "label": "Solr Zookeeper Znode",
+          "description": "SolR Zookeeper znode as: /<ZNODE>",
+          "default": "solr",
           "type": "port"
         },
         {

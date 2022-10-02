@@ -100,8 +100,8 @@ hive.truststore.password=#{truststore.password}
 
 
 # SOLR
-solr.server.host={{ globals['solr_host'] }}
-solr.server.port={{ globals['solr_port'] }}
+solr.zookeeper.quorum={{ globals['solr_zk_quorum'] }}
+solr.zookeeper.znode={{ globals['solr_znode'] }}
 solr.tls.enabled={{ globals['solr_tls_enabled'] }}
 solr.auth.kerberos=#{kerberos.enabled}
 # It is not needed to fill below configuration if KERBEROS is not activated

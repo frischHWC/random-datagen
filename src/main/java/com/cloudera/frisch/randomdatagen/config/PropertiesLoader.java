@@ -179,14 +179,14 @@ public class PropertiesLoader {
                     "hive.server2.zookeeper.namespace"));
         }
 
-        if(properties.get(ApplicationConfigs.SOLR_SERVER_HOST)==null
+        if(properties.get(ApplicationConfigs.SOLR_ZK_QUORUM)==null
             && properties.get(ApplicationConfigs.SOLR_ENV_PATH)!=null) {
             log.info("Going to auto-discover solr.server.host");
             // TODO: See later how to get that
 
         }
 
-        if(properties.get(ApplicationConfigs.SOLR_SERVER_PORT)==null
+        if(properties.get(ApplicationConfigs.SOLR_ZK_NODE)==null
             && properties.get(ApplicationConfigs.SOLR_ENV_PATH)!=null) {
             log.info("Going to auto-discover solr.server.port");
             // TODO: See later how to get that

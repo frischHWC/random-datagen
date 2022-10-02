@@ -704,8 +704,8 @@ public class DataGenerationController {
       @RequestParam(required = false, name = "threads") Integer threads,
       @RequestParam(required = false, name = "batches") Long numberOfBatches,
       @RequestParam(required = false, name = "rows") Long rowsPerBatch,
-      @RequestParam(required = false, name = "solr_host") String solrHost,
-      @RequestParam(required = false, name = "solr_port") String solrPort,
+      @RequestParam(required = false, name = "solr_zk_quorum") String solrZkQuorum,
+      @RequestParam(required = false, name = "solr_znode") String solrZnode,
       @RequestParam(required = false, name = "solr_tls") String solrTls,
       @RequestParam(required = false, name = "truststore_location") String trustoreLocation,
       @RequestParam(required = false, name = "truststore_password") String trustorePassword,
@@ -718,11 +718,11 @@ public class DataGenerationController {
     log.debug("Received request for SOLR with model: {} , threads: {} , batches: {}, rows: {}", modelFilePath, threads, numberOfBatches, rowsPerBatch);
 
     Map<ApplicationConfigs, String> extraProperties = new HashMap<>();
-    if(solrHost!=null && !solrHost.isEmpty()){
-      extraProperties.put(ApplicationConfigs.SOLR_SERVER_HOST, solrHost);
+    if(solrZkQuorum!=null && !solrZkQuorum.isEmpty()){
+      extraProperties.put(ApplicationConfigs.SOLR_ZK_QUORUM, solrZkQuorum);
     }
-    if(solrPort!=null && !solrPort.isEmpty()){
-      extraProperties.put(ApplicationConfigs.SOLR_SERVER_PORT, solrPort);
+    if(solrZnode!=null && !solrZnode.isEmpty()){
+      extraProperties.put(ApplicationConfigs.SOLR_ZK_NODE, solrZnode);
     }
     if(solrTls!=null && !solrTls.isEmpty()){
       extraProperties.put(ApplicationConfigs.SOLR_TLS_ENABLED, solrTls);

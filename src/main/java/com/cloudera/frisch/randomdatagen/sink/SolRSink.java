@@ -7,16 +7,16 @@ import com.cloudera.frisch.randomdatagen.model.Model;
 import com.cloudera.frisch.randomdatagen.model.OptionsConverter;
 import com.cloudera.frisch.randomdatagen.model.Row;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.kudu.client.KuduClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.BaseHttpSolrClient;
-import org.apache.solr.client.solrj.impl.HttpClientUtil;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
-import org.apache.solr.client.solrj.impl.Krb5HttpClientBuilder;
+import org.apache.solr.client.solrj.impl.*;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.security.PrivilegedExceptionAction;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SolRSink implements SinkInterface {
 
-    private final HttpSolrClient httpSolrClient;
+    private CloudSolrClient cloudSolrClient;
     private final String collection;
     private final Model model;
 
@@ -35,6 +35,9 @@ public class SolRSink implements SinkInterface {
     SolRSink(Model model, Map<ApplicationConfigs, String> properties) {
         this.collection = (String) model.getTableNames().get(OptionsConverter.TableNames.SOLR_COLLECTION);
         this.model = model;
+
+        List<String> zkHosts = Arrays.stream(properties.get(ApplicationConfigs.SOLR_ZK_QUORUM).split(",")).collect(Collectors.toList());
+        String znode = properties.get(ApplicationConfigs.SOLR_ZK_NODE);
 
         String protocol = "http";
 
@@ -46,6 +49,7 @@ public class SolRSink implements SinkInterface {
 
             protocol = "https";
         }
+
 
         if (Boolean.parseBoolean(properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS))) {
             String jaasFilePath = (String) model.getOptionsOrDefault(OptionsConverter.Options.SOLR_JAAS_FILE_PATH);
@@ -62,15 +66,28 @@ public class SolRSink implements SinkInterface {
             } catch (Exception e) {
                 log.warn("Could not set Kerberos for HTTP client due to error:", e);
             }
+
+            Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_USER),
+                properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_KEYTAB), new Configuration());
+
+            try {
+                this.cloudSolrClient = UserGroupInformation.getLoginUser().doAs(
+                    new PrivilegedExceptionAction<CloudSolrClient>() {
+                        @Override
+                        public CloudSolrClient run() throws Exception {
+                            return new CloudSolrClient.Builder(zkHosts, Optional.of(znode)).build();
+                        }
+                    });
+            }catch (Exception e) {
+                log.error("Could not connect to Solr due to error: ", e);
+            }
+
+
+        } else {
+            this.cloudSolrClient = new CloudSolrClient.Builder(zkHosts, Optional.of(znode)).build();
         }
 
-        HttpSolrClient.Builder solrClientBuilder = new HttpSolrClient.Builder(protocol + "://" +
-            properties.get(ApplicationConfigs.SOLR_SERVER_HOST).trim() + ":" +
-            properties.get(ApplicationConfigs.SOLR_SERVER_PORT).trim() + "/solr")
-            .withConnectionTimeout(10000)
-            .withSocketTimeout(60000);
 
-        this.httpSolrClient = solrClientBuilder.build();
 
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {
             deleteSolrCollection();
@@ -79,14 +96,14 @@ public class SolRSink implements SinkInterface {
         createSolRCollectionIfNotExists();
 
         // Set base URL directly to the collection, note that this is required
-        httpSolrClient.setBaseURL(protocol + "://" + properties.get(ApplicationConfigs.SOLR_SERVER_HOST) + ":" +
-            properties.get(ApplicationConfigs.SOLR_SERVER_PORT) + "/solr/" + collection);
+        cloudSolrClient.setDefaultCollection(collection);
+
     }
 
     @Override
     public void terminate() {
         try {
-            httpSolrClient.close();
+            cloudSolrClient.close();
         } catch (Exception e) {
             log.error("Could not close connection to SolR due to error: ", e);
         }
@@ -95,10 +112,10 @@ public class SolRSink implements SinkInterface {
     @Override
     public void sendOneBatchOfRows(List<Row> rows) {
         try {
-            httpSolrClient.add(
+            cloudSolrClient.add(
                     rows.parallelStream().map(Row::toSolRDoc).collect(Collectors.toList())
             );
-            httpSolrClient.commit();
+            cloudSolrClient.commit();
         } catch (Exception e) {
             log.error("An unexpected error occurred while adding documents to SolR collection : " +
                     collection + " due to error:", e);
@@ -108,7 +125,7 @@ public class SolRSink implements SinkInterface {
     private void createSolRCollectionIfNotExists() {
         try {
             log.debug("Creating collection : " + collection + " in SolR");
-            httpSolrClient.request(
+            cloudSolrClient.request(
                     CollectionAdminRequest.createCollection(collection,
                             (Integer) model.getOptionsOrDefault(OptionsConverter.Options.SOLR_SHARDS),
                             (Integer) model.getOptionsOrDefault(OptionsConverter.Options.SOLR_REPLICAS))
@@ -127,7 +144,7 @@ public class SolRSink implements SinkInterface {
 
     private void deleteSolrCollection() {
         try {
-            httpSolrClient.request(CollectionAdminRequest.deleteCollection(collection));
+            cloudSolrClient.request(CollectionAdminRequest.deleteCollection(collection));
         } catch (SolrServerException| IOException e) {
             log.error("Could not delete previous collection: " + collection + " due to error: ", e);
         }
