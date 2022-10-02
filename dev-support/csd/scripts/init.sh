@@ -48,3 +48,5 @@ fi
 
 
 echo "FINISHED INIT OF DATAGEN"
+
+exit 0
