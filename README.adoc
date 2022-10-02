@@ -1,46 +1,50 @@
 = Datagen - Data Generation
 
-Goal of this project is to generate Random data in order to insert them into different services of CDP platform.
+Goal of this project is to generate Data into various services of CDP platform.
 
 == Dependencies
 
-Datagen is made in Java 11 and requires maven > 2.5.
+Datagen is made with:
+
+- Java 11
+- Maven 2.5
+
+It is built for:
+
+- CDP 7.1.7
 
 Datagen is made as a Spring Boot project with dependencies on various services of the CDP platform.
 
-== Glossary
 
-Sink = Output system were data will be written, such as HDFS, HIVE, HBASE etc... +
-Model = Representation of data model use to generate random data
+== How does it work ?
 
-== Possible sinks
+Datagen is launching a Web Server with a sets of API to interact with.
+It comes also with a handy swagger to easily interact with APIs.
 
-List of possible sinks:
+These APIS lets you:
 
-- HDFS-AVRO : generates an AVRO file sent to HDFS
-- HDFS-CSV : generates a CSV file sent to HDFS
-- HDFS-JSON : generates a JSON file sent to HDFS
-- HDFS-ORC : generates an ORC file sent to HDFS
-- HDFS-PARQUET : generates a PARQUET file sent to HDFS
-- HBASE
-- KAFKA : Generates an avro or json or csv message and send it to Kafka
-- KUDU
-- OZONE
-- OZONE-AVRO : generates an AVRO file sent to OZONE
-- OZONE-JSON : generates a JSON file sent to OZONE
-- OZONE-CSV : generates a CSV file sent to OZONE
-- OZONE-ORC : generates an ORC file sent to OZONE
-- OZONE-PARQUET : generates a PARQUET file sent to OZONE
-- SOLR
-- HIVE
-- PARQUET: Generates a parquet file locally
-- ORC: Generates an ORC file locally
-- CSV: Generate a CSV file locally
-- AVRO: Generates an Avro file locally
-- JSON: Generates a JSON file locally
+- Ask for Data Generation to specified services
+- Schedule Data Generation to specified services
+- Test Data Generation
+- Get Metrics and health status of the web server
 
 
-== How to run it locally ?
+Parameters have all default values and can be empty (they will be defaulted), but they all also can be overriden,
+letting clients customize fully the data generation.
+
+By default, TLS is activated and a user/password is required (admin/admin by default).
+
+
+== Deployment
+
+Datagen can be run in two ways:
+
+- As a standalone web server, anywhere, but you'll need to provide configurations manually
+- Fully integrated into CDP using a parcel, a CSD and available as service through Cloudera Manager (configuration is automatic)
+
+
+
+=== How to run it locally ?
 
 First, go to link:pom.xml[pom.xml] and change cdp version to yours, change also if required, individual versions of each component. +
 Then Package the program:
@@ -52,7 +56,7 @@ Then Package the program:
 java -Dnashorn.args=--no-deprecation-warning --add-opens java.base/jdk.internal.ref=ALL-UNNAMED -jar random-datagen.jar
 
 
-== How to deploy it on CDP ?
+=== How to deploy it on CDP ?
 
 This project can be bundled to offer a parcel and an associated CSD, so it can be managed easily Cloudera Manager.
 
@@ -63,10 +67,10 @@ Best is to use the script link:dev-support/deployment/deploy.sh[deploy.sh].
 Here is an example on how to launch it:
 
 [source,bash]
-./deploy.sh --cluster-name=my-cluster \
+ ./deploy.sh \
+    --cluster-name=my-cluster \
     --cm-host=my.cm.host \
     --edge-host=my.edge.host.where.datagen.will.be.deployed \
-    --ranger-password=ranger_password \
     --datagen-version="1.0.0"
 
 See the helper command of the script to get more details on what customization are possible:
@@ -110,9 +114,17 @@ Usage is the following :
 
 ----
 
+Deploying it to CDP enables auto-configuration from Cloudera Manager, hence datagen is already configured to interact with services from CDP.
+It also ensures that rights are well set and default directories are created.
+
+Moreover, the full datagen service can be managed through Cloudera Manager (start/stop/configuration).
+
+It also provides already set up commands directly available from Cloudera Manager, under Datagen > Actions:
+
+image:dev-support/images/datagen_in_cm.png[Datagen Actions in CM]
 
 
-== NOT RECOMMENDED: How to run it on a cluster in a non-integrated way ?
+=== NOT RECOMMENDED: How to run it on a cluster in a non-integrated way ?
 
 Use script link:src/main/resources/scripts/launchToPlatform.sh[src/main/resources/launchToPlatform.sh] by setting your hostname, ssh user and key
 
@@ -123,7 +135,36 @@ Then script link:src/main/resources/scripts/launch.sh[src/main/resources/scripts
 This script add required jars to classpath and launch jar.
 
 
+
 == Data
+
+=== Where data will be generated ?
+
+There are various possible services where data can be generated, these are called sinks and here is the full possible list:
+
+- HDFS-AVRO : generates an AVRO file sent to HDFS
+- HDFS-CSV : generates a CSV file sent to HDFS
+- HDFS-JSON : generates a JSON file sent to HDFS
+- HDFS-ORC : generates an ORC file sent to HDFS
+- HDFS-PARQUET : generates a PARQUET file sent to HDFS
+- HBASE
+- KAFKA : Generates an avro or json or csv message and send it to Kafka
+- KUDU
+- OZONE
+- OZONE-AVRO : generates an AVRO file sent to OZONE
+- OZONE-JSON : generates a JSON file sent to OZONE
+- OZONE-CSV : generates a CSV file sent to OZONE
+- OZONE-ORC : generates an ORC file sent to OZONE
+- OZONE-PARQUET : generates a PARQUET file sent to OZONE
+- SOLR
+- HIVE
+- PARQUET: Generates a parquet file locally
+- ORC: Generates an ORC file locally
+- CSV: Generate a CSV file locally
+- AVRO: Generates an Avro file locally
+- JSON: Generates a JSON file locally
+
+__N.B: It is possible to output same data into various sinks__
 
 === Data generated
 

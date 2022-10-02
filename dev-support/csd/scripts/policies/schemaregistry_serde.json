@@ -1,37 +1,19 @@
 {
-  "name": "datagen policy",
+  "name": "Datagen policy for schema registry serde",
+  "service": "cm_schema-registry",
   "policyType": 0,
   "policyPriority": 0,
   "description": "DATAGEN's policy for default generation",
   "policyLabels": [
 
   ],
+  "sameLevel40schema-branch": null,
   "isAuditEnabled": true,
   "resources": {
-    "schema-group": {
-      "values": [
+    "registry-service": {
+      "serde": [
+        "*",
         "datagen*"
-      ],
-      "isRecursive": false,
-      "isExcludes": false
-    },
-    "schema-metadata": {
-      "values": [
-        "*"
-      ],
-      "isRecursive": false,
-      "isExcludes": false
-    },
-    "schema-branch": {
-      "values": [
-        "*"
-      ],
-      "isRecursive": false,
-      "isExcludes": false
-    },
-    "schema-version": {
-      "values": [
-        "*"
       ],
       "isRecursive": false,
       "isExcludes": false
@@ -71,6 +53,5 @@
   ],
   "denyExceptions": [
 
-  ],
-  "service": "cm_schema-registry_stream"
+  ]
 }

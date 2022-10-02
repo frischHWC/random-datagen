@@ -124,7 +124,7 @@
   ],
   "Options": [
     {"SOLR_SHARDS":  3},
-    {"SOLR_REPLICAS":  2},
+    {"SOLR_REPLICAS":  1},
     {"KAFKA_ACKS_CONFIG":  "all"},
     {"KAFKA_RETRIES_CONFIG":  3},
     {"KUDU_REPLICAS":  1},
