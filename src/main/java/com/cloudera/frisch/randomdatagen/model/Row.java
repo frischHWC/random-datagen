@@ -98,7 +98,7 @@ public class Row<T extends Field> {
         this.model.getFields().forEach((name, fieldtype) ->
             genericRecordRow.put(name.toString(), model.getFieldFromName(name.toString()).toAvroValue(values.get(name.toString())))
         );
-        return new AbstractMap.SimpleEntry<>(model.getPrimaryKeys().get(OptionsConverter.PrimaryKeys.KAFKA_MSG_KEY).toString(), genericRecordRow);
+        return new AbstractMap.SimpleEntry<>(getPrimaryKeysValues(OptionsConverter.PrimaryKeys.KAFKA_MSG_KEY), genericRecordRow);
     }
 
     public Map.Entry<String, String> toKafkaMessageString(KafkaSink.MessageType messageType) {

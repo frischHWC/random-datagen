@@ -117,7 +117,7 @@ public class CityField extends Field<CityField.City> {
      */
     @Override
     public String toStringValue(City value) {
-        return value.toString();
+        return value.getName();
     }
     @Override
     public City toCastValue(String value) {
