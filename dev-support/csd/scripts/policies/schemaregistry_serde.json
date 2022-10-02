@@ -1,5 +1,5 @@
 {
-  "name": "Datagen policy for schema registry serde",
+  "name": "datagen policy for schema registry serde",
   "service": "cm_schema-registry",
   "policyType": 0,
   "policyPriority": 1,
@@ -10,8 +10,8 @@
   "sameLevel40schema-branch": null,
   "isAuditEnabled": true,
   "resources": {
-    "registry-service": {
-      "serde": [
+    "serde": {
+      "values": [
         "*"
       ],
       "isRecursive": false,
