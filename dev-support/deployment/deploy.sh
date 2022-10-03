@@ -36,7 +36,7 @@ export CLUSTER_NAME_STREAMING=""
 # DEBUG
 export DEBUG=true
 export LOG_DIR="/tmp/datagen-deploy-logs/"$(date +%m-%d-%Y-%H-%M-%S)
-export LAUNCH_GENERATION=true
+export LAUNCH_GENERATION=false
 
 # Target Directory
 export TARGET_DIR="/tmp/datagen"

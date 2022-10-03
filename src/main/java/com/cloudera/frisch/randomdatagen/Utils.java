@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -360,7 +361,7 @@ public class Utils {
      */
     public static void recap(long numberOfBatches, long rowPerBatch, List<SinkParser.Sink> sinks, Model model) {
         log.info(" ************************* Recap of data generation ****************** ");
-        log.info("Generated " + rowPerBatch*numberOfBatches + " rows into : ");
+        log.info("Generated " + formatNumber(rowPerBatch*numberOfBatches) + " rows into : ");
 
         sinks.forEach(sink -> {
             switch (sink) {
@@ -373,8 +374,7 @@ public class Utils {
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
                         "-0000000000.csv");
-                    log.info("       to : ");
-                    log.info("       " +
+                    log.info("       to : " +
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                         model.getTableNames()
@@ -399,8 +399,7 @@ public class Utils {
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
                         "-0000000000.json");
-                    log.info("       to : ");
-                    log.info("       " +
+                    log.info("       to : " +
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                         model.getTableNames()
@@ -425,8 +424,7 @@ public class Utils {
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
                         "-0000000000.avro");
-                    log.info("       to : ");
-                    log.info("       " +
+                    log.info("       to : " +
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                         model.getTableNames()
@@ -451,8 +449,7 @@ public class Utils {
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
                         "-0000000000.orc");
-                    log.info("       to : ");
-                    log.info("       " +
+                    log.info("       to : " +
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                         model.getTableNames()
@@ -477,8 +474,7 @@ public class Utils {
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.HDFS_FILE_NAME) +
                         "-0000000000.parquet");
-                    log.info("       to : ");
-                    log.info("       " +
+                    log.info("       to : " +
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.HDFS_FILE_PATH) +
                         model.getTableNames()
@@ -521,8 +517,7 @@ public class Utils {
                     log.info("        From :" + model.getTableNames()
                         .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
                         "-0000000000.parquet");
-                    log.info("        to : ");
-                    log.info("       " +
+                    log.info("        to : " +
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
                         "-" +
@@ -543,8 +538,7 @@ public class Utils {
                     log.info("        From :" + model.getTableNames()
                         .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
                         "-0000000000.orc");
-                    log.info("        to : ");
-                    log.info("       " +
+                    log.info("        to : " +
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
                         "-" +
@@ -565,8 +559,7 @@ public class Utils {
                     log.info("        From :" + model.getTableNames()
                         .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
                         "-0000000000.avro");
-                    log.info("        to : ");
-                    log.info("       " +
+                    log.info("        to : " +
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
                         "-" +
@@ -587,8 +580,7 @@ public class Utils {
                     log.info("        From :" + model.getTableNames()
                         .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
                         "-0000000000.csv");
-                    log.info("        to : ");
-                    log.info("       " +
+                    log.info("        to : " +
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
                         "-" +
@@ -609,8 +601,7 @@ public class Utils {
                     log.info("        From :" + model.getTableNames()
                         .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
                         "-0000000000.json");
-                    log.info("        to : ");
-                    log.info("       " +
+                    log.info("        to : " +
                         model.getTableNames()
                             .get(OptionsConverter.TableNames.OZONE_KEY_NAME) +
                         "-" +
@@ -695,6 +686,23 @@ public class Utils {
 
         });
         log.info("****************************************************************");
+    }
+
+    public static String formatNumber(long numberToformat) {
+        DecimalFormat thousandsFormatter = new DecimalFormat("### ###");
+        DecimalFormat millionsFormatter = new DecimalFormat("### ### ###");
+        DecimalFormat billionFormatter = new DecimalFormat("### ### ### ###");
+        DecimalFormat thousandBillionFormatter = new DecimalFormat("### ### ### ### ###");
+
+        if(numberToformat>999999999999L) {
+            return thousandBillionFormatter.format(numberToformat);
+        } else if(numberToformat>999999999L) {
+            return billionFormatter.format(numberToformat);
+        } else if(numberToformat>999999L) {
+            return millionsFormatter.format(numberToformat);
+        } else {
+            return thousandsFormatter.format(numberToformat);
+        }
     }
 
 

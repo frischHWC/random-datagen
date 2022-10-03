@@ -39,27 +39,15 @@ public class SolRSink implements SinkInterface {
         List<String> zkHosts = Arrays.stream(properties.get(ApplicationConfigs.SOLR_ZK_QUORUM).split(",")).collect(Collectors.toList());
         String znode = properties.get(ApplicationConfigs.SOLR_ZK_NODE);
 
-        String protocol = "http";
-
         if(Boolean.parseBoolean(properties.get(ApplicationConfigs.SOLR_TLS_ENABLED))) {
             System.setProperty("javax.net.ssl.keyStore", properties.get(ApplicationConfigs.SOLR_KEYSTORE_LOCATION));
             System.setProperty("javax.net.ssl.keyStorePassword", properties.get(ApplicationConfigs.SOLR_KEYSTORE_PASSWORD));
             System.setProperty("javax.net.ssl.trustStore", properties.get(ApplicationConfigs.SOLR_TRUSTSTORE_LOCATION));
             System.setProperty("javax.net.ssl.trustStorePassword", properties.get(ApplicationConfigs.SOLR_TRUSTSTORE_PASSWORD));
-
-            protocol = "https";
         }
 
 
         if (Boolean.parseBoolean(properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS))) {
-            String jaasFilePath = (String) model.getOptionsOrDefault(OptionsConverter.Options.SOLR_JAAS_FILE_PATH);
-            Utils.createJaasConfigFile(jaasFilePath, "SolrJClient",
-                    properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_KEYTAB),
-                    properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_USER),
-                    true, true, false);
-            System.setProperty("java.security.auth.login.config", jaasFilePath);
-            System.setProperty("solr.kerberos.jaas.appname", "SolrJClient");
-            System.setProperty("javax.security.auth.useSubjectCredsOnly", "false");
 
             try(Krb5HttpClientBuilder krb5HttpClientBuilder = new Krb5HttpClientBuilder()) {
                 HttpClientUtil.setHttpClientBuilder(krb5HttpClientBuilder.getBuilder());
@@ -86,7 +74,6 @@ public class SolRSink implements SinkInterface {
         } else {
             this.cloudSolrClient = new CloudSolrClient.Builder(zkHosts, Optional.of(znode)).build();
         }
-
 
 
         if ((Boolean) model.getOptionsOrDefault(OptionsConverter.Options.DELETE_PREVIOUS)) {

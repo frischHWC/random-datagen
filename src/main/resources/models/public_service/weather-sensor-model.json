@@ -82,7 +82,7 @@
     {"SOLR_SHARDS":  3},
     {"SOLR_REPLICAS":  1},
     {"KAFKA_ACKS_CONFIG":  "all"},
-    {"KAFKA_MESSAGE_TYPE":  "CSV"},
+    {"KAFKA_MESSAGE_TYPE":  "JSON"},
     {"KAFKA_RETRIES_CONFIG":  3},
     {"KUDU_REPLICAS":  1},
     {"KUDU_BUCKETS":  32},

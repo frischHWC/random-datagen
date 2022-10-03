@@ -106,8 +106,8 @@
     },
     {
       "name": "gen_public_service_kafka",
-      "label": "Generates 1M Public Service Data to Kafka",
-      "description": "Generates 1M Public Service Data to Kafka",
+      "label": "Generates 1M Public Service Data to Kafka in Avro",
+      "description": "Generates 1M Public Service Data to Kafka in Avro",
       "roleCommand": "gen_public_service_kafka",
       "roleName": "DATAGEN_SERVER",
       "runMode": "single"
@@ -122,8 +122,8 @@
     },
     {
       "name": "gen_weather_kafka",
-      "label": "Generates 1M Weather Data to Kafka ",
-      "description": "Generates 1M Weather Data to Kafka",
+      "label": "Generates 1M Weather Data to Kafka in JSON",
+      "description": "Generates 1M Weather Data to Kafka in JSON",
       "roleCommand": "gen_weather_kafka",
       "roleName": "DATAGEN_SERVER",
       "runMode": "single"
@@ -396,8 +396,8 @@
         },
         {
           "name": "gen_public_service_kafka",
-          "label": "Generate Public Service Data to Kafka",
-          "description": "Generates 1M Public Service Data to Kafka",
+          "label": "Generate Public Service Data to Kafka in Avro",
+          "description": "Generates 1M Public Service Data to Kafka in Avro",
           "expectedExitCodes": [
             0
           ],
@@ -453,8 +453,8 @@
         },
         {
           "name": "gen_weather_kafka",
-          "label": "Generate 1M Weather Data to Kafka",
-          "description": "Generate 1M Weather Data to Kafka",
+          "label": "Generate 1M Weather Data to Kafka in JSON",
+          "description": "Generate 1M Weather Data to Kafka in JSON",
           "expectedExitCodes": [
             0
           ],
