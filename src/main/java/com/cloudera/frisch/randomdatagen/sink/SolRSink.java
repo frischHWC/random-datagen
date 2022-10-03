@@ -49,21 +49,19 @@ public class SolRSink implements SinkInterface {
 
         if (Boolean.parseBoolean(properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS))) {
 
-            try(Krb5HttpClientBuilder krb5HttpClientBuilder = new Krb5HttpClientBuilder()) {
+            try {
+                Krb5HttpClientBuilder krb5HttpClientBuilder = new Krb5HttpClientBuilder();
                 HttpClientUtil.setHttpClientBuilder(krb5HttpClientBuilder.getBuilder());
-            } catch (Exception e) {
-                log.warn("Could not set Kerberos for HTTP client due to error:", e);
-            }
 
             Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_USER),
                 properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_KEYTAB), new Configuration());
 
-            try {
-                this.cloudSolrClient = UserGroupInformation.getLoginUser().doAs(
+                UserGroupInformation.getLoginUser().doAs(
                     new PrivilegedExceptionAction<CloudSolrClient>() {
                         @Override
                         public CloudSolrClient run() throws Exception {
-                            return new CloudSolrClient.Builder(zkHosts, Optional.of(znode)).build();
+                            cloudSolrClient = new CloudSolrClient.Builder(zkHosts, Optional.of(znode)).build();
+                            return cloudSolrClient;
                         }
                     });
             } catch (Exception e) {
