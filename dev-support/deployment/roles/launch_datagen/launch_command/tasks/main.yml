@@ -130,7 +130,7 @@
 
 - name: Generate Public Service Data
   uri:
-    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/datagen/commands/gen_ps_kafka_kudu"
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/datagen/commands/gen_public_service_kudu"
     user: "{{ cloudera_manager_user }}"
     password: "{{ cloudera_manager_password }}"
     method: POST
@@ -158,7 +158,7 @@
 
 - name: Generate Weather Data
   uri:
-    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/datagen/commands/gen_weather_solr_kafka"
+    url: "{{ cloudera_manager_api_url }}/clusters/{{ cluster_name }}/services/datagen/commands/gen_weather_kafka"
     user: "{{ cloudera_manager_user }}"
     password: "{{ cloudera_manager_password }}"
     method: POST
