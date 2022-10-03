@@ -269,9 +269,10 @@
     body_format: json
   register: cloudera_manager_all_services
 
-- set_fact:
-    cluster_name_streaming: "{{ cluster_name }}"
-  when: cluster_name_streaming == ''
+- name: DEBUG - cluster_name_streaming
+  debug:
+    msg: "{{ cluster_name_streaming }}"
+  when: debug | default(false)
 
 - name: Get All services from CM for streaming cluster (Kafka + SR)
   uri:

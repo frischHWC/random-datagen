@@ -177,7 +177,7 @@
 # When using a streaming cluster, kafka link should not be made
 - set_fact:
     kafka_name: ""
-  when: not kafka_exists or cluster_name_streaming != ''
+  when: not kafka_exists or cluster_name_streaming != cluster_name
 
 - name: DEBUG - kafka_name
   debug:
@@ -203,7 +203,7 @@
 # When using a streaming cluster, schema registry link should not be made
 - set_fact:
     sr_name: ""
-  when: not sr_exists or cluster_name_streaming != ''
+  when: not sr_exists or cluster_name_streaming != cluster_name
 
 - name: DEBUG - sr_name
   debug:

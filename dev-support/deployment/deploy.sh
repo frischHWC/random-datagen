@@ -30,6 +30,7 @@ export DATAGEN_VERSION="0.1.5"
 export DISTRO_SUFFIX="el7"
 
 # If using a streaming cluster for Kafka and Schema Registry (specify its name using this variable)
+# If not, it will default to base cluster name
 export CLUSTER_NAME_STREAMING=""
 
 # DEBUG
@@ -42,7 +43,7 @@ export TARGET_DIR="/tmp/datagen"
 
 # Datagen Repository
 export DATA_GEN_GIT_URL="https://github.infra.cloudera.com/frisch/datagen"
-export DATA_GEN_GIT_BRANCH="spring"
+export DATA_GEN_GIT_BRANCH="main"
 
 
 
@@ -186,6 +187,11 @@ then
 elif [ "${SSH_PASSWORD}" != "" ]
 then
     echo "ansible_ssh_pass=${PASSWORD}" >> ${HOSTS_TEMP}
+fi
+
+if [ -z "${CLUSTER_NAME_STREAMING}" ] || [ "${CLUSTER_NAME_STREAMING}" == "" ]
+then
+  export CLUSTER_NAME_STREAMING="${CLUSTER_NAME}"
 fi
 
 envsubst < extra-vars.yml > ${EXTRA_VARS_TEMP}
