@@ -358,7 +358,7 @@
         },
         {
           "name": "gen_transaction_hbase",
-          "label": "Generate Transaction Data",
+          "label": "Generates 1M Transactions to HBase",
           "description": "Generates 1M Transactions to HBase",
           "expectedExitCodes": [
             0
@@ -377,7 +377,7 @@
         },
         {
           "name": "gen_sensor_hive",
-          "label": "Generate Sensor Data",
+          "label": "Generates 10M Sensors Data to Hive",
           "description": "Generates 10M Sensors Data to Hive",
           "expectedExitCodes": [
             0
@@ -396,7 +396,7 @@
         },
         {
           "name": "gen_public_service_kafka",
-          "label": "Generate Public Service Data to Kafka in Avro",
+          "label": "Generates 1M Public Service Data to Kafka in Avro",
           "description": "Generates 1M Public Service Data to Kafka in Avro",
           "expectedExitCodes": [
             0
@@ -415,7 +415,7 @@
         },
         {
           "name": "gen_public_service_kudu",
-          "label": "Generate Public Service Data to Kudu",
+          "label": "Generates 1M Public Service Data to Kudu",
           "description": "Generates 1M Public Service Data to Kudu",
           "expectedExitCodes": [
             0
