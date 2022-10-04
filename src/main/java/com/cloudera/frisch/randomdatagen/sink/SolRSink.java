@@ -54,9 +54,12 @@ public class SolRSink implements SinkInterface {
                     properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_KEYTAB),
                     properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_USER),
                     true, true, false);
+                Utils.createJaasConfigFile(jaasFilePath, "Client",
+                    properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_KEYTAB),
+                    properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_USER),
+                    true, true, false);
                 System.setProperty("java.security.auth.login.config", jaasFilePath);
                 System.setProperty("solr.kerberos.jaas.appname", "SolrJClient");
-                System.setProperty("javax.security.auth.useSubjectCredsOnly", "false");
 
                 Krb5HttpClientBuilder krb5HttpClientBuilder = new Krb5HttpClientBuilder();
                 HttpClientUtil.setHttpClientBuilder(krb5HttpClientBuilder.getBuilder());
