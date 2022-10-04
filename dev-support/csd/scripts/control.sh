@@ -22,6 +22,7 @@ case $CMD in
     exec ${JAVA_HOME}/bin/java -Dnashorn.args=--no-deprecation-warning --add-opens java.base/jdk.internal.ref=ALL-UNNAMED ${TRUSTSTORE_CONFIG} -Dspring.profiles.active=cdp -Dserver.port=${SERVER_PORT} \
      -jar -Xmx${MAX_HEAP_SIZE}G ${DATAGEN_JAR_PATH} --spring.config.location=file:${CONF_DIR}/service.properties
     ;;
+
   (*)
     echo "Don't understand [$CMD]"
     ;;

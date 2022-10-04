@@ -48,13 +48,21 @@ public class SolRSink implements SinkInterface {
 
 
         if (Boolean.parseBoolean(properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS))) {
-
             try {
+                String jaasFilePath = (String) model.getOptionsOrDefault(OptionsConverter.Options.SOLR_JAAS_FILE_PATH);
+                Utils.createJaasConfigFile(jaasFilePath, "SolrJClient",
+                    properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_KEYTAB),
+                    properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_USER),
+                    true, true, false);
+                System.setProperty("java.security.auth.login.config", jaasFilePath);
+                System.setProperty("solr.kerberos.jaas.appname", "SolrJClient");
+                System.setProperty("javax.security.auth.useSubjectCredsOnly", "false");
+
                 Krb5HttpClientBuilder krb5HttpClientBuilder = new Krb5HttpClientBuilder();
                 HttpClientUtil.setHttpClientBuilder(krb5HttpClientBuilder.getBuilder());
 
-            Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_USER),
-                properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_KEYTAB), new Configuration());
+                Utils.loginUserWithKerberos(properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_USER),
+                    properties.get(ApplicationConfigs.SOLR_AUTH_KERBEROS_KEYTAB), new Configuration());
 
                 UserGroupInformation.getLoginUser().doAs(
                     new PrivilegedExceptionAction<CloudSolrClient>() {

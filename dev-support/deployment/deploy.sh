@@ -29,6 +29,11 @@ export CDP_VERSION="7.1.7.1000"
 export DATAGEN_VERSION="0.1.5"
 export DISTRO_SUFFIX="el7"
 
+# Steps to launch
+export CREATE_DATAGEN=true
+export INSTALL_DATAGEN=true
+export LAUNCH_DATAGEN=true
+
 # If using a streaming cluster for Kafka and Schema Registry (specify its name using this variable)
 # If not, it will default to base cluster name
 export CLUSTER_NAME_STREAMING=""
@@ -84,6 +89,9 @@ function usage()
     echo "  --data-gen-git-url=$DATA_GEN_GIT_URL : Datagen Git URL to use (if different of official one) (Default) $DATA_GEN_GIT_URL "
     echo "  --data-gen-git-branch=$DATA_GEN_GIT_BRANCH : Datagen Git Branch to use (if different of official one) (Default) $DATA_GEN_GIT_BRANCH "
     echo ""
+    echo "  --create-datagen=$CREATE_DATAGEN : To launch playbooks for creation of datagen (Default) $CREATE_DATAGEN "
+    echo "  --install-datagen=$INSTALL_DATAGEN : To launch playbooks for installation of datagen (Default) $INSTALL_DATAGEN "
+    echo "  --launch-datagen=$LAUNCH_DATAGEN : To launch playbooks for launch of datagen (Default) $LAUNCH_DATAGEN "
     echo ""
 }
 
@@ -155,7 +163,16 @@ while [ "$1" != "" ]; do
             ;;
         --data-gen-git-branch)
             DATA_GEN_GIT_BRANCH=$VALUE
-            ;;  
+            ;;
+        --create-datagen)
+            CREATE_DATAGEN=$VALUE
+            ;;
+        --install-datagen)
+            INSTALL_DATAGEN=$VALUE
+            ;;
+        --launch-datagen)
+            LAUNCH_DATAGEN=$VALUE
+            ;;
         *)
             ;;
     esac
@@ -207,6 +224,9 @@ then
 fi
 
 
+
+if [ "${CREATE_DATAGEN}" == "true" ]
+then
 # Launch playbook to clone repo on edge host, mvn clean package, create the CSD, create the parcel
 echo "################### Creation of Datagen ###################"
 if [ "${DEBUG}" = "true" ]
@@ -224,9 +244,11 @@ else
   echo " See details in file: ${LOG_DIR}/create_datagen.log "
   exit 1
 fi
+fi
 
 
-
+if [ "${INSTALL_DATAGEN}" == "true" ]
+then
 # Launch playbook to remove any parcel, csd if existing, install the parcel and the csd
 echo "################### Installation of Datagen ###################"
 if [ "${DEBUG}" = "true" ]
@@ -244,9 +266,11 @@ else
   echo " See details in file: ${LOG_DIR}/install_datagen.log "
   exit 1
 fi
+fi
 
 
-
+if [ "${LAUNCH_DATAGEN}" == "true" ]
+then
 # Launch playbook to install the service on edge host using CM apis and launch any required command
 echo "################### Launch of Datagen ###################"
 if [ "${DEBUG}" = "true" ]
@@ -263,6 +287,7 @@ else
   echo " FAILURE: Could not launch Datagen " 
   echo " See details in file: ${LOG_DIR}/launch_datagen.log "
   exit 1
+fi
 fi
 
 
