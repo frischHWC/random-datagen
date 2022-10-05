@@ -177,6 +177,7 @@
     validate_certs: no
     body_format: json
   register: zk_full_config
+  when: solr_exists
 
 - name: Get ZK Server full config
   uri:
@@ -190,6 +191,7 @@
     validate_certs: no
     body_format: json
   register: zk_server_full_config
+  when: solr_exists
 
 - name: Get ZK roles repartition
   uri:
@@ -203,6 +205,7 @@
     validate_certs: no
     body_format: json
   register: zk_roles
+  when: solr_exists
 
 
 ### SET ZK CONFIGS ###
@@ -213,17 +216,18 @@
     zk_port: "{{ zk_server_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'clientPort'].value | [0]"
+  when: solr_exists
 
 - set_fact:
     zk_port: "{{ zk_server_full_config.json | community.general.json_query(query) }}"
   vars:
     query: "items[?name == 'clientPort'].default | [0]"
-  when: zk_port == ""
+  when: solr_exists and zk_port == ""
 
 - name: DEBUG - zk_port
   debug:
     msg: "{{ zk_port }}"
-  when: debug | default(false)
+  when: solr_exists and debug | default(false)
 
 
 # Set ZK Quorum
@@ -232,19 +236,21 @@
     zk_hosts: "{{ zk_roles.json | community.general.json_query(query) }}"
   vars:
     query: "items[?type == 'SERVER'].hostRef.hostname"
+  when: solr_exists
 
 - name: DEBUG - zk_hosts
   debug:
     msg: "{{ zk_hosts }}"
-  when: debug | default(false)
+  when: solr_exists and debug | default(false)
 
 - set_fact:
     solr_zk_quorum: "{% for host in zk_hosts %}{{ host }}:{{ zk_port }}{% if not loop.last %},{% endif %}{% endfor %}"
+  when: solr_exists
 
 - name: DEBUG - solr_zk_quorum
   debug:
     msg: "{{ solr_zk_quorum }}"
-  when: debug | default(false)
+  when: solr_exists and debug | default(false)
 
 
 # Kerberos
