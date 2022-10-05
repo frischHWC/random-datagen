@@ -189,6 +189,11 @@ done
 HOSTS_TEMP=$(mktemp)
 EXTRA_VARS_TEMP=$(mktemp)
 
+if [ "${EDGE_HOST}" = "" ]
+then
+  export EDG_HOST=${CM_HOST}
+fi
+
 mkdir -p ${LOG_DIR}
 
 echo "
