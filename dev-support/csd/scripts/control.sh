@@ -19,7 +19,15 @@ case $CMD in
       TRUSTSTORE_CONFIG="${TRUSTSTORE_CONFIG} -Djavax.net.ssl.trustStorePassword=${TRUSTSTORE_PASSWORD} "
     fi
 
-    exec ${JAVA_HOME}/bin/java -Dnashorn.args=--no-deprecation-warning --add-opens java.base/jdk.internal.ref=ALL-UNNAMED ${TRUSTSTORE_CONFIG} -Dspring.profiles.active=cdp -Dserver.port=${SERVER_PORT} \
+    JAVA_HOME_FOR_DATAGEN=""
+    if [ -n "${JAVA_HOME_CUSTOM}" ]
+    then
+      JAVA_HOME_FOR_DATAGEN=${JAVA_HOME_CUSTOM}
+    else
+      JAVA_HOME_FOR_DATAGEN=${JAVA_HOME}
+    fi
+
+    exec ${JAVA_HOME_FOR_DATAGEN}/bin/java -Dnashorn.args=--no-deprecation-warning --add-opens java.base/jdk.internal.ref=ALL-UNNAMED ${TRUSTSTORE_CONFIG} -Dspring.profiles.active=cdp -Dserver.port=${SERVER_PORT} \
      -jar -Xmx${MAX_HEAP_SIZE}G ${DATAGEN_JAR_PATH} --spring.config.location=file:${CONF_DIR}/service.properties
     ;;
 

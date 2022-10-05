@@ -199,7 +199,8 @@
           "TRUSTSTORE_PASSWORD": "${ssl_client_truststore_password}",
           "KEYSTORE_PASSWORD": "${ssl_server_keystore_password}",
           "KEYSTORE_KEYPASSWORD": "${ssl_server_keystore_keypassword}",
-          "ADMIN_PASSWORD": "${admin_password}"
+          "ADMIN_PASSWORD": "${admin_password}",
+          "JAVA_HOME_CUSTOM": "${java_home_custom}"
         }
       },
       "configWriter": {
@@ -614,6 +615,14 @@
           "configurableInWizard": true,
           "default": "admin",
           "type": "password"
+        },
+        {
+          "name": "java_home_custom",
+          "label": "Custom JAVA_HOME",
+          "description": "The JAVA_HOME path to use for Datagen Web Server. (By default, it is using the one provided by CM)",
+          "required": false,
+          "default": "",
+          "type": "string"
         },
 
 
