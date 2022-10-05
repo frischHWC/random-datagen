@@ -13,6 +13,7 @@ export EDGE_HOST=""
 # Auth to use to connect to cluster machines (if auth is required, otherwise let it empty)
 export SSH_KEY=""
 export SSH_PASSWORD=""
+export SSH_USER="root"
 
 # Cloudera Manager related
 export CM_HOST=""
@@ -63,6 +64,7 @@ function usage()
     echo ""
     echo "  --cluster-name=$CLUSTER_NAME The name of the cluster to interact with (Default) "
     echo "  --edge-host=$EDGE_HOST : To create data generation from this node and install the service on it (Default) "
+    echo "  --ssh-user=$SSH_USER : To connect to clusters' host (Default) $SSH_USER"
     echo "  --ssh-key=$SSH_KEY : To connect to clusters' host or provide a password (Default) "
     echo "  --ssh-password=$SSH_PASSWORD : To connect to clusters' host or provide a ssh-key (Default) "
     echo ""
@@ -109,6 +111,9 @@ while [ "$1" != "" ]; do
             ;;
         --edge-host)
             EDGE_HOST=$VALUE
+            ;;
+        --ssh-user)
+            SSH_USER=$VALUE
             ;;
         --ssh-key)
             SSH_KEY=$VALUE
@@ -195,7 +200,7 @@ ${EDGE_HOST}
 
 [all:vars]
 ansible_connection=ssh
-ansible_user=root
+ansible_user=${SSH_USER}
 " >> ${HOSTS_TEMP}
 
 if [ "${SSH_KEY}" != "" ]
