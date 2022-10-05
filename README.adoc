@@ -1,3 +1,7 @@
+OLD REPO -> Moved to https://github.com/frischHWC/datagen 
+
+
+
 = Random - Data Generation
 
 Goal of this project is to generate Random data in order to insert them into different services of CDP platform.
